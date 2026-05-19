@@ -1,0 +1,115 @@
+
+:root {
+--bg-dark: #070a13;
+--bg-card: #111827;
+--primary-yellow: #FFB300;
+--accent-yellow-light: #FFD54F;
+}
+
+body {
+font-family: 'Inter', sans-serif;
+background-color: var(--bg-dark);
+color: #ffffff;
+height: 100vh;
+margin: 0;
+overflow: hidden;
+}
+
+p, label, span, a {
+color: #ffffff !important;
+}
+
+.text-muted {
+color: #ffffff !important;
+opacity: 0.7;
+}
+
+.text-gradient-yellow {
+background: linear-gradient(90deg, var(--primary-yellow), var(--accent-yellow-light));
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+}
+
+.login-container {
+display: flex;
+height: 100vh;
+}
+
+.login-sidebar {
+    flex: 1;
+
+    /* Imagen */
+    background-image:
+        linear-gradient(
+            135deg,
+            rgba(7, 10, 19, 0.88),
+            rgba(15, 23, 42, 0.85)
+        ),
+        url('https://img.freepik.com/foto-gratis/escena-fotorrealista-granja-avicola-pollos_23-2151500801.jpg');
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding: 80px;
+    border-right: 1px solid rgba(255, 179, 0, 0.25);
+}
+
+
+/* Formulario */
+.login-form-section {
+width: 450px;
+background-color: var(--bg-dark);
+display: flex;
+flex-direction: column;
+justify-content: center;
+padding: 60px;
+}
+
+.form-control {
+background-color: #1a2236 !important;
+border: 1px solid rgba(255, 255, 255, 0.12) !important;
+color: #ffffff !important;
+padding: 12px 15px;
+border-radius: 10px;
+}
+
+.form-control:focus {
+border-color: var(--primary-yellow) !important;
+box-shadow: 0 0 0 4px rgba(255, 179, 0, 0.15);
+}
+
+.btn-primary-custom {
+background: linear-gradient(135deg, var(--primary-yellow), var(--accent-yellow-light));
+color: #000000 !important;
+border: none;
+padding: 14px;
+border-radius: 10px;
+font-weight: 800;
+width: 100%;
+margin-top: 20px;
+transition: all 0.3s ease;
+}
+
+.btn-primary-custom:hover {
+transform: translateY(-2px);
+box-shadow: 0 8px 20px rgba(255, 179, 0, 0.35);
+}
+
+@media (max-width: 992px) {
+.login-sidebar {
+display: none;
+}
+
+
+.login-form-section {
+    width: 100%;
+    padding: 40px;
+}
+
+
+}

@@ -1,0 +1,17 @@
+{
+  "name": "tizzila-whatsapp-service",
+  "version": "1.0.0",
+  "description": "WhatsApp gateway for Tizzila App using Baileys",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.16",
+    "express": "^4.19.2",
+    "pino": "^9.3.2",
+    "qrcode": "^1.5.4"
+  }
+}

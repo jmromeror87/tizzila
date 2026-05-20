@@ -62,7 +62,7 @@ class Customer extends Model
     }
     public function paymentTerm()
 {
-    return $this->belongsTo(\App\Models\global\PaymentTerm::class);
+    return $this->belongsTo(\App\Models\Global\PaymentTerm::class);
 }
 public function invoices()
 {

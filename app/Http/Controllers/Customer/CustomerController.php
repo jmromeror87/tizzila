@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Http;
-use App\Models\global\PaymentTerm;
+use App\Models\Global\PaymentTerm;
 
 class CustomerController extends Controller
 {

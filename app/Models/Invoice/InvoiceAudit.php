@@ -14,7 +14,7 @@ namespace App\Models\Invoice;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Models\global\Company;
+use App\Models\Global\Company;
 use App\Models\User;
 
 class InvoiceAudit extends Model

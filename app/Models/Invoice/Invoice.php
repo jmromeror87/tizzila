@@ -14,15 +14,15 @@ namespace App\Models\Invoice;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Models\global\Company;
+use App\Models\Global\Company;
 use App\Models\Customer\Customer;
 use App\Models\Poultry\PoultryDispatch;
 use App\Models\Poultry\PoultryOrderSchedule;
 use App\Models\Invoice\InvoiceItem;
 use App\Models\Invoice\InvoicePayment;
 use App\Models\Invoice\InvoiceAudit;
-use App\Models\global\CompanyTaxProfile;
-use App\Models\global\PaymentTerm;
+use App\Models\Global\CompanyTaxProfile;
+use App\Models\Global\PaymentTerm;
 
 class Invoice extends Model
 {

@@ -12,7 +12,7 @@
 
 namespace App\Services\Invoice;
 
-use App\Models\global\CompanyTaxProfile;
+use App\Models\Global\CompanyTaxProfile;
 use Illuminate\Support\Facades\DB;
 use Exception;
 

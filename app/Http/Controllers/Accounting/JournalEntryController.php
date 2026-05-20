@@ -53,7 +53,7 @@ public function index(Request $request)
         });
     }
 
-    $entries = $query->paginate(20);
+    $entries = $query->paginate(5);
 
     // ✅ KPI corregido — suma desde líneas, no desde journal_entries
     $todayTotal = \App\Models\Accounting\JournalEntryLine::whereHas('journalEntry', function ($q) {

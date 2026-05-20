@@ -112,8 +112,7 @@
                             <input type="file"
                                    name="evidences[]"
                                    multiple
-                                   accept="image/*"
-                                   capture="environment"
+                                   accept="image/*,image/heic,image/heif"
                                    class="block w-full text-xs text-zinc-500
                                           file:mr-4 file:py-2 file:px-4
                                           file:rounded-full file:border-0
@@ -160,7 +159,6 @@
 
                     <button type="submit"
                             id="submit-btn"
-                            onclick="prepareSignature()"
                             class="w-full mt-4 bg-yellow-500 hover:bg-yellow-400 active:scale-[0.98] text-black font-black uppercase py-5 rounded-2xl shadow-lg shadow-yellow-500/10 transition-all flex items-center justify-center gap-2 group">
                         <span>Confirmar Entrega</span>
                         <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -226,15 +224,17 @@
         window.addEventListener("resize", resizeCanvas);
         resizeCanvas();
 
-        function prepareSignature() {
-            if (!signaturePad.isEmpty()) {
-                document.getElementById('signature-input').value = signaturePad.toDataURL('image/png');
-            }
-        }
-
         function clearSignature() {
             signaturePad.clear();
         }
+
+        document.getElementById('confirm-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!signaturePad.isEmpty()) {
+                document.getElementById('signature-input').value = signaturePad.toDataURL('image/png');
+            }
+            this.submit();
+        });
 
         // Geolocalización
         if (navigator.geolocation) {

@@ -96,8 +96,9 @@ class WhatsAppService
 
     public function sendDeliveryLink(string $phone, string $clientName, string $publicUrl): bool
     {
+        $empresa = config('app.name');
         $message =
-            "*Tizzila App*\n\n" .
+            "*{$empresa}*\n\n" .
             "Hola *{$clientName}* 🐣\n\n" .
             "Su pedido de pollitos está en camino.\n" .
             "Por favor valide la entrega aquí:\n\n" .
@@ -108,8 +109,9 @@ class WhatsAppService
 
     public function sendDriverRouteLink(string $phone, string $driverName, string $routeId, ?int $totalBirds, int $stops, string $routeUrl): bool
     {
+        $empresa = config('app.name');
         $message =
-            "*Tizzila App*\n\n" .
+            "*{$empresa}*\n\n" .
             "🚚 Hola *{$driverName}*, tienes una ruta asignada.\n\n" .
             "Ruta: *#{$routeId}*\n" .
             "Pollitos: *" . ($totalBirds ?? 0) . "*\n" .

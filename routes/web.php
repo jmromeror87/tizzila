@@ -46,7 +46,7 @@ use App\Http\Controllers\Customer\CustomerDeliveryController;
 use App\Http\Controllers\Poultry\PoultryTypeController;
 use App\Http\Controllers\Driver\DriverRouteController;
 use App\Http\Controllers\Poultry\PoultryProviderDocumentBatchController;
-use App\Http\Controllers\global\TaxCategoryController;
+use App\Http\Controllers\Global\TaxCategoryController;
 use App\Http\Controllers\Invoice\InvoiceController;
 use App\Http\Controllers\Invoice\InvoicePaymentController;
 

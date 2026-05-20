@@ -252,8 +252,8 @@ $marginNetPct = $salesThisMonth > 0
         */
         $topBirdTypes = PoultryOrderSchedule::whereBetween('dispatch_date', [$startOfMonth, $endOfMonth])
             ->where('status', '!=', 'cancelled')
-            ->select('poultry_type_id', DB::raw('SUM(quantity) as total_qty'), DB::raw('COUNT(*) as order_count'))
-            ->groupBy('poultry_type_id')
+            ->select('poultry_type', DB::raw('SUM(quantity) as total_qty'), DB::raw('COUNT(*) as order_count'))
+            ->groupBy('poultry_type')
             ->orderByDesc('total_qty')
             ->limit(5)
             ->with('poultryType:id,name')

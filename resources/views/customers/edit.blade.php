@@ -52,7 +52,7 @@
             </div>
         @endif
 
-        <form action="{{ route('customers.update', $customer) }}" method="POST">
+        <form id="edit-form" action="{{ route('customers.update', $customer) }}" method="POST">
             @csrf @method('PUT')
 
             <div class="space-y-5">
@@ -211,7 +211,7 @@
                            class="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition-colors">
                             Cancelar
                         </a>
-                        <button type="submit"
+                        <button type="submit" form="edit-form"
                             class="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shadow-[0_8px_20px_rgba(234,179,8,0.2)]">
                             <i class="fas fa-save"></i> Guardar Cambios
                         </button>

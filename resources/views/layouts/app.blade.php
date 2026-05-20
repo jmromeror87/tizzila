@@ -91,8 +91,8 @@
                 </div>
             </main>
 
-            <footer class="border-t border-white/5 py-6 text-center text-[9px] text-gray-600 uppercase tracking-[0.3em]">
-                © {{ date('Y') }} Tizzila App · Orquestación Avícola Inteligente
+            <footer class="border-t border-white/5 py-6 text-center text-[9px] uppercase tracking-[0.3em]">
+                <span class="text-yellow-500 font-black">© {{ date('Y') }} Tizzila App · Orquestación Avícola Inteligente · Ing. Jhoan Romero</span>
             </footer>
         </div>
 

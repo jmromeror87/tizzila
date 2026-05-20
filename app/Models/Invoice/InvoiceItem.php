@@ -14,7 +14,7 @@ namespace App\Models\Invoice;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Models\poultry\PoultryDispatchItem;
+use App\Models\Poultry\PoultryDispatchItem;
 use App\Models\Invoice\TaxCategory;
 
 class InvoiceItem extends Model

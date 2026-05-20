@@ -14,7 +14,7 @@ namespace App\Models\Dispatch;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Driver\PoultryDriver;
-use App\Models\poultry\PoultryDispatch;
+use App\Models\Poultry\PoultryDispatch;
 
 class PoultryDispatchRoute extends Model
 {

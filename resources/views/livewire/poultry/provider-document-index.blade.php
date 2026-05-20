@@ -73,7 +73,7 @@
             </button>
             <div class="text-center min-w-[110px]">
                 <p class="text-xs font-black text-white uppercase">
-                    {{ \Carbon\Carbon::create($year, $month)->translatedFormat('F') }}
+                    {{ ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'][$month - 1] }}
                 </p>
                 <p class="text-[9px] font-black text-yellow-500/50">{{ $year }}</p>
             </div>

@@ -41,7 +41,7 @@
             <p class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1">Total Pedidos</p>
             <p class="text-2xl font-black text-white">{{ $totalOrders }}</p>
             <p class="text-[9px] text-zinc-600 mt-1 font-bold uppercase">
-                {{ \Carbon\Carbon::create(null, $month)->translatedFormat('F') }} {{ $year }}
+                {{ ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'][$month - 1] }} {{ $year }}
             </p>
         </div>
         <div class="bg-[#0d121f] border border-white/5 rounded-2xl p-4">
@@ -95,8 +95,11 @@
         <div class="flex items-center gap-2 shrink-0">
             <select wire:model.live="month"
                 class="bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-[10px] font-black text-white uppercase outline-none focus:border-yellow-500/50">
+                @php
+                    $meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+                @endphp
                 @foreach(range(1, 12) as $m)
-                    <option value="{{ $m }}">{{ \Carbon\Carbon::create(null, $m)->translatedFormat('F') }}</option>
+                    <option value="{{ $m }}">{{ $meses[$m - 1] }}</option>
                 @endforeach
             </select>
             <select wire:model.live="year"

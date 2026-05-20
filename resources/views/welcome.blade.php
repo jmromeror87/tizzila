@@ -70,11 +70,18 @@
         .nav-links a:hover { color: #fff; background: rgba(255,255,255,0.05); }
         .btn-login {
             height: 36px; padding: 0 20px;
-            background: var(--yellow); color: #000;
+            background: var(--yellow); color: #000 !important;
             font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em;
             border-radius: 10px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
         }
-        .btn-login:hover { background: var(--yellow-hover); color: #000; }
+        .btn-login i { color: #000 !important; }
+        .btn-login:hover { background: var(--yellow-hover); color: #000 !important; }
+
+        /* ── NAV MOBILE ── */
+        @media (max-width: 600px) {
+            .nav-links a:not(.btn-login) { display: none; }
+            .btn-login { padding: 0 16px; font-size: 10px; }
+        }
 
         /* ── HERO ── */
         .hero {

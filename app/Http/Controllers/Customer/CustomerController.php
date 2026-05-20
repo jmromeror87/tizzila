@@ -289,11 +289,18 @@ public function create()
     */
     public function destroy(Customer $customer)
     {
-        $customer->delete();
+        try {
+            $customer->delete();
 
-        return redirect()
-            ->route('customers.index')
-            ->with('warning', 'Cliente eliminado del sistema.');
+            return redirect()
+                ->route('customers.index')
+                ->with('success', 'Cliente eliminado del sistema.');
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            return redirect()
+                ->route('customers.index')
+                ->with('error', 'No se puede eliminar el cliente "' . $customer->name . '" porque tiene facturas, despachos o pagos asociados. Desactívelo en lugar de eliminarlo.');
+        }
     }
 
     /*

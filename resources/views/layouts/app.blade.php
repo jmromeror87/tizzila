@@ -54,6 +54,37 @@
 
             <main class="flex-1 p-4 sm:p-6 lg:p-10 bg-[#070a13]">
                 <div class="max-w-7xl mx-auto">
+                    {{-- Flash messages globales --}}
+                    @if(session('error'))
+                        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 6000)"
+                             class="mb-4 bg-red-500/10 border border-red-500/20 text-red-400 px-5 py-3 rounded-2xl flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-exclamation-circle text-sm"></i>
+                                <span class="text-xs font-bold">{{ session('error') }}</span>
+                            </div>
+                            <button @click="show = false"><i class="fas fa-times text-[10px]"></i></button>
+                        </div>
+                    @endif
+                    @if(session('warning'))
+                        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)"
+                             class="mb-4 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 px-5 py-3 rounded-2xl flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-exclamation-triangle text-sm"></i>
+                                <span class="text-xs font-bold">{{ session('warning') }}</span>
+                            </div>
+                            <button @click="show = false"><i class="fas fa-times text-[10px]"></i></button>
+                        </div>
+                    @endif
+                    @if(session('success'))
+                        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)"
+                             class="mb-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-5 py-3 rounded-2xl flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-check-circle text-sm"></i>
+                                <span class="text-xs font-bold">{{ session('success') }}</span>
+                            </div>
+                            <button @click="show = false"><i class="fas fa-times text-[10px]"></i></button>
+                        </div>
+                    @endif
                     <div class="animate-fade-in">
                         {{ $slot }}
                     </div>

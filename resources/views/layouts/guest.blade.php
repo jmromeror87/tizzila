@@ -16,6 +16,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'Tizzila') }} - Acceso</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
         <!-- Fonts: Usamos Inter para mantener la consistencia con el App Layout -->
         <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -224,7 +224,6 @@ class PoultryOrderSchedule2026Seeder extends Seeder
     {
         return [
             'provider_id'      => $providerId,
-            'poultry_type_id'  => $typeId,
             'poultry_type'     => $typeEnum,
             'quantity'         => $qty,
             'dispatch_date'    => $dispatch->toDateString(),

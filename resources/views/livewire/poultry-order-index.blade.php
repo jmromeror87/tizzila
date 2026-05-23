@@ -249,12 +249,24 @@
                                         <i class="fas fa-exchange-alt"></i>
                                     </a>
 
-                                    {{-- Crear/ver despacho (solo si aprobado y programado) --}}
+                                    {{-- Factura de Compra PRONAVICOLA --}}
                                     @if($isApproved && $isProgrammed)
+                                    @php $hasPurchaseInvoice = (bool)($order->purchaseInvoice ?? false); @endphp
+                                    <a href="{{ $hasPurchaseInvoice
+                                                ? route('poultry.purchase-invoices.show', $order->purchaseInvoice->id)
+                                                : route('poultry.purchase-invoices.create', $order) }}"
+                                       title="{{ $hasPurchaseInvoice ? 'Ver factura de compra' : 'Registrar factura de compra' }}"
+                                       class="h-8 w-8 rounded-xl {{ $hasPurchaseInvoice ? 'bg-purple-500/10 border-purple-500/20 hover:bg-purple-500/20 text-purple-400' : 'bg-orange-500/10 border-orange-500/20 hover:bg-orange-500/20 text-orange-400' }} border flex items-center justify-center transition-all text-[10px]">
+                                        <i class="fas fa-file-invoice-dollar"></i>
+                                    </a>
+                                    @endif
+
+                                    {{-- Crear/ver despacho (solo si tiene factura de compra) --}}
+                                    @if($isApproved && $isProgrammed && isset($order->purchaseInvoice) && $order->purchaseInvoice)
                                     <a href="{{ $hasDispatch
                                                 ? route('poultry.dispatches.show', $order->dispatch->id)
                                                 : route('poultry.dispatches.create', $order) }}"
-                                       title="{{ $hasDispatch ? 'Ver manifiesto' : 'Crear despacho' }}"
+                                       title="{{ $hasDispatch ? 'Ver manifiesto' : 'Crear distribución' }}"
                                        class="h-8 w-8 rounded-xl {{ $hasDispatch ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20 text-emerald-400' : 'bg-yellow-500/10 border-yellow-500/20 hover:bg-yellow-500/20 text-yellow-400' }} border flex items-center justify-center transition-all text-[10px]">
                                         <i class="fas {{ $hasDispatch ? 'fa-file-invoice' : 'fa-truck' }}"></i>
                                     </a>

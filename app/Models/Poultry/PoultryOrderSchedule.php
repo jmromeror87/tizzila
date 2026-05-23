@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Validation\ValidationException;
 use App\Models\Poultry\PoultryOrderDocument;
+use App\Models\Poultry\PurchaseInvoice;
 use App\Models\Customer\Customer;
 
 class PoultryOrderSchedule extends Model
@@ -89,6 +90,11 @@ class PoultryOrderSchedule extends Model
     public function dispatches()
     {
         return $this->hasMany(PoultryDispatch::class);
+    }
+
+    public function purchaseInvoice()
+    {
+        return $this->hasOne(PurchaseInvoice::class);
     }
 
     public function documents()

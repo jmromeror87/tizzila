@@ -22,6 +22,7 @@ class PoultryDispatch extends Model
 
    protected $fillable = [
         'poultry_order_schedule_id',
+        'purchase_invoice_id',
         'dispatch_date',
         'dispatch_time',
         'status',
@@ -35,10 +36,14 @@ class PoultryDispatch extends Model
         'finished_at'   => 'datetime',
     ];
 
-    // 🔗 Pedido origen
     public function order()
     {
         return $this->belongsTo(PoultryOrderSchedule::class, 'poultry_order_schedule_id');
+    }
+
+    public function purchaseInvoice()
+    {
+        return $this->belongsTo(PurchaseInvoice::class);
     }
     public function route()
 {

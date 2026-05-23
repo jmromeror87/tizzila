@@ -119,7 +119,8 @@ class PoultryOrderIndex extends Component // ✅ Corregido: "extends"
         $query = PoultryOrderSchedule::with([
                 'provider',
                 'documents',
-                'approval.batches'
+                'approval.batches',
+                'purchaseInvoice',
             ])
             ->whereMonth('dispatch_date', $this->month)
             ->whereYear('dispatch_date', $this->year);

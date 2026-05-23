@@ -209,7 +209,7 @@
 
     <script>
         const dispatchDate  = "{{ $route->dispatch_date->toDateString() }}";
-        mapboxgl.accessToken = '{{ config("services.mapbox.token") }}';
+        mapboxgl.accessToken = '{{ $mapboxToken }}';
         const stops         = @json($mapStops);
         const origin        = "{{ $route->origin_address }}";
         const departureTime = "{{ $route->departure_time }}";

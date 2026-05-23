@@ -165,6 +165,37 @@
                             <p class="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Plazo acordado</p>
                             <p class="text-xs font-black text-white">{{ $customer->paymentTerm?->name ?? '—' }}</p>
                         </div>
+                        @if($customer->credit_limit > 0)
+                        @php
+                            $cupo = $customer->credit_limit;
+                            $usado = $totalBalance; // saldo pendiente
+                            $pct = $cupo > 0 ? min(100, round(($usado / $cupo) * 100)) : 0;
+                            $color = $pct >= 90 ? 'bg-red-500' : ($pct >= 60 ? 'bg-yellow-500' : 'bg-emerald-500');
+                            $textColor = $pct >= 90 ? 'text-red-400' : ($pct >= 60 ? 'text-yellow-400' : 'text-emerald-400');
+                        @endphp
+                        <div class="py-2 border-b border-white/5 space-y-1.5">
+                            <div class="flex justify-between items-center">
+                                <p class="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Cupo de crédito</p>
+                                <p class="text-xs font-black text-yellow-400">${{ number_format($cupo, 0, ',', '.') }}</p>
+                            </div>
+                            <div class="flex justify-between items-center text-[9px] font-black">
+                                <span class="text-zinc-500">Usado: <span class="{{ $textColor }}">${{ number_format($usado, 0, ',', '.') }}</span></span>
+                                <span class="{{ $textColor }}">{{ $pct }}%</span>
+                            </div>
+                            <div class="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
+                                <div class="{{ $color }} h-1.5 rounded-full transition-all duration-500" style="width: {{ $pct }}%"></div>
+                            </div>
+                            <div class="flex justify-between text-[8px] text-zinc-600 font-black">
+                                <span>Disponible: ${{ number_format(max(0, $cupo - $usado), 0, ',', '.') }}</span>
+                                <span class="{{ $pct >= 90 ? 'text-red-400' : '' }}">{{ $pct >= 90 ? '⚠ CUPO AGOTADO' : ($pct >= 60 ? 'CUPO ALTO' : 'CUPO OK') }}</span>
+                            </div>
+                        </div>
+                        @else
+                        <div class="flex justify-between items-center py-2 border-b border-white/5">
+                            <p class="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Cupo de crédito</p>
+                            <p class="text-[9px] font-black text-zinc-500">Sin cupo asignado</p>
+                        </div>
+                        @endif
                         <div class="flex justify-between items-center py-2 border-b border-white/5">
                             <p class="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Coordenadas</p>
                             <p class="text-[9px] font-mono text-zinc-500">{{ $customer->latitude }}, {{ $customer->longitude }}</p>

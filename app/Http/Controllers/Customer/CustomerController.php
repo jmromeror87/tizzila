@@ -98,8 +98,11 @@ public function create()
                 'postal_code' => 'nullable|string|max:10',
               
                 'payment_term_id' => 'required|exists:payment_terms,id',
+                'credit_limit'    => 'nullable|numeric|min:0',
             ]
         );
+
+        $validated['credit_limit'] = $request->input('credit_limit', 0) ?? 0;
 
         /*
         |--------------------------------------------------------------------------
@@ -246,7 +249,10 @@ public function create()
         'municipality_id' => 'required|string|max:10',
         'address'         => 'required|string|max:255',
         'payment_term_id' => 'required|exists:payment_terms,id',
+        'credit_limit'    => 'nullable|numeric|min:0',
     ]);
+
+    $validated['credit_limit'] = $request->input('credit_limit', 0) ?? 0;
 
     /*
     |--------------------------------------------------------------------------
@@ -289,18 +295,13 @@ public function create()
     */
     public function destroy(Customer $customer)
     {
-        try {
-            $customer->delete();
+        $customer->update(['is_active' => !$customer->is_active]);
 
-            return redirect()
-                ->route('customers.index')
-                ->with('success', 'Cliente eliminado del sistema.');
+        $estado = $customer->is_active ? 'activado' : 'desactivado';
 
-        } catch (\Illuminate\Database\QueryException $e) {
-            return redirect()
-                ->route('customers.index')
-                ->with('error', 'No se puede eliminar el cliente "' . $customer->name . '" porque tiene facturas, despachos o pagos asociados. Desactívelo en lugar de eliminarlo.');
-        }
+        return redirect()
+            ->route('customers.index')
+            ->with('success', "Cliente {$customer->name} {$estado} correctamente.");
     }
 
     /*

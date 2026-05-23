@@ -185,18 +185,30 @@
                         <h3 class="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">Política Financiera</h3>
                     </div>
                     <div class="p-6">
-                        <div class="max-w-sm">
-                            <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Término de Pago <span class="text-red-400">*</span></label>
-                            <select name="payment_term_id" required
-                                class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm text-white outline-none focus:border-yellow-500/50">
-                                <option value="">— Seleccionar condición —</option>
-                                @foreach($paymentTerms as $term)
-                                    <option value="{{ $term->id }}" {{ old('payment_term_id') == $term->id ? 'selected' : '' }}>
-                                        {{ $term->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <p class="text-[9px] text-zinc-600 mt-2">Se aplica al generar facturas y calcular fechas de vencimiento.</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
+                            <div>
+                                <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Término de Pago <span class="text-red-400">*</span></label>
+                                <select name="payment_term_id" required
+                                    class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm text-white outline-none focus:border-yellow-500/50">
+                                    <option value="">— Seleccionar condición —</option>
+                                    @foreach($paymentTerms as $term)
+                                        <option value="{{ $term->id }}" {{ old('payment_term_id') == $term->id ? 'selected' : '' }}>
+                                            {{ $term->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <p class="text-[9px] text-zinc-600 mt-2">Se aplica al generar facturas y calcular fechas de vencimiento.</p>
+                            </div>
+                            <div>
+                                <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Cupo de Crédito <span class="text-zinc-600">(opcional)</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm font-black">$</span>
+                                    <input type="number" name="credit_limit" min="0" step="1000"
+                                        value="{{ old('credit_limit', 0) }}"
+                                        class="w-full pl-8 pr-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm text-white outline-none focus:border-yellow-500/50">
+                                </div>
+                                <p class="text-[9px] text-zinc-600 mt-1">0 = sin cupo asignado (contado)</p>
+                            </div>
                         </div>
                     </div>
                 </div>

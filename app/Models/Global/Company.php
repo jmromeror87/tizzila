@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Storage;
 
 class Company extends Model
 {
@@ -30,6 +31,12 @@ class Company extends Model
         'logo_path',
         'is_active',
     ];
+
+    public function getLogoUrlAttribute(): ?string
+    {
+        if (!$this->logo_path) return null;
+        return Storage::disk('public')->url($this->logo_path);
+    }
 
     public function documentType(): BelongsTo
     {

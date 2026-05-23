@@ -83,8 +83,9 @@ class DispatchRouteController extends Controller
             ->values();
 
         return view('dispatch.routes.show', [
-            'route'    => $route,
-            'mapStops' => $mapStops,
+            'route'       => $route,
+            'mapStops'    => $mapStops,
+            'mapboxToken' => config('services.mapbox.token'),
         ]);
     }
 

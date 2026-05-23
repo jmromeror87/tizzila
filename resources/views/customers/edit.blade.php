@@ -180,38 +180,47 @@
                         <h3 class="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">Política Financiera</h3>
                     </div>
                     <div class="p-6">
-                        <div class="max-w-sm">
-                            <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Término de Pago <span class="text-red-400">*</span></label>
-                            <select name="payment_term_id" required
-                                class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm text-white outline-none focus:border-yellow-500/50">
-                                @foreach($paymentTerms as $term)
-                                    <option value="{{ $term->id }}"
-                                        @selected(old('payment_term_id', $customer->payment_term_id) == $term->id)>
-                                        {{ $term->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
+                            <div>
+                                <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Término de Pago <span class="text-red-400">*</span></label>
+                                <select name="payment_term_id" required
+                                    class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm text-white outline-none focus:border-yellow-500/50">
+                                    @foreach($paymentTerms as $term)
+                                        <option value="{{ $term->id }}"
+                                            @selected(old('payment_term_id', $customer->payment_term_id) == $term->id)>
+                                            {{ $term->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Cupo de Crédito <span class="text-zinc-600">(opcional)</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm font-black">$</span>
+                                    <input type="number" name="credit_limit" min="0" step="1000"
+                                        value="{{ old('credit_limit', $customer->credit_limit ?? 0) }}"
+                                        class="w-full pl-8 pr-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm text-white outline-none focus:border-yellow-500/50">
+                                </div>
+                                <p class="text-[9px] text-zinc-600 mt-1">0 = sin cupo asignado (contado)</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 {{-- ACCIONES --}}
                 <div class="flex items-center justify-between pt-2">
-                    <form method="POST" action="{{ route('customers.destroy', $customer) }}"
-                          onsubmit="return confirm('¿Eliminar definitivamente a {{ $customer->name }}? Esta acción no se puede deshacer.')">
-                        @csrf @method('DELETE')
-                        <button type="submit"
+                    <button type="button"
+                            onclick="if(confirm('¿Desactivar a {{ $customer->name }}?')) document.getElementById('delete-form').submit()"
                             class="text-[9px] font-black uppercase tracking-widest text-red-400/50 hover:text-red-400 transition-colors flex items-center gap-2">
-                            <i class="fas fa-trash text-[9px]"></i> Eliminar Cliente
-                        </button>
-                    </form>
+                        <i class="fas fa-ban text-[9px]"></i> Desactivar Cliente
+                    </button>
 
                     <div class="flex items-center gap-4">
                         <a href="{{ route('customers.show', $customer) }}"
                            class="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition-colors">
                             Cancelar
                         </a>
-                        <button type="submit" form="edit-form"
+                        <button type="submit"
                             class="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shadow-[0_8px_20px_rgba(234,179,8,0.2)]">
                             <i class="fas fa-save"></i> Guardar Cambios
                         </button>
@@ -219,6 +228,11 @@
                 </div>
 
             </div>
+        </form>
+
+        {{-- Form de desactivar FUERA del form principal --}}
+        <form id="delete-form" method="POST" action="{{ route('customers.destroy', $customer) }}" class="hidden">
+            @csrf @method('DELETE')
         </form>
     </div>
 

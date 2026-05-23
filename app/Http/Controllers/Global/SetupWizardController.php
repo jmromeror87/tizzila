@@ -26,6 +26,7 @@ class SetupWizardController extends Controller
             'trade_name' => 'nullable|string|max:255',
             'email'      => 'required|email|max:255',
             'phone'      => 'nullable|string|max:20',
+            'logo'       => 'nullable|image|mimes:png,jpg,jpeg,svg,webp|max:2048',
         ]);
 
         $company = Company::first();
@@ -34,12 +35,19 @@ class SetupWizardController extends Controller
             abort(500, 'No existe empresa base para el setup.');
         }
 
-        $company->update([
+        $data = [
             'legal_name' => $request->legal_name,
             'trade_name' => $request->trade_name,
             'email'      => $request->email,
             'phone'      => $request->phone,
-        ]);
+        ];
+
+        if ($request->hasFile('logo')) {
+            $path = $request->file('logo')->store('logos', 'public');
+            $data['logo_path'] = $path;
+        }
+
+        $company->update($data);
 
         return redirect()->route('setup.address');
     }

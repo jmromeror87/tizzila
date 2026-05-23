@@ -67,6 +67,12 @@ class CitiesSeeder extends Seeder
             ['state' => 'SAN', 'name' => 'Bucaramanga', 'dane' => '68001'],
             ['state' => 'SAN', 'name' => 'Floridablanca', 'dane' => '68276'],
 
+            // Norte de Santander
+            ['state' => 'NSA', 'name' => 'Cúcuta',          'dane' => '54001'],
+            ['state' => 'NSA', 'name' => 'Ocaña',            'dane' => '54498'],
+            ['state' => 'NSA', 'name' => 'Pamplona',         'dane' => '54518'],
+            ['state' => 'NSA', 'name' => 'Villa del Rosario', 'dane' => '54874'],
+
             // Cundinamarca
             ['state' => 'CUN', 'name' => 'Soacha',    'dane' => '25754'],
             ['state' => 'CUN', 'name' => 'Chía',      'dane' => '25175'],

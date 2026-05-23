@@ -42,6 +42,7 @@ class Customer extends Model
         'phone',
         'is_active',
         'payment_term_id',
+        'credit_limit',
     ];
 
     /**

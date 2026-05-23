@@ -43,13 +43,13 @@ class Customer extends Model
         'is_active',
         'payment_term_id',
         'credit_limit',
+        'is_fixed_client',
+        'fixed_weekly_quantity',
     ];
 
-    /**
-     * Los atributos que deben ser convertidos a tipos nativos.
-     */
     protected $casts = [
         'is_active' => 'boolean',
+        'is_fixed_client' => 'boolean',
             'latitude' => 'decimal:8',
     'longitude' => 'decimal:8',
     ];

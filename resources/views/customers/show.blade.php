@@ -200,6 +200,30 @@
                             <p class="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Coordenadas</p>
                             <p class="text-[9px] font-mono text-zinc-500">{{ $customer->latitude }}, {{ $customer->longitude }}</p>
                         </div>
+                        <div class="flex justify-between items-center py-2 border-b border-white/5">
+                            <p class="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Tipo de cliente</p>
+                            @if($customer->is_fixed_client)
+                                <span class="text-[9px] font-black px-2 py-0.5 rounded-lg text-yellow-400 bg-yellow-500/10 border border-yellow-500/20 flex items-center gap-1">
+                                    <i class="fas fa-star text-[8px]"></i> FIJO · {{ number_format($customer->fixed_weekly_quantity, 0) }} aves/sem
+                                </span>
+                            @else
+                                <span class="text-[9px] font-black text-zinc-500">Variable</span>
+                            @endif
+                        </div>
+                        @php
+                            $hasOverdue = $overdueBalance > 0;
+                            $overLimit  = $customer->credit_limit > 0 && $totalBalance > $customer->credit_limit;
+                            $creditStatus = $hasOverdue ? 'blocked_overdue' : ($overLimit ? 'blocked_limit' : 'ok');
+                        @endphp
+                        @if($creditStatus !== 'ok')
+                        <div class="flex justify-between items-center py-2 border-b border-white/5">
+                            <p class="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Alerta crédito</p>
+                            <span class="text-[9px] font-black px-2 py-0.5 rounded-lg text-red-400 bg-red-500/10 border border-red-500/20 flex items-center gap-1">
+                                <i class="fas fa-ban text-[8px]"></i>
+                                {{ $creditStatus === 'blocked_overdue' ? 'DEUDA VENCIDA' : 'CUPO EXCEDIDO' }}
+                            </span>
+                        </div>
+                        @endif
                         <div class="flex justify-between items-center py-2">
                             <p class="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Estado</p>
                             <span class="text-[9px] font-black px-2 py-0.5 rounded-lg {{ $customer->is_active ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/20' : 'text-red-400 bg-red-500/10 border border-red-500/20' }}">

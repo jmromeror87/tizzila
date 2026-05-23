@@ -114,6 +114,25 @@ class PoultryDispatchController extends Controller
                 ->with('warning', 'Este pedido ya tiene un despacho generado.');
         }
 
+        // 🔒 BLOQUEO DURO DE CRÉDITO: validar cada cliente antes de proceder
+        $customerIds = collect($validated['items'])->pluck('customer_id')->unique();
+        $blockedCustomers = \App\Models\Customer\Customer::whereIn('id', $customerIds)
+            ->with(['invoices' => fn($q) => $q->where('balance', '>', 0)])
+            ->get()
+            ->filter(function ($customer) {
+                $totalBalance  = $customer->invoices->sum('balance');
+                $overdueBalance = $customer->invoices->where('payment_status', 'overdue')->sum('balance');
+                $overLimit     = $customer->credit_limit > 0 && $totalBalance > $customer->credit_limit;
+                return $overdueBalance > 0 || $overLimit;
+            });
+
+        if ($blockedCustomers->isNotEmpty()) {
+            $names = $blockedCustomers->map(fn($c) => $c->name)->implode(', ');
+            return back()->withErrors([
+                'credit_block' => "Despacho bloqueado. Los siguientes clientes tienen deuda vencida o cupo excedido: {$names}. Regulariza la cartera antes de despachar."
+            ]);
+        }
+
         // 3️⃣ Fecha (lunes o jueves)
         $dispatchDate = Carbon::parse($order->dispatch_date);
 

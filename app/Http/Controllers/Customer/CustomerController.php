@@ -171,6 +171,7 @@ public function create()
         $totalInvoices  = $customer->invoices->count();
         $paidCount      = $customer->invoices->where('balance', 0)->count();
         $overdueCount   = $customer->invoices->where('payment_status', 'overdue')->count();
+        $overdueBalance = $customer->invoices->where('payment_status', 'overdue')->sum('balance');
         $pendingCount   = $customer->invoices->whereIn('payment_status', ['pending','partial'])->count();
 
         $scorePct = $totalInvoiced > 0
@@ -187,7 +188,7 @@ public function create()
         return view('customers.show', compact(
             'customer',
             'totalInvoiced', 'totalPaid', 'totalBalance',
-            'totalInvoices', 'paidCount', 'overdueCount', 'pendingCount',
+            'totalInvoices', 'paidCount', 'overdueCount', 'overdueBalance', 'pendingCount',
             'scorePct', 'scoreLabel'
         ));
     }
@@ -248,11 +249,15 @@ public function create()
         'phone'           => 'nullable|string|max:50',
         'municipality_id' => 'required|string|max:10',
         'address'         => 'required|string|max:255',
-        'payment_term_id' => 'required|exists:payment_terms,id',
-        'credit_limit'    => 'nullable|numeric|min:0',
+        'payment_term_id'        => 'required|exists:payment_terms,id',
+        'credit_limit'           => 'nullable|numeric|min:0',
+        'is_fixed_client'        => 'nullable|boolean',
+        'fixed_weekly_quantity'  => 'nullable|integer|min:0',
     ]);
 
-    $validated['credit_limit'] = $request->input('credit_limit', 0) ?? 0;
+    $validated['credit_limit']          = $request->input('credit_limit', 0) ?? 0;
+    $validated['is_fixed_client']       = $request->boolean('is_fixed_client');
+    $validated['fixed_weekly_quantity'] = $request->input('fixed_weekly_quantity', 0) ?? 0;
 
     /*
     |--------------------------------------------------------------------------

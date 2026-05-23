@@ -204,6 +204,37 @@
                                 <p class="text-[9px] text-zinc-600 mt-1">0 = sin cupo asignado (contado)</p>
                             </div>
                         </div>
+
+                        {{-- CLIENTE FIJO --}}
+                        <div class="mt-5 pt-5 border-t border-white/5">
+                            <p class="text-[9px] font-black uppercase tracking-[0.2em] text-yellow-500/70 mb-4">Tipo de Cliente</p>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <div class="relative">
+                                            <input type="hidden" name="is_fixed_client" value="0">
+                                            <input type="checkbox" name="is_fixed_client" value="1"
+                                                {{ old('is_fixed_client', $customer->is_fixed_client) ? 'checked' : '' }}
+                                                class="sr-only peer"
+                                                id="is_fixed_client_toggle">
+                                            <div class="w-10 h-5 bg-white/10 peer-checked:bg-yellow-500 rounded-full transition-all border border-white/10 peer-checked:border-yellow-500/50"></div>
+                                            <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white/50 peer-checked:bg-black rounded-full transition-all peer-checked:translate-x-5"></div>
+                                        </div>
+                                        <div>
+                                            <p class="text-[10px] font-black text-white uppercase tracking-widest">Cliente Fijo</p>
+                                            <p class="text-[9px] text-zinc-500">Compra cada semana garantizado</p>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div>
+                                    <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Cantidad Semanal Fija</label>
+                                    <input type="number" name="fixed_weekly_quantity" min="0" step="100"
+                                        value="{{ old('fixed_weekly_quantity', $customer->fixed_weekly_quantity ?? 0) }}"
+                                        class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm text-white outline-none focus:border-yellow-500/50">
+                                    <p class="text-[9px] text-zinc-600 mt-1">Aves/semana comprometidas</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

@@ -121,6 +121,9 @@
         ::-webkit-scrollbar-track { background: #070a13; }
         ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #eab308; }
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; appearance: textfield; }
     </style>
 
 @stack('scripts')

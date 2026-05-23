@@ -63,14 +63,13 @@
 
                 {{-- ACCIONES --}}
                 <div class="flex items-center justify-between pt-2">
-                    <form method="POST" action="{{ route('poultry.providers.destroy', $provider) }}"
-                          onsubmit="return confirm('¿Eliminar a {{ $provider->business_name }}? Esta acción no se puede deshacer.')">
-                        @csrf @method('DELETE')
-                        <button type="submit"
+                    <div>
+                        <button type="button"
+                            onclick="document.getElementById('delete-provider-form').submit()"
                             class="text-[9px] font-black uppercase tracking-widest text-red-400/50 hover:text-red-400 transition-colors flex items-center gap-2">
                             <i class="fas fa-trash text-[9px]"></i> Eliminar Proveedor
                         </button>
-                    </form>
+                    </div>
 
                     <div class="flex items-center gap-4">
                         <a href="{{ route('poultry.providers.show', $provider) }}"
@@ -85,6 +84,12 @@
                 </div>
 
             </div>
+        </form>
+
+        {{-- Form de eliminar separado del form de edición --}}
+        <form id="delete-provider-form" method="POST" action="{{ route('poultry.providers.destroy', $provider) }}"
+              onsubmit="return confirm('¿Eliminar a {{ $provider->business_name }}? Esta acción no se puede deshacer.')">
+            @csrf @method('DELETE')
         </form>
     </div>
 </x-app-layout>

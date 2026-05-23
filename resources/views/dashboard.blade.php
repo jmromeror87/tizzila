@@ -377,7 +377,7 @@
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between mb-1">
                                     <p class="text-xs font-black text-white truncate pr-2 uppercase tracking-tight">
-                                        {{ $bird->poultryType->name ?? 'Sin tipo' }}
+                                        {{ $bird->type_name ?? 'Sin tipo' }}
                                     </p>
                                     <div class="flex items-center gap-2">
                                         <span class="text-[9px] {{ $birdTextColors[$i] ?? 'text-zinc-400' }} font-black">{{ number_format($bird->total_qty) }} und</span>
@@ -586,7 +586,7 @@
             new Chart(ctxBird, {
                 type: 'doughnut',
                 data: {
-                    labels: @json($topBirdTypes->pluck('poultryType.name')),
+                    labels: @json($topBirdTypes->pluck('type_name')),
                     datasets: [{
                         data: @json($topBirdTypes->pluck('total_qty')),
                         backgroundColor: ['#eab308','#3b82f6','#10b981','#a855f7','#f97316'],

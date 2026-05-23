@@ -250,13 +250,19 @@ $marginNetPct = $salesThisMonth > 0
         | 17️⃣ TOP TIPOS DE AVE POR VOLUMEN (MES)
         |--------------------------------------------------------------------------
         */
-        $topBirdTypes = PoultryOrderSchedule::whereBetween('dispatch_date', [$startOfMonth, $endOfMonth])
-            ->where('status', '!=', 'cancelled')
-            ->select('poultry_type', DB::raw('SUM(quantity) as total_qty'), DB::raw('COUNT(*) as order_count'))
-            ->groupBy('poultry_type')
+        $topBirdTypes = DB::table('poultry_order_schedules as pos')
+            ->leftJoin('poultry_types as pt', 'pt.id', '=', 'pos.poultry_type_id')
+            ->whereBetween('pos.dispatch_date', [$startOfMonth, $endOfMonth])
+            ->where('pos.status', '!=', 'cancelled')
+            ->select(
+                'pos.poultry_type_id',
+                DB::raw('COALESCE(pt.name, pos.poultry_type, "Sin tipo") as type_name'),
+                DB::raw('SUM(pos.quantity) as total_qty'),
+                DB::raw('COUNT(*) as order_count')
+            )
+            ->groupBy('pos.poultry_type_id', 'pos.poultry_type', 'pt.name')
             ->orderByDesc('total_qty')
             ->limit(5)
-            ->with('poultryType:id,name')
             ->get();
 
         $totalBirdsMonth = $topBirdTypes->sum('total_qty') ?: 1;

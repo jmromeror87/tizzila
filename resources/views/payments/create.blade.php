@@ -127,7 +127,7 @@
                                     <i
                                         class="fas fa-dollar-sign text-yellow-500/50 group-focus-within:text-yellow-500 transition-colors"></i>
                                 </div>
-                                <input type="number" step="0.01" name="amount" id="amount_input" max="{{ $balance }}"
+                                <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" step="0.01" name="amount" id="amount_input" max="{{ $balance }}"
                                     placeholder="0.00" required
                                     oninput="updateProjectedBalance({{ $balance }}, this.value)"
                                     class="w-full pl-12 pr-4 py-4 bg-zinc-900/50 border border-white/5 rounded-2xl focus:border-yellow-500 focus:ring-0 font-black text-2xl text-white font-mono placeholder:text-zinc-800 transition-all">

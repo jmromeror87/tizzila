@@ -203,7 +203,7 @@
                                 <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Cupo de Crédito <span class="text-zinc-600">(opcional)</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm font-black">$</span>
-                                    <input type="number" name="credit_limit" min="0" step="1000"
+                                    <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" name="credit_limit" min="0" step="1000"
                                         value="{{ old('credit_limit', 0) }}"
                                         class="w-full pl-8 pr-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm text-white outline-none focus:border-yellow-500/50">
                                 </div>

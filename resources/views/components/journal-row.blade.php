@@ -27,11 +27,11 @@
                class="w-full bg-transparent border-none text-zinc-400 text-xs focus:ring-0 placeholder:text-zinc-800">
     </td>
     <td class="px-4 py-3">
-        <input type="number" step="0.01" name="lines[{{ $index }}][debit]" value="0"
+        <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" step="0.01" name="lines[{{ $index }}][debit]" value="0"
                class="w-full bg-transparent border-none text-right font-mono font-black text-sm text-white focus:ring-0 debit-input">
     </td>
     <td class="px-4 py-3">
-        <input type="number" step="0.01" name="lines[{{ $index }}][credit]" value="0"
+        <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" step="0.01" name="lines[{{ $index }}][credit]" value="0"
                class="w-full bg-transparent border-none text-right font-mono font-black text-sm text-white focus:ring-0 credit-input">
     </td>
     <td class="px-4 py-3 text-center text-zinc-800">

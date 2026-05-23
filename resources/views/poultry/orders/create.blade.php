@@ -162,7 +162,7 @@
                                 {{-- Cantidad --}}
                                 <div class="w-full md:w-44 flex items-center bg-[#070a13] rounded-xl px-4 border border-white/10 focus-within:border-yellow-500/50 transition-all relative">
                                     <div class="absolute -top-4 left-0 text-[8px] font-black text-gray-600 uppercase">Cantidad</div>
-                                    <input type="number" :name="'items['+index+'][quantity]'" x-model="item.quantity" placeholder="0" min="1" required
+                                    <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" :name="'items['+index+'][quantity]'" x-model="item.quantity" placeholder="0" min="1" required
                                         class="w-full bg-transparent border-none text-white text-center font-black text-lg focus:ring-0">
                                     <span class="text-[9px] font-black text-gray-600 uppercase ml-2">U.</span>
                                 </div>

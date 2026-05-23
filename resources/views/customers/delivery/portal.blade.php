@@ -149,7 +149,7 @@
                     </button>
                     
                     <div class="flex flex-col items-center flex-1">
-                        <input type="number" name="dead_quantity" id="dead_quantity" value="0" 
+                        <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" name="dead_quantity" id="dead_quantity" value="0" 
                                inputmode="numeric" oninput="updateReceived()"
                                class="counter-input">
                         <span class="text-[10px] font-black text-red-500 uppercase tracking-[0.2em]">Muertos</span>
@@ -166,7 +166,7 @@
                         <p class="text-[11px] text-zinc-400 font-bold">Total certificado</p>
                     </div>
                     <div class="flex items-center">
-                        <input type="number" name="received_quantity" id="received_quantity" readonly>
+                        <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" name="received_quantity" id="received_quantity" readonly>
                         <span class="text-2xl ml-1">🐥</span>
                     </div>
                 </div>

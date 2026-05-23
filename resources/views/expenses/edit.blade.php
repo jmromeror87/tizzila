@@ -128,26 +128,26 @@
                             <label class="text-[10px] font-black text-zinc-500 uppercase tracking-widest ">Base Gravable</label>
                             <div class="relative">
                                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 font-black">$</span>
-                                <input type="number" step="0.01" name="tax_base" id="tax_base" required value="{{ old('tax_base', $expense->tax_base) }}"
+                                <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" step="0.01" name="tax_base" id="tax_base" required value="{{ old('tax_base', $expense->tax_base) }}"
                                     class="w-full bg-transparent border-b-2 border-white/10 text-white pl-8 pr-4 py-3 text-xl font-black focus:border-[#f3c444] focus:ring-0 transition-all">
                             </div>
                         </div>
 
                         <div class="space-y-4">
                             <label class="text-[10px] font-black text-zinc-500 uppercase tracking-widest ">IVA (+)</label>
-                            <input type="number" step="0.01" name="iva" id="iva" value="{{ old('iva', $expense->iva) }}"
+                            <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" step="0.01" name="iva" id="iva" value="{{ old('iva', $expense->iva) }}"
                                 class="w-full bg-transparent border-b-2 border-white/10 text-emerald-500 px-4 py-3 text-xl font-black focus:border-emerald-500">
                         </div>
 
                         <div class="space-y-4">
                             <label class="text-[10px] font-black text-zinc-500 uppercase tracking-widest ">Retención (-)</label>
-                            <input type="number" step="0.01" name="retefuente" id="retefuente" value="{{ old('retefuente', $expense->retefuente) }}"
+                            <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" step="0.01" name="retefuente" id="retefuente" value="{{ old('retefuente', $expense->retefuente) }}"
                                 class="w-full bg-transparent border-b-2 border-white/10 text-red-500 px-4 py-3 text-xl font-black focus:border-red-500">
                         </div>
 
                         <div class="space-y-4 bg-white/5 rounded-2xl p-4 border border-white/5">
                             <label class="text-[10px] font-black text-[#f3c444] uppercase tracking-widest ">Total Neto</label>
-                            <input type="number" step="0.01" name="total" id="total_display" readonly value="{{ old('total', $expense->total) }}"
+                            <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" step="0.01" name="total" id="total_display" readonly value="{{ old('total', $expense->total) }}"
                                 class="w-full bg-transparent border-none text-white px-0 py-2 text-2xl font-black focus:ring-0">
                         </div>
                     </div>

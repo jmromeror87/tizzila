@@ -49,7 +49,7 @@
         <div>
             <label class="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1.5 block">Días de Crédito</label>
             <div class="relative">
-                <input type="number"
+                <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none"
                        name="payment_days"
                        value="{{ old('payment_days', $type->payment_days ?? 15) }}"
                        class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-2.5 text-xs font-black text-white focus:outline-none focus:border-yellow-500/50 transition-colors"

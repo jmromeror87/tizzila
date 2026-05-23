@@ -140,7 +140,7 @@ function addItem() {
         </div>
         <div class="md:col-span-3">
             <label class="text-[9px] font-black text-gray-500 mb-2 block uppercase tracking-widest">Cantidad</label>
-            <input type="number" name="items[${index}][quantity]" min="1" required
+            <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" name="items[${index}][quantity]" min="1" required
                    placeholder="0" oninput="handleQty(this)"
                    class="qty-field w-full bg-black/30 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white font-black text-center focus:outline-none focus:border-yellow-500/50 transition-colors">
         </div>
@@ -148,7 +148,7 @@ function addItem() {
             <label class="text-[9px] font-black text-emerald-500/70 mb-2 block uppercase tracking-widest">Precio ($)</label>
             <div class="relative">
                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500/60 text-sm font-black pointer-events-none">$</span>
-                <input type="number" step="0.01" name="items[${index}][price_applied]"
+                <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" step="0.01" name="items[${index}][price_applied]"
                        value="${aiSuggestedPrice}" required
                        class="w-full bg-black/30 border border-emerald-500/20 rounded-xl pl-8 pr-4 py-2.5 text-sm text-emerald-400 font-black text-center focus:outline-none focus:border-emerald-500/50 transition-colors">
             </div>

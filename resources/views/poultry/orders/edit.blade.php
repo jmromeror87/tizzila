@@ -122,7 +122,7 @@
                             <div class="bg-black/20 p-6 rounded-3xl border border-white/5 space-y-3">
                                 <label class="text-[9px] font-black text-gray-500 uppercase tracking-widest block">Aves (Unidades)</label>
                                 <div class="flex items-center gap-3">
-                                    <input type="number" 
+                                    <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" 
                                            name="quantity"
                                            x-model="qty"
                                            class="w-full bg-[#111827] border-white/10 rounded-xl text-white text-2xl font-black focus:border-yellow-500 text-center tabular-nums">

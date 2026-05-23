@@ -67,7 +67,7 @@
         </label>
         <div class="relative">
             <span class="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-600 font-black">$</span>
-            <input type="number" name="amount" step="0.01"
+            <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" name="amount" step="0.01"
                 value="{{ old('amount', $recurringExpense->amount ?? '') }}"
                 class="w-full bg-black border border-white/10 text-white rounded-2xl pl-10 pr-5 py-4 text-lg font-black focus:border-[#f3c444] focus:ring-0 transition-all">
         </div>

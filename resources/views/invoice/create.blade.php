@@ -144,12 +144,12 @@ function addItem() {
                        placeholder="DESCRIPCIÓN OPERATIVA">
             </div>
             <div class="col-span-2">
-                <input type="number" step="0.01" name="items[${index}][quantity]" oninput="calculateTotals()"
+                <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" step="0.01" name="items[${index}][quantity]" oninput="calculateTotals()"
                        class="input-qty no-spinner w-full bg-black/30 border border-white/10 rounded-lg py-1.5 px-2 text-xs text-white font-black text-center focus:outline-none focus:border-yellow-500/50 font-mono"
                        placeholder="0.00" required>
             </div>
             <div class="col-span-2">
-                <input type="number" step="0.01" name="items[${index}][unit_price]" oninput="calculateTotals()"
+                <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" step="0.01" name="items[${index}][unit_price]" oninput="calculateTotals()"
                        class="input-price no-spinner w-full bg-black/30 border border-white/10 rounded-lg py-1.5 px-2 text-xs text-yellow-500 font-black text-center focus:outline-none focus:border-yellow-500/50 font-mono"
                        placeholder="0.00" required>
             </div>

@@ -149,11 +149,11 @@
                        class="w-full bg-transparent border-none text-zinc-400 text-[10px] font-bold focus:ring-0 placeholder:text-zinc-800 uppercase">
             </td>
             <td class="px-6 py-4">
-                <input type="number" step="0.01" name="lines[{idx}][debit]" value="0.00"
+                <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" step="0.01" name="lines[{idx}][debit]" value="0.00"
                        class="w-full bg-black/20 border border-white/5 rounded-xl text-right font-mono font-black text-sm text-emerald-500 focus:ring-1 focus:ring-emerald-500/30 debit-input py-2">
             </td>
             <td class="px-6 py-4">
-                <input type="number" step="0.01" name="lines[{idx}][credit]" value="0.00"
+                <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" step="0.01" name="lines[{idx}][credit]" value="0.00"
                        class="w-full bg-black/20 border border-white/5 rounded-xl text-right font-mono font-black text-sm text-rose-500 focus:ring-1 focus:ring-rose-500/30 credit-input py-2">
             </td>
             <td class="px-6 py-4 text-center">
@@ -238,8 +238,8 @@
 
     <style>
         .font-mono { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
-        input[type="number"]::-webkit-inner-spin-button, 
-        input[type="number"]::-webkit-outer-spin-button { 
+        input[type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none"]::-webkit-inner-spin-button, 
+        input[type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none"]::-webkit-outer-spin-button { 
             -webkit-appearance: none; 
             margin: 0; 
         }

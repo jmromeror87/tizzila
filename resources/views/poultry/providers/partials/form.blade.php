@@ -120,7 +120,7 @@
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                 <i class="fas fa-hourglass-half text-gray-600 group-focus-within:text-yellow-500 transition-colors"></i>
             </div>
-            <input type="number" name="payment_terms_days"
+            <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" name="payment_terms_days"
                    class="w-full bg-[#070a13] border-white/10 rounded-xl text-white text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/30 transition-all py-3.5 pl-11 pr-16"
                    value="{{ old('payment_terms_days', $provider->payment_terms_days ?? 0) }}"
                    placeholder="0">

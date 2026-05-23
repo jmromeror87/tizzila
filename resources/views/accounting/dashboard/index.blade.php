@@ -96,7 +96,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Año Fiscal</label>
-                        <input type="number" name="year" value="{{ now()->year }}" required
+                        <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" name="year" value="{{ now()->year }}" required
                             class="w-full bg-black/40 border border-white/10 rounded-xl text-white text-xs font-bold px-4 py-3 focus:border-yellow-500/50 focus:ring-0 transition-all">
                     </div>
                     <div>

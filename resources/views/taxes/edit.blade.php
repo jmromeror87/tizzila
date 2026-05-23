@@ -58,7 +58,7 @@
                             <div>
                                 <label class="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1.5 block">Tasa Porcentual</label>
                                 <div class="relative">
-                                    <input type="number" step="0.01" name="percentage" value="{{ old('percentage', $tax->percentage ?? $tax->percent ?? 0) }}" required
+                                    <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" step="0.01" name="percentage" value="{{ old('percentage', $tax->percentage ?? $tax->percent ?? 0) }}" required
                                            class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-2.5 text-xs font-black text-white focus:outline-none focus:border-yellow-500/50 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-600">%</span>
                                 </div>

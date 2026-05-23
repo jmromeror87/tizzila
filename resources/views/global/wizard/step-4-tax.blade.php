@@ -103,12 +103,12 @@
                                 </div>
                                 <div>
                                     <label class="block text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1.5">Desde (Inicio)</label>
-                                    <input type="number" name="from_number" value="{{ $profile?->from_number }}" placeholder="1"
+                                    <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" name="from_number" value="{{ $profile?->from_number }}" placeholder="1"
                                         class="w-full bg-black/40 border border-white/10 rounded-xl text-white font-mono text-xs font-bold px-4 py-3 focus:border-yellow-500/50 focus:ring-0 transition-all placeholder:text-zinc-700">
                                 </div>
                                 <div>
                                     <label class="block text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1.5">Hasta (Límite)</label>
-                                    <input type="number" name="to_number" value="{{ $profile?->to_number }}" placeholder="5000"
+                                    <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" name="to_number" value="{{ $profile?->to_number }}" placeholder="5000"
                                         class="w-full bg-black/40 border border-white/10 rounded-xl text-white font-mono text-xs font-bold px-4 py-3 focus:border-yellow-500/50 focus:ring-0 transition-all placeholder:text-zinc-700">
                                 </div>
                             </div>

@@ -77,7 +77,7 @@
                             <label class="text-[10px] uppercase font-black text-zinc-500 ml-1">
                                 Bajas (Muertos)
                             </label>
-                            <input type="number"
+                            <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none"
                                    name="dead_quantity"
                                    id="dead_quantity"
                                    value="0"
@@ -90,7 +90,7 @@
                             <label class="text-[10px] uppercase font-black text-zinc-500 ml-1">
                                 Total Recibidos
                             </label>
-                            <input type="number"
+                            <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none"
                                    name="received_quantity"
                                    id="received_quantity"
                                    readonly

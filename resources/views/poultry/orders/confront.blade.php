@@ -176,7 +176,7 @@
                     </div>
                     <div>
                         <label class="block text-[9px] font-black text-yellow-500 uppercase tracking-widest mb-1.5">Verificación Humana</label>
-                        <input type="number" name="verified_quantity"
+                        <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" name="verified_quantity"
                             value="{{ $currentBatch->verified_quantity ?? $currentBatch->quantity }}"
                             {{ $isLocked ? 'disabled' : '' }}
                             class="w-full bg-black/40 border border-white/10 rounded-xl text-white text-lg font-black px-4 py-3 focus:border-yellow-500/50 focus:ring-0 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
@@ -226,7 +226,7 @@
                         </div>
                         <div>
                             <label class="block text-[9px] font-black text-yellow-500 uppercase tracking-widest mb-1.5">Verificación Humana</label>
-                            <input type="number" name="verified_quantity"
+                            <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" name="verified_quantity"
                                 value="{{ $batch->verified_quantity ?? $batch->quantity }}"
                                 {{ $isLocked ? 'disabled' : '' }}
                                 class="w-full bg-black/40 border border-white/10 rounded-xl text-white text-lg font-black px-4 py-3 focus:border-yellow-500/50 focus:ring-0 transition-all disabled:opacity-40 disabled:cursor-not-allowed">

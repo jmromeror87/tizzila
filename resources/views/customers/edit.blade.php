@@ -197,9 +197,9 @@
                                 <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Cupo de Crédito <span class="text-zinc-600">(opcional)</span></label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm font-black">$</span>
-                                    <input type="number" name="credit_limit" min="0" step="1000"
+                                    <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" name="credit_limit" min="0" step="1000"
                                         value="{{ old('credit_limit', $customer->credit_limit ?? 0) }}"
-                                        class="w-full pl-8 pr-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm text-white outline-none focus:border-yellow-500/50">
+                                        class="w-full pl-8 pr-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm text-white outline-none focus:border-yellow-500/50 [appearance:none]">
                                 </div>
                                 <p class="text-[9px] text-zinc-600 mt-1">0 = sin cupo asignado (contado)</p>
                             </div>
@@ -228,9 +228,9 @@
                                 </div>
                                 <div>
                                     <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Cantidad Semanal Fija</label>
-                                    <input type="number" name="fixed_weekly_quantity" min="0" step="100"
+                                    <input type="number" style="appearance:none;-moz-appearance:textfield;-webkit-appearance:none" name="fixed_weekly_quantity" min="0" step="100"
                                         value="{{ old('fixed_weekly_quantity', $customer->fixed_weekly_quantity ?? 0) }}"
-                                        class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm text-white outline-none focus:border-yellow-500/50">
+                                        class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm text-white outline-none focus:border-yellow-500/50 [appearance:none]">
                                     <p class="text-[9px] text-zinc-600 mt-1">Aves/semana comprometidas</p>
                                 </div>
                             </div>

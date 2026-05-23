@@ -693,7 +693,7 @@ Route::middleware(['auth'])
     });
 
     // 🧾 FACTURAS DE COMPRA (PRONAVICOLA)
-    Route::prefix('purchase-invoices')->name('purchase-invoices.')->group(function () {
+    Route::prefix('purchase-invoices')->name('purchase-invoices.')->middleware(['auth'])->group(function () {
         Route::get('orders/{order}/create', [PurchaseInvoiceController::class, 'create'])->name('create');
         Route::post('orders/{order}', [PurchaseInvoiceController::class, 'store'])->name('store');
         Route::get('{purchaseInvoice}', [PurchaseInvoiceController::class, 'show'])->name('show');

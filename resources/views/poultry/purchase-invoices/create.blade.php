@@ -43,7 +43,7 @@
             </div>
         </div>
 
-        <form method="POST" action="{{ route('poultry.purchase-invoices.store', $order) }}">
+        <form method="POST" action="{{ route('purchase-invoices.store', $order) }}">
             @csrf
 
             {{-- DATOS DE LA FACTURA --}}

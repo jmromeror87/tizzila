@@ -176,10 +176,17 @@ class PoultryOrderScheduleController extends Controller
                     'extendedProps' => [
                         'provider' => $order->provider?->business_name ?? 'No asignado',
                         'quantity' => $order->quantity,
-                        'poultry'  => $order->poultryType?->name,
+                        'poultry'  => $order->poultryType?->name ?? ucfirst($order->poultry_type ?? ''),
                         'icon'     => $order->poultryType?->icon,
                         'status'   => strtoupper($order->status),
-                        'type'     => $order->poultryType?->slug, // 👈 IMPORTANTE
+                        'type'     => match($order->poultry_type) {
+                            'bb'      => 'pollito-bb',
+                            'lsl'     => 'lohmann-lsl',
+                            'lohmann' => 'lohmann-brown',
+                            default   => $order->poultryType?->name
+                                ? str($order->poultryType->name)->slug()->toString()
+                                : 'otros',
+                        },
                     ],
 
                     'backgroundColor' => $statusColor,

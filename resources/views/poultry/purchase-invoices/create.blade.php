@@ -2,7 +2,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-4">
-            <a href="{{ route('poultry.orders.show', $order) }}"
+            <a href="{{ route('poultry.orders.index') }}"
                class="h-9 w-9 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-zinc-400 hover:text-white flex items-center justify-center transition-all">
                 <i class="fas fa-arrow-left text-xs"></i>
             </a>
@@ -158,7 +158,7 @@
 
             {{-- ACCIONES --}}
             <div class="flex items-center justify-end gap-4 pt-2 mt-5">
-                <a href="{{ route('poultry.orders.show', $order) }}"
+                <a href="{{ route('poultry.orders.index') }}"
                    class="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition-colors">
                     Cancelar
                 </a>

@@ -3,7 +3,7 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <a href="{{ route('poultry.orders.show', $purchaseInvoice->order) }}"
+                <a href="{{ route('poultry.orders.index') }}"
                    class="h-9 w-9 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-zinc-400 hover:text-white flex items-center justify-center transition-all">
                     <i class="fas fa-arrow-left text-xs"></i>
                 </a>

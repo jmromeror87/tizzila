@@ -697,6 +697,7 @@ Route::middleware(['auth'])
         Route::get('orders/{order}/create', [PurchaseInvoiceController::class, 'create'])->name('create');
         Route::post('orders/{order}', [PurchaseInvoiceController::class, 'store'])->name('store');
         Route::get('{purchaseInvoice}', [PurchaseInvoiceController::class, 'show'])->name('show');
+        Route::post('{purchaseInvoice}/pay', [PurchaseInvoiceController::class, 'pay'])->name('pay');
     });
 /*
 |--------------------------------------------------------------------------

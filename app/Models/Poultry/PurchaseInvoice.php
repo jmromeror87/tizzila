@@ -48,4 +48,9 @@ class PurchaseInvoice extends Model
     {
         return $this->hasMany(PoultryDispatch::class);
     }
+
+    public function payments()
+    {
+        return $this->hasMany(PurchaseInvoicePayment::class);
+    }
 }

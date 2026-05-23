@@ -11,7 +11,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Poultry\PoultryOrderSchedule;
 use App\Models\Poultry\PurchaseInvoice;
 use App\Models\Poultry\Provider;
+use App\Models\Poultry\PurchaseInvoicePayment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PurchaseInvoiceController extends Controller
 {
@@ -99,9 +101,39 @@ class PurchaseInvoiceController extends Controller
             ->with('success', "Factura {$invoice->invoice_number} registrada. Ahora puedes crear la distribución.");
     }
 
+    public function pay(Request $request, PurchaseInvoice $purchaseInvoice)
+    {
+        $validated = $request->validate([
+            'payment_date'   => 'required|date',
+            'amount'         => 'required|numeric|min:1|max:' . $purchaseInvoice->balance,
+            'payment_method' => 'required|in:transferencia,efectivo,cheque',
+            'reference'      => 'nullable|string|max:100',
+            'notes'          => 'nullable|string|max:300',
+        ]);
+
+        PurchaseInvoicePayment::create([
+            ...$validated,
+            'purchase_invoice_id' => $purchaseInvoice->id,
+            'registered_by'       => Auth::id(),
+        ]);
+
+        $totalPaid  = $purchaseInvoice->payments()->sum('amount') + $validated['amount'];
+        $newBalance = max(0, $purchaseInvoice->total - $totalPaid);
+        $status     = $newBalance == 0 ? 'paid' : ($totalPaid > 0 ? 'partial' : 'pending');
+
+        $purchaseInvoice->update([
+            'balance'        => $newBalance,
+            'payment_status' => $status,
+        ]);
+
+        return redirect()
+            ->route('purchase-invoices.show', $purchaseInvoice)
+            ->with('success', 'Pago registrado. Saldo pendiente: $' . number_format($newBalance, 0, ',', '.'));
+    }
+
     public function show(PurchaseInvoice $purchaseInvoice)
     {
-        $purchaseInvoice->load(['order', 'provider', 'items', 'dispatches.items']);
+        $purchaseInvoice->load(['order', 'provider', 'items', 'dispatches.items', 'payments']);
 
         $totalDistributed = $purchaseInvoice->dispatches
             ->flatMap->items

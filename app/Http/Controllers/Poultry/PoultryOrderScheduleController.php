@@ -23,6 +23,9 @@ use App\Models\Poultry\PoultryOrderDocument;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Poultry\PoultryProviderDocument;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use App\Models\Customer\Customer;
+use App\Models\Invoice\Invoice;
 
 class PoultryOrderScheduleController extends Controller
 {
@@ -510,6 +513,63 @@ public function storeApproval(Request $request, PoultryOrderSchedule $order)
     /* ============================================================
      | DESTROY
      ============================================================ */
+    /* ============================================================
+     | DSS EXCEDENTES — Sugerencias para sobrantes
+     ============================================================ */
+    public function dssSurplus(Request $request, PoultryOrderSchedule $order)
+    {
+        $surplus = max(0, (int) $request->query('surplus', 0));
+
+        if ($surplus === 0) {
+            return response()->json(['suggestions' => [], 'surplus' => 0]);
+        }
+
+        // Clientes variables (no fijos) activos, sin deuda vencida ni cupo excedido
+        $suggestions = Customer::where('is_active', true)
+            ->where('is_fixed_client', false)
+            ->withSum(['invoices as total_balance' => fn($q) => $q->where('balance', '>', 0)], 'balance')
+            ->withSum(['invoices as overdue_balance' => fn($q) => $q->where('payment_status', 'overdue')], 'balance')
+            ->withSum(['invoices as total_invoiced'], 'total')
+            ->withSum(['invoices as total_paid' => fn($q) => $q->where('balance', 0)], 'total')
+            ->withCount(['invoices as total_orders'])
+            ->get()
+            ->filter(function ($c) {
+                // Excluir bloqueados
+                $overdue   = $c->overdue_balance > 0;
+                $overLimit = $c->credit_limit > 0 && $c->total_balance > $c->credit_limit;
+                return !$overdue && !$overLimit;
+            })
+            ->map(function ($c) use ($surplus) {
+                $effectiveness = $c->total_invoiced > 0
+                    ? round((($c->total_invoiced - ($c->total_balance ?? 0)) / $c->total_invoiced) * 100, 1)
+                    : 0;
+
+                // Score: 60% efectividad pago + 40% volumen histórico (normalizado)
+                $score = $effectiveness;
+
+                return [
+                    'id'              => $c->id,
+                    'name'            => $c->name,
+                    'phone'           => $c->phone,
+                    'effectiveness'   => $effectiveness,
+                    'total_orders'    => $c->total_orders,
+                    'total_balance'   => $c->total_balance ?? 0,
+                    'credit_limit'    => $c->credit_limit,
+                    'suggested_qty'   => min($surplus, max(100, (int) round($surplus * ($effectiveness / 100)))),
+                    'score'           => $score,
+                    'status_color'    => $effectiveness >= 90 ? 'emerald' : ($effectiveness >= 60 ? 'yellow' : 'orange'),
+                ];
+            })
+            ->sortByDesc('score')
+            ->take(6)
+            ->values();
+
+        return response()->json([
+            'surplus'     => $surplus,
+            'suggestions' => $suggestions,
+        ]);
+    }
+
     public function destroy(PoultryOrderSchedule $order)
     {
         $order->delete();

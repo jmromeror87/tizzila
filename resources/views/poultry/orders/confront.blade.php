@@ -201,6 +201,29 @@
         </div>
         @endif
 
+        {{-- DSS EXCEDENTES --}}
+        @if(!$isLocked)
+        <div id="dss-panel" class="hidden bg-[#0d121f] border border-yellow-500/30 rounded-2xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-yellow-500/10 flex items-center gap-3">
+                <div class="h-2 w-2 rounded-full bg-yellow-500 animate-pulse"></div>
+                <div>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-yellow-500">DSS · Excedente Detectado</p>
+                    <p class="text-[9px] text-zinc-500 mt-0.5">Clientes variables sugeridos para absorber el sobrante</p>
+                </div>
+                <span id="dss-surplus-badge" class="ml-auto text-[10px] font-black text-yellow-400 bg-yellow-500/10 border border-yellow-500/20 px-3 py-1 rounded-lg"></span>
+            </div>
+            <div id="dss-loading" class="py-10 flex items-center justify-center gap-3 text-zinc-500">
+                <i class="fas fa-circle-notch fa-spin"></i>
+                <span class="text-[10px] font-black uppercase tracking-widest">Analizando cartera...</span>
+            </div>
+            <div id="dss-results" class="hidden divide-y divide-white/[0.04]"></div>
+            <div id="dss-empty" class="hidden py-10 text-center">
+                <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Sin clientes disponibles para el sobrante</p>
+                <p class="text-[9px] text-zinc-600 mt-1">Todos los clientes variables tienen deuda o cupo excedido</p>
+            </div>
+        </div>
+        @endif
+
         {{-- LOTES MÚLTIPLES --}}
         @if(isset($batches) && $batches->count())
         <div class="space-y-4">
@@ -314,5 +337,70 @@
     <script>
         function openDocumentModal()  { document.getElementById('documentModal').classList.replace('hidden','flex'); }
         function closeDocumentModal() { document.getElementById('documentModal').classList.replace('flex','hidden'); }
+
+        // DSS EXCEDENTES
+        const programmedQty = {{ $order->quantity }};
+        const dssUrl = "{{ route('poultry.orders.dss-surplus', $order) }}";
+
+        document.querySelectorAll('input[name="verified_quantity"]').forEach(input => {
+            input.addEventListener('input', debounce(function () {
+                const verified = parseInt(this.value) || 0;
+                const surplus  = verified - programmedQty;
+                const panel    = document.getElementById('dss-panel');
+                if (!panel) return;
+
+                if (surplus <= 0) {
+                    panel.classList.add('hidden');
+                    return;
+                }
+
+                panel.classList.remove('hidden');
+                document.getElementById('dss-surplus-badge').textContent = '+' + surplus.toLocaleString('es-CO') + ' aves sobrantes';
+                document.getElementById('dss-loading').classList.remove('hidden');
+                document.getElementById('dss-results').classList.add('hidden');
+                document.getElementById('dss-empty').classList.add('hidden');
+
+                fetch(dssUrl + '?surplus=' + surplus)
+                    .then(r => r.json())
+                    .then(data => {
+                        document.getElementById('dss-loading').classList.add('hidden');
+                        if (!data.suggestions.length) {
+                            document.getElementById('dss-empty').classList.remove('hidden');
+                            return;
+                        }
+                        const colors = { emerald: '#10b981', yellow: '#eab308', orange: '#f97316' };
+                        const html = data.suggestions.map(c => `
+                            <div class="px-6 py-4 flex items-center gap-4 hover:bg-white/[0.02] transition-colors">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-black text-white truncate">${c.name}</p>
+                                    <p class="text-[9px] text-zinc-500 mt-0.5">${c.total_orders} pedidos · ${c.phone ?? '—'}</p>
+                                </div>
+                                <div class="text-center px-3">
+                                    <p class="text-[8px] font-black text-zinc-500 uppercase mb-1">Efectividad</p>
+                                    <p class="text-sm font-black" style="color:${colors[c.status_color]}">${c.effectiveness}%</p>
+                                </div>
+                                <div class="text-center px-3">
+                                    <p class="text-[8px] font-black text-zinc-500 uppercase mb-1">Sugerido</p>
+                                    <p class="text-sm font-black text-yellow-400">${c.suggested_qty.toLocaleString('es-CO')}</p>
+                                </div>
+                                <div class="text-center px-3">
+                                    <p class="text-[8px] font-black text-zinc-500 uppercase mb-1">Cartera</p>
+                                    <p class="text-[10px] font-black text-white">$${c.total_balance.toLocaleString('es-CO')}</p>
+                                </div>
+                            </div>
+                        `).join('');
+                        document.getElementById('dss-results').innerHTML = html;
+                        document.getElementById('dss-results').classList.remove('hidden');
+                    })
+                    .catch(() => {
+                        document.getElementById('dss-loading').classList.add('hidden');
+                    });
+            }, 600));
+        });
+
+        function debounce(fn, ms) {
+            let t;
+            return function(...args) { clearTimeout(t); t = setTimeout(() => fn.apply(this, args), ms); };
+        }
     </script>
 </x-app-layout>

@@ -684,6 +684,11 @@ Route::middleware(['auth'])
             PoultryOrderScheduleController::class,
             'incident'
         ])->name('incident');
+
+        Route::get('{order}/dss-surplus', [
+            PoultryOrderScheduleController::class,
+            'dssSurplus'
+        ])->name('dss-surplus');
     });
 /*
 |--------------------------------------------------------------------------

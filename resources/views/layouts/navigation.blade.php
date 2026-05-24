@@ -118,10 +118,10 @@
                         <i class="fas fa-list-ol w-3.5 text-center"></i>Lista de Pedidos
                     </a>
                     <a href="{{ route('poultry.providers.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition-all {{ request()->routeIs('poultry.providers.*') ? 'text-[#f3c444] bg-[#f3c444]/5' : 'text-gray-500 hover:text-white hover:bg-white/5' }}">
-                        <i class="fas fa-industry w-3.5 text-center"></i>Proveedores
+                        <i class="fas fa-users w-3.5 text-center"></i>Terceros
                     </a>
                     <a href="{{ route('poultry.provider-documents.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition-all {{ request()->routeIs('poultry.provider-documents.*') ? 'text-[#f3c444] bg-[#f3c444]/5' : 'text-gray-500 hover:text-white hover:bg-white/5' }}">
-                        <i class="fas fa-file-contract w-3.5 text-center"></i>Docs. Proveedor
+                        <i class="fas fa-file-contract w-3.5 text-center"></i>Docs. Tercero
                     </a>
                     <a href="{{ route('purchase-invoices.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition-all {{ request()->routeIs('purchase-invoices.*') ? 'text-[#f3c444] bg-[#f3c444]/5' : 'text-gray-500 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-file-invoice-dollar w-3.5 text-center"></i>Ctas. por Pagar

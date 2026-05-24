@@ -18,7 +18,7 @@
                 </a>
                 <div>
                     <h2 class="text-2xl font-black text-white tracking-tighter uppercase leading-none">
-                        Editar <span class="text-yellow-500">Proveedor</span>
+                        Editar <span class="text-yellow-500">Tercero</span>
                     </h2>
                     <p class="text-[9px] text-zinc-500 uppercase tracking-[0.3em] font-bold mt-1">
                         {{ $provider->business_name }} · #{{ str_pad($provider->id, 4, '0', STR_PAD_LEFT) }}
@@ -54,7 +54,7 @@
                 <div class="bg-[#0d121f] border border-white/5 rounded-2xl overflow-hidden">
                     <div class="px-6 py-4 border-b border-white/5 flex items-center gap-3">
                         <span class="text-[9px] font-black text-yellow-500 bg-yellow-500/10 border border-yellow-500/20 px-2 py-0.5 rounded-lg">01</span>
-                        <h3 class="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">Datos del Proveedor</h3>
+                        <h3 class="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">Datos del Tercero</h3>
                     </div>
                     <div class="p-6">
                         @include('poultry.providers.partials.form', ['provider' => $provider])
@@ -67,7 +67,7 @@
                         <button type="button"
                             onclick="document.getElementById('delete-provider-form').submit()"
                             class="text-[9px] font-black uppercase tracking-widest text-red-400/50 hover:text-red-400 transition-colors flex items-center gap-2">
-                            <i class="fas fa-trash text-[9px]"></i> Eliminar Proveedor
+                            <i class="fas fa-trash text-[9px]"></i> Eliminar Tercero
                         </button>
                     </div>
 

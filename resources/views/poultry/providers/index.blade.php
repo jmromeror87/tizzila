@@ -13,7 +13,7 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <h2 class="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter leading-none">
-                    Directorio de <span class="text-yellow-500">Proveedores</span>
+                    Directorio de <span class="text-yellow-500">Terceros</span>
                 </h2>
                 <p class="text-[10px] text-gray-500 font-bold uppercase tracking-[0.3em] mt-1">
                     Maestro logístico · {{ $providers->total() }} registros
@@ -52,7 +52,7 @@
         <div class="bg-[#0d121f] border border-white/5 rounded-2xl overflow-hidden">
             <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between">
                 <h3 class="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">
-                    <i class="fas fa-warehouse text-yellow-500 mr-2"></i>Proveedores Registrados
+                    <i class="fas fa-users text-yellow-500 mr-2"></i>Terceros Registrados
                 </h3>
                 @if($search)
                     <a href="{{ route('poultry.providers.index') }}" class="text-[9px] font-black uppercase tracking-widest text-zinc-500 hover:text-yellow-500 transition-colors flex items-center gap-1.5">
@@ -65,8 +65,9 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="border-b border-white/[0.04] text-[9px] font-black uppercase tracking-widest text-zinc-600">
-                            <th class="px-6 py-3">Proveedor</th>
+                            <th class="px-6 py-3">Tercero</th>
                             <th class="px-4 py-3 text-center">Identificación</th>
+                            <th class="px-4 py-3 text-center">Tipo</th>
                             <th class="px-4 py-3 text-center">Plazo</th>
                             <th class="px-4 py-3 text-center">Pedidos</th>
                             <th class="px-4 py-3 text-center">Estado</th>
@@ -94,6 +95,13 @@
                                         <span class="text-yellow-500 text-[9px]">{{ $provider->tax_id_type }}</span>
                                         {{ $provider->tax_id }}
                                     </span>
+                                </td>
+                                <td class="px-4 py-4 text-center">
+                                    @php
+                                        $typeMap = ['poultry'=>['Aves','text-yellow-400 bg-yellow-500/10 border-yellow-500/20'],'expense'=>['Gastos','text-blue-400 bg-blue-500/10 border-blue-500/20'],'general'=>['General','text-zinc-400 bg-white/5 border-white/10']];
+                                        [$tl, $tc] = $typeMap[$provider->provider_type ?? 'general'] ?? ['General','text-zinc-400 bg-white/5 border-white/10'];
+                                    @endphp
+                                    <span class="px-2 py-0.5 rounded-lg text-[9px] font-black uppercase border {{ $tc }}">{{ $tl }}</span>
                                 </td>
                                 <td class="px-4 py-4 text-center">
                                     <span class="text-xs font-black text-white">{{ $provider->payment_terms_days ?? 0 }}</span>
@@ -138,8 +146,8 @@
                             <tr>
                                 <td colspan="6" class="py-16 text-center">
                                     <div class="flex flex-col items-center gap-3 opacity-20">
-                                        <i class="fas fa-warehouse text-4xl"></i>
-                                        <p class="text-[10px] font-black uppercase tracking-[0.4em]">Sin proveedores registrados</p>
+                                        <i class="fas fa-users text-4xl"></i>
+                                        <p class="text-[10px] font-black uppercase tracking-[0.4em]">Sin terceros registrados</p>
                                     </div>
                                 </td>
                             </tr>
@@ -150,7 +158,7 @@
 
             <div class="px-6 py-4 border-t border-white/5 flex justify-between items-center">
                 <span class="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">
-                    Total: {{ $providers->total() }} proveedores
+                    Total: {{ $providers->total() }} terceros
                 </span>
                 <div>{{ $providers->links() }}</div>
             </div>

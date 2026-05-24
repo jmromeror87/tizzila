@@ -111,11 +111,13 @@
             <div class="bg-[#0d121f] border border-white/5 rounded-2xl overflow-hidden">
                 <div class="px-6 py-4 border-b border-white/5 flex items-center gap-2">
                     <span class="text-[9px] font-black text-yellow-500 bg-yellow-500/10 border border-yellow-500/20 px-2 py-0.5 rounded-lg">01</span>
-                    <h3 class="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">Ficha del Proveedor</h3>
+                    <h3 class="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">Ficha del Tercero</h3>
                 </div>
                 <div class="p-5 space-y-4">
                     @php
+                        $typeLabels = ['poultry' => 'Proveedor de Aves', 'expense' => 'Proveedor de Gastos', 'general' => 'General'];
                         $fields = [
+                            ['label' => 'Tipo de Tercero', 'value' => $typeLabels[$provider->provider_type ?? 'general'] ?? 'General'],
                             ['label' => 'Razón Social',   'value' => $provider->business_name],
                             ['label' => 'Nombre Comercial', 'value' => $provider->trade_name ?: '—'],
                             ['label' => 'Identificación',  'value' => $provider->tax_id_type . ' ' . $provider->tax_id],

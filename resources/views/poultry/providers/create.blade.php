@@ -18,7 +18,7 @@
                 </a>
                 <div>
                     <h2 class="text-2xl font-black text-white tracking-tighter uppercase leading-none">
-                        Registrar <span class="text-yellow-500">Proveedor</span>
+                        Registrar <span class="text-yellow-500">Tercero</span>
                     </h2>
                     <p class="text-[9px] text-zinc-500 uppercase tracking-[0.3em] font-bold mt-1">Maestro de Entidades</p>
                 </div>
@@ -64,7 +64,7 @@
                     </a>
                     <button type="submit"
                         class="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shadow-[0_8px_20px_rgba(234,179,8,0.2)]">
-                        <i class="fas fa-save"></i> Guardar Proveedor
+                        <i class="fas fa-save"></i> Guardar Tercero
                     </button>
                 </div>
 

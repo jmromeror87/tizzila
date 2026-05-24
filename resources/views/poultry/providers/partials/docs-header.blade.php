@@ -9,6 +9,6 @@
     </div>
     <a href="{{ route('poultry.providers.index') }}"
        class="h-9 px-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-zinc-400 hover:text-white flex items-center gap-2 transition-all text-[10px] font-black uppercase tracking-widest w-fit">
-        <i class="fas fa-warehouse text-xs"></i> Proveedores
+        <i class="fas fa-users text-xs"></i> Terceros
     </a>
 </div>

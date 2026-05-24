@@ -96,13 +96,14 @@ class ProviderController extends Controller
             'payment_conditions'       => ['nullable', 'string'],
             'preferred_payment_method' => ['required', 'in:transfer,cash,check'],
             'status'                   => ['required', 'in:active,inactive'],
+            'provider_type'            => ['required', 'in:poultry,expense,general'],
         ]);
 
         Provider::create($validated);
 
         return redirect()
             ->route('poultry.providers.index')
-            ->with('success', 'Proveedor creado correctamente.');
+            ->with('success', 'Tercero registrado correctamente.');
     }
 
     /* ============================================================
@@ -135,13 +136,14 @@ class ProviderController extends Controller
             'payment_conditions'       => ['nullable', 'string'],
             'preferred_payment_method' => ['required', 'in:transfer,cash,check'],
             'status'                   => ['required', 'in:active,inactive'],
+            'provider_type'            => ['required', 'in:poultry,expense,general'],
         ]);
 
         $provider->update($validated);
 
         return redirect()
             ->route('poultry.providers.index')
-            ->with('success', 'Proveedor actualizado correctamente.');
+            ->with('success', 'Tercero actualizado correctamente.');
     }
 
     public function show(Provider $provider)

@@ -78,13 +78,12 @@
                 <div class="grid md:grid-cols-2 gap-10">
                     <div class="group">
                         <label class="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-3 block ml-1 group-focus-within:text-[#f3c444] transition-colors">
-                            Proveedor de Servicio
+                            Tercero / Proveedor
                             <span class="text-zinc-700 ml-1">(Opcional)</span>
                         </label>
-                        {{-- ✅ FIX 1: removido required — provider_id es nullable --}}
                         <select name="provider_id"
                                 class="w-full bg-black border border-white/10 rounded-2xl text-white text-xs font-bold px-5 py-4 focus:border-[#f3c444] focus:ring-0 transition-all appearance-none uppercase">
-                            <option value="">Sin proveedor</option>
+                            <option value="">Sin tercero</option>
                             @foreach($providers as $p)
                                 {{-- ✅ FIX 3: old() para mantener valor al fallar --}}
                                 <option value="{{ $p->id }}" {{ old('provider_id') == $p->id ? 'selected' : '' }}>

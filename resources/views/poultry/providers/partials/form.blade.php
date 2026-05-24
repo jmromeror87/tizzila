@@ -10,6 +10,22 @@
 
 <div class="grid grid-cols-1 md:grid-cols-6 gap-x-8 gap-y-6">
 
+    {{-- TIPO DE TERCERO --}}
+    <div class="col-span-1 md:col-span-6">
+        <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Tipo de Tercero</label>
+        <div class="grid grid-cols-3 gap-3">
+            @foreach(['poultry' => ['Proveedor de Aves', 'fas fa-feather-alt', 'yellow'], 'expense' => ['Proveedor de Gastos', 'fas fa-receipt', 'blue'], 'general' => ['General / Otro', 'fas fa-user-tie', 'zinc']] as $val => [$lbl, $ico, $col])
+            <label class="cursor-pointer group">
+                <input type="radio" name="provider_type" value="{{ $val }}" @checked(old('provider_type', $provider->provider_type ?? 'poultry') == $val) class="sr-only peer">
+                <div class="peer-checked:border-{{ $col }}-500/50 peer-checked:bg-{{ $col }}-500/10 peer-checked:text-{{ $col }}-400 border border-white/10 bg-black/20 rounded-xl px-4 py-3 flex items-center gap-3 text-zinc-500 transition-all hover:border-white/20">
+                    <i class="{{ $ico }} text-sm"></i>
+                    <span class="text-[10px] font-black uppercase tracking-widest">{{ $lbl }}</span>
+                </div>
+            </label>
+            @endforeach
+        </div>
+    </div>
+
     {{-- BLOQUE 1: IDENTIFICACIÓN LEGAL --}}
     <div class="col-span-1 md:col-span-6 flex items-center gap-3 mb-2">
         <div class="h-[1px] flex-1 bg-white/5"></div>

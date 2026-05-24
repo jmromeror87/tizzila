@@ -167,6 +167,67 @@
         </div>
     </div>
 
+    {{-- BLOQUE 2B: UBICACIÓN --}}
+    <div class="col-span-1 md:col-span-6 flex items-center gap-3 mt-4 mb-2">
+        <div class="h-[1px] flex-1 bg-white/5"></div>
+        <span class="text-[9px] font-black text-gray-600 uppercase tracking-[0.3em]">Ubicación</span>
+        <div class="h-[1px] flex-1 bg-white/5"></div>
+    </div>
+
+    {{-- Dirección --}}
+    <div class="col-span-1 md:col-span-6">
+        <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Dirección</label>
+        <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <i class="fas fa-map-marker-alt text-gray-600 group-focus-within:text-yellow-500 transition-colors"></i>
+            </div>
+            <input type="text" name="address_line"
+                   class="w-full bg-[#070a13] border-white/10 rounded-xl text-white text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/30 transition-all py-3.5 pl-11 pr-4"
+                   value="{{ old('address_line', $provider->address_line ?? '') }}"
+                   placeholder="Calle 10 # 5-20, Bodega 3">
+        </div>
+    </div>
+
+    {{-- Ciudad / Departamento / Código Postal --}}
+    <div class="col-span-1 md:col-span-2">
+        <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Ciudad</label>
+        <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <i class="fas fa-city text-gray-600 group-focus-within:text-yellow-500 transition-colors"></i>
+            </div>
+            <input type="text" name="city"
+                   class="w-full bg-[#070a13] border-white/10 rounded-xl text-white text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/30 transition-all py-3.5 pl-11 pr-4"
+                   value="{{ old('city', $provider->city ?? '') }}"
+                   placeholder="Bogotá">
+        </div>
+    </div>
+
+    <div class="col-span-1 md:col-span-2">
+        <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Departamento</label>
+        <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <i class="fas fa-map text-gray-600 group-focus-within:text-yellow-500 transition-colors"></i>
+            </div>
+            <input type="text" name="department"
+                   class="w-full bg-[#070a13] border-white/10 rounded-xl text-white text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/30 transition-all py-3.5 pl-11 pr-4"
+                   value="{{ old('department', $provider->department ?? '') }}"
+                   placeholder="Cundinamarca">
+        </div>
+    </div>
+
+    <div class="col-span-1 md:col-span-2">
+        <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Código Postal</label>
+        <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <i class="fas fa-hashtag text-gray-600 group-focus-within:text-yellow-500 transition-colors"></i>
+            </div>
+            <input type="text" name="postal_code"
+                   class="w-full bg-[#070a13] border-white/10 rounded-xl text-white text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/30 transition-all py-3.5 pl-11 pr-4"
+                   value="{{ old('postal_code', $provider->postal_code ?? '') }}"
+                   placeholder="110111">
+        </div>
+    </div>
+
     {{-- BLOQUE 3: CONDICIONES COMERCIALES --}}
     <div class="col-span-1 md:col-span-6 flex items-center gap-3 mt-4 mb-2">
         <div class="h-[1px] flex-1 bg-white/5"></div>

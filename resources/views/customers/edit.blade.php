@@ -151,6 +151,19 @@
                                 class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm text-white outline-none focus:border-yellow-500/50">
                         </div>
                         <div>
+                            <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">
+                                Zona de Entrega
+                                <span class="text-zinc-600 normal-case tracking-normal font-normal ml-1">(para ordenar la ruta)</span>
+                            </label>
+                            <select name="delivery_zone"
+                                class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm text-white outline-none focus:border-yellow-500/50">
+                                <option value="">Sin zona asignada</option>
+                                @foreach(['norte' => '🔵 Norte', 'sur' => '🟡 Sur', 'oriente' => '🟢 Oriente', 'occidente' => '🔴 Occidente', 'centro' => '⚪ Centro'] as $val => $lbl)
+                                <option value="{{ $val }}" {{ old('delivery_zone', $customer->delivery_zone) === $val ? 'selected' : '' }}>{{ $lbl }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
                             <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Municipio (DANE) <span class="text-red-400">*</span></label>
                             <input type="text" name="municipality_id" value="{{ old('municipality_id', $customer->municipality_id) }}" required
                                 class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm font-mono text-yellow-500 outline-none focus:border-yellow-500/50">

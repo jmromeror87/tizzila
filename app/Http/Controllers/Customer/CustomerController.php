@@ -253,11 +253,13 @@ public function create()
         'credit_limit'           => 'nullable|numeric|min:0',
         'is_fixed_client'        => 'nullable|boolean',
         'fixed_weekly_quantity'  => 'nullable|integer|min:0',
+        'delivery_zone'          => 'nullable|in:norte,sur,oriente,occidente,centro',
     ]);
 
     $validated['credit_limit']          = $request->input('credit_limit', 0) ?? 0;
     $validated['is_fixed_client']       = $request->boolean('is_fixed_client');
     $validated['fixed_weekly_quantity'] = $request->input('fixed_weekly_quantity', 0) ?? 0;
+    $validated['delivery_zone']         = $request->input('delivery_zone') ?: null;
 
     /*
     |--------------------------------------------------------------------------

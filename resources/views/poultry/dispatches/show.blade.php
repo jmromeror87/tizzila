@@ -92,6 +92,73 @@
             </span>
         </div>
 
+        {{-- ══ RUTA SUGERIDA POR ZONA ══ --}}
+        @php
+            $zoneOrder  = ['norte', 'oriente', 'centro', 'occidente', 'sur'];
+            $zoneColors = ['norte'=>'blue','sur'=>'yellow','oriente'=>'emerald','occidente'=>'red','centro'=>'zinc'];
+            $zoneEmojis = ['norte'=>'🔵','sur'=>'🟡','oriente'=>'🟢','occidente'=>'🔴','centro'=>'⚪'];
+            $byZone     = $dispatch->items->groupBy(fn($i) => $i->customer->delivery_zone ?: 'sin_zona');
+            $hasZones   = $dispatch->items->filter(fn($i) => $i->customer->delivery_zone)->count() > 0;
+        @endphp
+
+        @if($hasZones)
+        <div class="bg-[#0d121f] border border-white/5 rounded-2xl overflow-hidden">
+            <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-route text-yellow-500 text-xs"></i>
+                    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Ruta Sugerida por Zona</h3>
+                </div>
+                @if($dispatch->status === 'scheduled')
+                <form method="POST" action="{{ route('dispatch.routes.generate') }}">
+                    @csrf
+                    <button type="submit"
+                        class="h-8 px-4 bg-yellow-500 hover:bg-yellow-400 text-black rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
+                        <i class="fas fa-magic text-[9px]"></i> Generar Ruta con Mapbox
+                    </button>
+                </form>
+                @endif
+            </div>
+            <div class="p-5">
+                <div class="flex flex-wrap gap-3">
+                    @php $step = 1; @endphp
+                    @foreach($zoneOrder as $zone)
+                        @if(isset($byZone[$zone]))
+                        @php $zc = $zoneColors[$zone] ?? 'zinc'; $emoji = $zoneEmojis[$zone] ?? '📍'; @endphp
+                        <div class="flex-1 min-w-[160px] bg-{{ $zc }}-500/5 border border-{{ $zc }}-500/20 rounded-xl p-3">
+                            <p class="text-[9px] font-black text-{{ $zc }}-400 uppercase tracking-widest mb-2">
+                                {{ $emoji }} {{ ucfirst($zone) }} · {{ $byZone[$zone]->count() }} paradas
+                            </p>
+                            @foreach($byZone[$zone] as $item)
+                            <div class="flex items-center gap-2 py-1 border-b border-{{ $zc }}-500/10 last:border-0">
+                                <span class="text-[8px] font-black text-{{ $zc }}-400/60 w-4">{{ $step++ }}</span>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-[9px] font-black text-white truncate">{{ $item->customer->name }}</p>
+                                    <p class="text-[8px] text-zinc-600 truncate">{{ $item->customer->address }}</p>
+                                </div>
+                                <span class="text-[9px] font-black text-white flex-shrink-0">{{ number_format($item->quantity) }}</span>
+                            </div>
+                            @endforeach
+                        </div>
+                        @endif
+                    @endforeach
+                    @if(isset($byZone['sin_zona']))
+                    <div class="flex-1 min-w-[160px] bg-white/5 border border-white/10 rounded-xl p-3 opacity-50">
+                        <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-2">📍 Sin zona · {{ $byZone['sin_zona']->count() }} paradas</p>
+                        @foreach($byZone['sin_zona'] as $item)
+                        <div class="flex items-center gap-2 py-1 border-b border-white/5 last:border-0">
+                            <span class="text-[8px] font-black text-zinc-600 w-4">{{ $step++ }}</span>
+                            <p class="text-[9px] text-zinc-500 truncate flex-1">{{ $item->customer->name }}</p>
+                            <span class="text-[9px] text-zinc-500 flex-shrink-0">{{ number_format($item->quantity) }}</span>
+                        </div>
+                        @endforeach
+                    </div>
+                    @endif
+                </div>
+                <p class="text-[9px] text-zinc-700 mt-3">Orden: Norte → Oriente → Centro → Occidente → Sur · Asigna zona a cada cliente para mejorar la ruta</p>
+            </div>
+        </div>
+        @endif
+
         {{-- Tabla de distribución --}}
         <div class="bg-[#0d121f] border border-white/5 rounded-2xl overflow-hidden">
             <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
@@ -137,6 +204,10 @@
                                 </td>
                                 <td class="px-5 py-4">
                                     <p class="text-[10px] text-gray-500 leading-snug max-w-[180px]">{{ $item->customer->address }}</p>
+                                    @if($item->customer->delivery_zone)
+                                    @php $zoneColors = ['norte'=>'blue','sur'=>'yellow','oriente'=>'emerald','occidente'=>'red','centro'=>'zinc']; $zc = $zoneColors[$item->customer->delivery_zone] ?? 'zinc'; @endphp
+                                    <span class="text-[8px] font-black text-{{ $zc }}-400 bg-{{ $zc }}-500/10 px-1.5 py-0.5 rounded uppercase">{{ $item->customer->delivery_zone }}</span>
+                                    @endif
                                 </td>
                                 <td class="px-5 py-4 text-right">
                                     <p class="text-sm font-black text-white group-hover:text-yellow-500 transition-colors">{{ number_format($item->quantity) }}</p>

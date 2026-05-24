@@ -254,18 +254,75 @@ class PurchaseInvoiceController extends Controller
 
     public function show(PurchaseInvoice $purchaseInvoice)
     {
-        $purchaseInvoice->load(['order', 'provider', 'items', 'dispatches.items', 'payments']);
+        $purchaseInvoice->load([
+            'order.distributions.customer',
+            'provider',
+            'items',
+            'dispatches.items',
+            'payments',
+        ]);
 
-        $totalDistributed = $purchaseInvoice->dispatches
-            ->flatMap->items
-            ->sum('quantity');
+        $totalDistributed = $purchaseInvoice->dispatches->flatMap->items->sum('quantity');
+        $pendingQty       = $purchaseInvoice->quantity_invoiced - $totalDistributed;
 
-        $pendingQty = $purchaseInvoice->quantity_invoiced - $totalDistributed;
+        // ── Comparar factura vs distribución planeada ──────────────────────
+        $plannedTotal  = $purchaseInvoice->order->distributions->sum('quantity');
+        $invoiced      = $purchaseInvoice->quantity_invoiced;
+        $delta         = $invoiced - $plannedTotal;  // + excedente / - déficit
+
+        // DSS excedente: clientes variables activos sin bloqueo de crédito
+        $dssClients = collect();
+        if ($delta > 0) {
+            $assignedIds = $purchaseInvoice->order->distributions->pluck('customer_id');
+
+            $dssClients = \App\Models\Customer\Customer::where('is_active', true)
+                ->where('is_fixed_client', false)
+                ->whereNotIn('id', $assignedIds)
+                ->with(['invoices' => fn($q) => $q->where('balance', '>', 0)])
+                ->get()
+                ->filter(function ($c) {
+                    $overdue   = $c->invoices->where('payment_status', 'overdue')->sum('balance');
+                    $total     = $c->invoices->sum('balance');
+                    $overLimit = $c->credit_limit > 0 && $total > $c->credit_limit;
+                    return $overdue == 0 && !$overLimit;
+                })
+                ->map(function ($c) {
+                    $totalInv  = $c->invoices->sum('total') ?? 0;
+                    $totalPaid = $totalInv - ($c->invoices->sum('balance') ?? 0);
+                    $c->effectiveness = $totalInv > 0 ? round(($totalPaid / $totalInv) * 100, 1) : 100;
+                    return $c;
+                })
+                ->sortByDesc('effectiveness')
+                ->take(8)
+                ->values();
+        }
+
+        // DSS déficit: qué clientes planeados reducir (menores efectividad)
+        $dssDeficitSuggestions = collect();
+        if ($delta < 0) {
+            $dssDeficitSuggestions = $purchaseInvoice->order->distributions
+                ->map(function ($dist) {
+                    $c = $dist->customer;
+                    $totalInv  = $c->invoices()->sum('total') ?? 0;
+                    $totalBal  = $c->invoices()->where('balance', '>', 0)->sum('balance') ?? 0;
+                    $dist->effectiveness = $totalInv > 0
+                        ? round((($totalInv - $totalBal) / $totalInv) * 100, 1)
+                        : 100;
+                    return $dist;
+                })
+                ->sortBy('effectiveness')
+                ->take(5)
+                ->values();
+        }
 
         return view('poultry.purchase-invoices.show', compact(
             'purchaseInvoice',
             'totalDistributed',
-            'pendingQty'
+            'pendingQty',
+            'plannedTotal',
+            'delta',
+            'dssClients',
+            'dssDeficitSuggestions',
         ));
     }
 }

@@ -63,6 +63,177 @@
             </div>
         </div>
 
+        {{-- ══ PANEL COMPARACIÓN: FACTURA vs DISTRIBUCIÓN PLANEADA ══ --}}
+        @php
+            $absD        = abs($delta);
+            $hasPlanned  = $plannedTotal > 0;
+            $isSurplus   = $delta > 0;
+            $isDeficit   = $delta < 0;
+            $isExact     = $delta === 0;
+            $pctCoverage = $plannedTotal > 0
+                ? min(100, round(($purchaseInvoice->quantity_invoiced / $plannedTotal) * 100))
+                : 0;
+        @endphp
+
+        <div class="bg-[#0d121f] border border-{{ $isSurplus ? 'yellow-500/20' : ($isDeficit ? 'red-500/20' : 'emerald-500/20') }} rounded-2xl overflow-hidden">
+            {{-- Header --}}
+            <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="h-8 w-8 rounded-xl flex items-center justify-center
+                        {{ $isSurplus ? 'bg-yellow-500/10' : ($isDeficit ? 'bg-red-500/10' : 'bg-emerald-500/10') }}">
+                        <i class="fas fa-{{ $isSurplus ? 'arrow-up' : ($isDeficit ? 'arrow-down' : 'check') }}
+                            text-{{ $isSurplus ? 'yellow' : ($isDeficit ? 'red' : 'emerald') }}-400 text-xs"></i>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-black uppercase tracking-[0.3em]
+                            text-{{ $isSurplus ? 'yellow' : ($isDeficit ? 'red' : 'emerald') }}-400">
+                            {{ $isSurplus ? '⚡ Excedente — aves extra sin asignar' : ($isDeficit ? '⚠ Déficit — faltan aves para cubrir el plan' : '✓ Factura igual al plan') }}
+                        </p>
+                        <p class="text-[10px] font-black text-white">Factura vs Distribución Programada</p>
+                    </div>
+                </div>
+                <a href="{{ route('poultry.distribution.show', $purchaseInvoice->order) }}"
+                   class="h-8 px-4 bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-400 hover:text-white rounded-xl text-[9px] font-black uppercase tracking-widest flex items-center gap-2 transition-all">
+                    <i class="fas fa-users text-[9px]"></i> Ver Plan
+                </a>
+            </div>
+
+            <div class="p-6">
+                {{-- Barra visual comparación --}}
+                <div class="grid grid-cols-3 gap-4 mb-6 text-center">
+                    <div>
+                        <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Planeado</p>
+                        <p class="text-2xl font-black text-zinc-300 tracking-tighter">{{ number_format($plannedTotal) }}</p>
+                        <p class="text-[9px] text-zinc-600">{{ $purchaseInvoice->order->distributions->count() }} clientes</p>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Diferencia</p>
+                        <p class="text-2xl font-black tracking-tighter {{ $isSurplus ? 'text-yellow-400' : ($isDeficit ? 'text-red-400' : 'text-emerald-400') }}">
+                            {{ $isSurplus ? '+' : '' }}{{ number_format($delta) }}
+                        </p>
+                        <p class="text-[9px] {{ $isSurplus ? 'text-yellow-600' : ($isDeficit ? 'text-red-600' : 'text-emerald-600') }}">
+                            {{ $isSurplus ? 'aves excedentes' : ($isDeficit ? 'aves faltantes' : 'perfecto') }}
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Facturado</p>
+                        <p class="text-2xl font-black text-white tracking-tighter">{{ number_format($purchaseInvoice->quantity_invoiced) }}</p>
+                        <p class="text-[9px] text-zinc-600">{{ $pctCoverage }}% del plan</p>
+                    </div>
+                </div>
+
+                {{-- Barra de cobertura --}}
+                <div class="mb-6">
+                    <div class="w-full h-3 bg-white/5 rounded-full overflow-hidden relative">
+                        <div class="h-full rounded-full transition-all duration-700
+                            {{ $isExact ? 'bg-emerald-500' : ($isSurplus ? 'bg-yellow-500' : 'bg-red-500') }}"
+                             style="width: {{ min(100, $pctCoverage) }}%"></div>
+                        @if($isSurplus)
+                        <div class="absolute top-0 bottom-0 bg-yellow-500/20 border-l-2 border-yellow-400/60"
+                             style="left:{{ min(100, $pctCoverage > 0 ? round(($plannedTotal / $purchaseInvoice->quantity_invoiced) * 100) : 100) }}%; right:0"></div>
+                        @endif
+                    </div>
+                    <div class="flex justify-between text-[8px] font-black text-zinc-600 mt-1">
+                        <span>0</span>
+                        @if($hasPlanned)<span class="text-zinc-500">Plan: {{ number_format($plannedTotal) }}</span>@endif
+                        <span>{{ number_format($purchaseInvoice->quantity_invoiced) }}</span>
+                    </div>
+                </div>
+
+                {{-- ══ DSS EXCEDENTE ══ --}}
+                @if($isSurplus && $dssClients->count() > 0)
+                <div class="border border-yellow-500/20 rounded-xl overflow-hidden">
+                    <div class="px-4 py-3 bg-yellow-500/5 border-b border-yellow-500/10 flex items-center gap-2">
+                        <i class="fas fa-robot text-yellow-400 text-xs"></i>
+                        <p class="text-[9px] font-black text-yellow-400 uppercase tracking-widest">
+                            DSS · Clientes sugeridos para las {{ number_format($absD) }} aves excedentes
+                        </p>
+                    </div>
+                    <div class="divide-y divide-yellow-500/5">
+                        @foreach($dssClients as $c)
+                        <div class="px-4 py-3 flex items-center gap-3 hover:bg-yellow-500/5 transition-colors">
+                            <div class="flex-1">
+                                <p class="text-xs font-black text-white">{{ $c->name }}</p>
+                                <p class="text-[9px] text-zinc-600">Cliente variable · Sin deuda vencida</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[9px] font-black text-{{ $c->effectiveness >= 90 ? 'emerald' : 'yellow' }}-400">
+                                    {{ $c->effectiveness }}% efectividad
+                                </p>
+                            </div>
+                            <a href="{{ route('poultry.distribution.show', $purchaseInvoice->order) }}"
+                               class="h-7 px-3 bg-yellow-500/10 border border-yellow-500/20 hover:bg-yellow-500/20 text-yellow-400 rounded-lg text-[9px] font-black uppercase transition-all">
+                                Asignar →
+                            </a>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @elseif($isSurplus && $dssClients->isEmpty())
+                <div class="bg-red-500/5 border border-red-500/20 rounded-xl px-4 py-3 text-center">
+                    <p class="text-[9px] font-black text-red-400 uppercase">Sin clientes variables disponibles sin deuda vencida</p>
+                    <p class="text-[9px] text-zinc-600 mt-1">Todos los clientes variables tienen bloqueo de crédito activo</p>
+                </div>
+                @endif
+
+                {{-- ══ DSS DÉFICIT ══ --}}
+                @if($isDeficit && $dssDeficitSuggestions->count() > 0)
+                <div class="border border-red-500/20 rounded-xl overflow-hidden">
+                    <div class="px-4 py-3 bg-red-500/5 border-b border-red-500/10 flex items-center gap-2">
+                        <i class="fas fa-robot text-red-400 text-xs"></i>
+                        <p class="text-[9px] font-black text-red-400 uppercase tracking-widest">
+                            DSS · Clientes a reducir para ajustar al déficit de {{ number_format($absD) }} aves
+                        </p>
+                    </div>
+                    <div class="divide-y divide-red-500/5">
+                        @foreach($dssDeficitSuggestions as $dist)
+                        <div class="px-4 py-3 flex items-center gap-3 hover:bg-red-500/5 transition-colors">
+                            <div class="flex-1">
+                                <p class="text-xs font-black text-white">{{ $dist->customer->name }}</p>
+                                <p class="text-[9px] text-zinc-600">Planeado: {{ number_format($dist->quantity) }} aves</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[9px] font-black text-{{ $dist->effectiveness >= 90 ? 'emerald' : ($dist->effectiveness >= 70 ? 'yellow' : 'red') }}-400">
+                                    {{ $dist->effectiveness }}% efectividad
+                                </p>
+                                <p class="text-[9px] text-zinc-600">menor prioridad</p>
+                            </div>
+                            <a href="{{ route('poultry.distribution.show', $purchaseInvoice->order) }}"
+                               class="h-7 px-3 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 text-red-400 rounded-lg text-[9px] font-black uppercase transition-all">
+                                Ajustar →
+                            </a>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
+                {{-- Lista de distribución planeada --}}
+                @if($purchaseInvoice->order->distributions->count() > 0)
+                <div class="mt-4">
+                    <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-3">Distribución planeada</p>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        @foreach($purchaseInvoice->order->distributions as $dist)
+                        <div class="bg-black/30 border border-white/5 rounded-xl px-3 py-2 flex items-center justify-between">
+                            <p class="text-[10px] font-black text-zinc-300 truncate">{{ $dist->customer->name }}</p>
+                            <p class="text-[10px] font-black text-white ml-2 flex-shrink-0">{{ number_format($dist->quantity) }}</p>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @else
+                <div class="mt-4 text-center py-6 text-zinc-700">
+                    <i class="fas fa-users text-2xl opacity-20 mb-2 block"></i>
+                    <p class="text-[9px] font-black uppercase tracking-widest">Sin distribución planeada</p>
+                    <a href="{{ route('poultry.distribution.show', $purchaseInvoice->order) }}"
+                       class="inline-block mt-2 text-[9px] font-black text-yellow-400 hover:text-yellow-300 uppercase tracking-widest transition-colors">
+                        Planear distribución →
+                    </a>
+                </div>
+                @endif
+            </div>
+        </div>
+
         {{-- DETALLES --}}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 

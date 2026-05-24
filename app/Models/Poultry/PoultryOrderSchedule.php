@@ -71,6 +71,11 @@ class PoultryOrderSchedule extends Model
         )->withPivot('quantity');
     }
 
+    public function distributions()
+    {
+        return $this->hasMany(\App\Models\Poultry\PoultryOrderDistribution::class);
+    }
+
     public function approval()
     {
         return $this->hasOne(

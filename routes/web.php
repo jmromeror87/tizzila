@@ -48,6 +48,7 @@ use App\Http\Controllers\Driver\DriverRouteController;
 use App\Http\Controllers\Poultry\PoultryProviderDocumentBatchController;
 use App\Http\Controllers\Poultry\PurchaseInvoiceController;
 use App\Http\Controllers\Poultry\ProjectionController;
+use App\Http\Controllers\Poultry\PlannedDistributionController;
 use App\Http\Controllers\Global\TaxCategoryController;
 use App\Http\Controllers\Invoice\InvoiceController;
 use App\Http\Controllers\Invoice\InvoicePaymentController;
@@ -691,6 +692,15 @@ Route::middleware(['auth'])
             PoultryOrderScheduleController::class,
             'dssSurplus'
         ])->name('dss-surplus');
+    });
+
+    // 📋 DISTRIBUCIÓN PROGRAMADA (Parte 1)
+    Route::prefix('orders/{order}/distribution')->name('poultry.distribution.')->middleware('auth')->group(function () {
+        Route::get('/', [PlannedDistributionController::class, 'show'])->name('show');
+        Route::post('/auto-fixed', [PlannedDistributionController::class, 'autoLoadFixed'])->name('auto-fixed');
+        Route::post('/', [PlannedDistributionController::class, 'store'])->name('store');
+        Route::put('/{distribution}', [PlannedDistributionController::class, 'update'])->name('update');
+        Route::delete('/{distribution}', [PlannedDistributionController::class, 'destroy'])->name('destroy');
     });
 
     // 📊 PROYECCIÓN COMERCIAL

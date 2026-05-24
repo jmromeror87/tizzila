@@ -249,6 +249,16 @@
                                         <i class="fas fa-exchange-alt"></i>
                                     </a>
 
+                                    {{-- Distribución Programada --}}
+                                    @if($isProgrammed)
+                                    @php $distCount = $order->distributions->count(); @endphp
+                                    <a href="{{ route('poultry.distribution.show', $order) }}"
+                                       title="Distribución programada"
+                                       class="h-8 w-8 rounded-xl {{ $distCount > 0 ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20 text-emerald-400' : 'bg-yellow-500/10 border-yellow-500/20 hover:bg-yellow-500/20 text-yellow-400' }} border flex items-center justify-center transition-all text-[10px]">
+                                        <i class="fas fa-users"></i>
+                                    </a>
+                                    @endif
+
                                     {{-- Factura de Compra PRONAVICOLA --}}
                                     @if($isApproved && $isProgrammed)
                                     @php $hasPurchaseInvoice = (bool)($order->purchaseInvoice ?? false); @endphp

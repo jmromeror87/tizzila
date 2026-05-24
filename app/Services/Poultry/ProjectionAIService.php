@@ -16,9 +16,9 @@ class ProjectionAIService
      * Genera análisis predictivo narrativo usando GPT-4o.
      * Recibe datos históricos y contexto del negocio.
      */
-    public function analyze(array $historicalData, array $nextMonths, array $fixedClients): array
+    public function analyze(array $historicalData, array $nextMonths, array $fixedClients, array $marketEvents = []): array
     {
-        $prompt = $this->buildPrompt($historicalData, $nextMonths, $fixedClients);
+        $prompt = $this->buildPrompt($historicalData, $nextMonths, $fixedClients, $marketEvents);
 
         try {
             $response = Http::withToken(config('services.openai.key'))
@@ -59,11 +59,12 @@ class ProjectionAIService
         }
     }
 
-    private function buildPrompt(array $historical, array $nextMonths, array $fixedClients): string
+    private function buildPrompt(array $historical, array $nextMonths, array $fixedClients, array $marketEvents = []): string
     {
-        $histJson  = json_encode($historical, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        $nextJson  = json_encode($nextMonths,  JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        $fixedJson = json_encode($fixedClients, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $histJson   = json_encode($historical,    JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $nextJson   = json_encode($nextMonths,    JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $fixedJson  = json_encode($fixedClients,  JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $eventsJson = json_encode($marketEvents,  JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 
         return <<<PROMPT
 Analiza estos datos históricos de pedidos de aves de DISTRIAVICOLA SOFRAQ SAS y genera proyección predictiva.
@@ -76,6 +77,9 @@ Analiza estos datos históricos de pedidos de aves de DISTRIAVICOLA SOFRAQ SAS y
 
 ## CLIENTES FIJOS (demanda comprometida):
 {$fixedJson}
+
+## NOVEDADES DE MERCADO ACTIVAS (factores externos que afectan la demanda):
+{$eventsJson}
 
 Considera:
 - La empresa opera lunes y jueves (2 despachos por semana)

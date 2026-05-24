@@ -724,11 +724,20 @@ Route::middleware(['auth'])
 */
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MarketEventController;
 
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
+
+    // Novedades de Mercado
+    Route::prefix('market-events')->name('market-events.')->group(function () {
+        Route::get('/',                    [MarketEventController::class, 'index'])->name('index');
+        Route::post('/',                   [MarketEventController::class, 'store'])->name('store');
+        Route::patch('/{event}/toggle',    [MarketEventController::class, 'toggle'])->name('toggle');
+        Route::delete('/{event}',          [MarketEventController::class, 'destroy'])->name('destroy');
+    });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

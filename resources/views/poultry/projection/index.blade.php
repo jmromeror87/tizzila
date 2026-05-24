@@ -14,6 +14,30 @@
 
     <div class="py-4 space-y-6">
 
+        {{-- ══ ALERTAS DE MERCADO ACTIVAS ══ --}}
+        @if(isset($marketEvents) && $marketEvents->count() > 0)
+        <div class="space-y-2">
+            @foreach($marketEvents as $me)
+            @php
+                $mc = match($me->severity) { 'high' => 'red', 'medium' => 'yellow', default => 'blue' };
+            @endphp
+            <div class="bg-{{ $mc }}-500/10 border border-{{ $mc }}-500/30 rounded-2xl px-5 py-3 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-triangle-exclamation text-{{ $mc }}-400"></i>
+                    <div>
+                        <p class="text-[10px] font-black text-{{ $mc }}-300">{{ $me->title }}</p>
+                        <p class="text-[9px] text-zinc-500">{{ $me->type_label }} · Impacto estimado: {{ $me->estimated_impact_pct }}% en ventas</p>
+                    </div>
+                </div>
+                <a href="{{ route('market-events.index') }}"
+                   class="text-[9px] font-black text-{{ $mc }}-400 uppercase tracking-widest hover:text-{{ $mc }}-300 transition-colors flex-shrink-0">
+                    Ver →
+                </a>
+            </div>
+            @endforeach
+        </div>
+        @endif
+
         {{-- ══ PANEL IA ══ --}}
         @php
             $tendenciaColor = match($aiAnalysis['tendencia'] ?? 'estable') {

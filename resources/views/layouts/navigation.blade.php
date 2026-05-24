@@ -129,6 +129,13 @@
                     <a href="{{ route('poultry.projection') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition-all {{ request()->routeIs('poultry.projection') ? 'text-[#f3c444] bg-[#f3c444]/5' : 'text-gray-500 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-chart-line w-3.5 text-center"></i>Proyección 3 Meses
                     </a>
+                    <a href="{{ route('market-events.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition-all {{ request()->routeIs('market-events.*') ? 'text-[#f3c444] bg-[#f3c444]/5' : 'text-gray-500 hover:text-white hover:bg-white/5' }}">
+                        <i class="fas fa-triangle-exclamation w-3.5 text-center"></i>Novedades Mercado
+                        @php $activeEvents = \App\Models\MarketEvent::active()->count(); @endphp
+                        @if($activeEvents > 0)
+                        <span class="ml-auto text-[8px] font-black bg-red-500 text-white rounded-full px-1.5 py-0.5">{{ $activeEvents }}</span>
+                        @endif
+                    </a>
                     <a href="{{ route('claims.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition-all {{ request()->routeIs('claims.*') ? 'text-[#f3c444] bg-[#f3c444]/5' : 'text-gray-500 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-exclamation-circle w-3.5 text-center"></i>Reclamos
                     </a>

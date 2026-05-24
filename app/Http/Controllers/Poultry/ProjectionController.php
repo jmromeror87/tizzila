@@ -10,6 +10,7 @@ namespace App\Http\Controllers\Poultry;
 use App\Http\Controllers\Controller;
 use App\Models\Poultry\PoultryOrderSchedule;
 use App\Models\Customer\Customer;
+use App\Models\MarketEvent;
 use App\Services\Poultry\ProjectionAIService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -27,7 +28,10 @@ class ProjectionController extends Controller
         // ── 3. CLIENTES FIJOS ───────────────────────────────────────────────
         $fixedClients = $this->buildFixedClients();
 
-        // ── 4. ANÁLISIS IA ──────────────────────────────────────────────────
+        // ── 4. NOVEDADES DE MERCADO ACTIVAS ────────────────────────────────
+        $marketEvents = MarketEvent::active()->latest()->get();
+
+        // ── 5. ANÁLISIS IA ──────────────────────────────────────────────────
         $aiAnalysis = $ai->analyze(
             $historical->toArray(),
             $projection->map(fn($m) => [
@@ -40,11 +44,20 @@ class ProjectionController extends Controller
                 'name'             => $c->name,
                 'weekly_quantity'  => $c->fixed_weekly_quantity,
                 'effectiveness_pct'=> $c->effectiveness,
+            ])->toArray(),
+            $marketEvents->map(fn($e) => [
+                'titulo'          => $e->title,
+                'tipo'            => $e->type_label,
+                'severidad'       => $e->severity,
+                'impacto_pct'     => $e->estimated_impact_pct,
+                'descripcion'     => $e->description,
+                'desde'           => $e->starts_at->format('Y-m-d'),
+                'hasta'           => $e->ends_at?->format('Y-m-d'),
             ])->toArray()
         );
 
         return view('poultry.projection.index', compact(
-            'projection', 'historical', 'fixedClients', 'aiAnalysis'
+            'projection', 'historical', 'fixedClients', 'aiAnalysis', 'marketEvents'
         ));
     }
 

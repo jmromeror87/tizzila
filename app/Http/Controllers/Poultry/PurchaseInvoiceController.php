@@ -138,24 +138,66 @@ class PurchaseInvoiceController extends Controller
             'notes'          => 'nullable|string|max:300',
         ]);
 
-        PurchaseInvoicePayment::create([
+        $payment = PurchaseInvoicePayment::create([
             ...$validated,
             'purchase_invoice_id' => $purchaseInvoice->id,
             'registered_by'       => Auth::id(),
         ]);
 
-        $totalPaid  = $purchaseInvoice->payments()->sum('amount') + $validated['amount'];
+        $totalPaid  = $purchaseInvoice->payments()->sum('amount');
         $newBalance = max(0, $purchaseInvoice->total - $totalPaid);
-        $status     = $newBalance == 0 ? 'paid' : ($totalPaid > 0 ? 'partial' : 'pending');
+        $status     = $newBalance == 0 ? 'paid' : 'partial';
 
         $purchaseInvoice->update([
             'balance'        => $newBalance,
             'payment_status' => $status,
         ]);
 
+        // Asiento contable: Débito 2205 Proveedores / Crédito 111005 Bancos
+        $this->createPaymentJournalEntry($purchaseInvoice, $payment);
+
         return redirect()
             ->route('purchase-invoices.show', $purchaseInvoice)
-            ->with('success', 'Pago registrado. Saldo pendiente: $' . number_format($newBalance, 0, ',', '.'));
+            ->with('success', 'Pago registrado. Asiento contable generado. Saldo: $' . number_format($newBalance, 0, ',', '.'));
+    }
+
+    private function createPaymentJournalEntry(PurchaseInvoice $invoice, PurchaseInvoicePayment $payment): void
+    {
+        $companyId = DB::table('companies')->value('id') ?? 1;
+        $ref       = $payment->reference ? " · Ref: {$payment->reference}" : '';
+
+        $entry = JournalEntry::create([
+            'company_id'    => $companyId,
+            'date'          => $payment->payment_date,
+            'reference'     => $invoice->invoice_number,
+            'description'   => "Pago PRONAVICOLA · {$invoice->invoice_number}{$ref}",
+            'module_source' => 'purchase_invoice_payment',
+            'module_id'     => $payment->id,
+            'status'        => 'posted',
+            'created_by'    => Auth::id(),
+            'total_debit'   => $payment->amount,
+            'total_credit'  => $payment->amount,
+        ]);
+
+        // Débito: 2205 Proveedores Nacionales (cancela la deuda)
+        $entry->lines()->create([
+            'account_id'       => 15,
+            'third_party_id'   => $invoice->provider_id,
+            'third_party_type' => 'provider',
+            'description'      => "Cancelación deuda PRONAVICOLA · {$invoice->invoice_number}",
+            'debit'            => $payment->amount,
+            'credit'           => 0,
+        ]);
+
+        // Crédito: 111005 Banco Cuenta Corriente (sale el dinero)
+        $entry->lines()->create([
+            'account_id'       => 6,
+            'third_party_id'   => $invoice->provider_id,
+            'third_party_type' => 'provider',
+            'description'      => "Transferencia bancaria PRONAVICOLA{$ref}",
+            'debit'            => 0,
+            'credit'           => $payment->amount,
+        ]);
     }
 
     private function createJournalEntry(PurchaseInvoice $invoice): void

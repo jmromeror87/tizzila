@@ -14,16 +14,61 @@
     <div class="col-span-1 md:col-span-6">
         <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Tipo de Tercero</label>
         <div class="grid grid-cols-3 gap-3">
-            @foreach(['poultry' => ['Proveedor de Aves', 'fas fa-feather-alt', 'yellow'], 'expense' => ['Proveedor de Gastos', 'fas fa-receipt', 'blue'], 'general' => ['General / Otro', 'fas fa-user-tie', 'zinc']] as $val => [$lbl, $ico, $col])
-            <label class="cursor-pointer group">
-                <input type="radio" name="provider_type" value="{{ $val }}" @checked(old('provider_type', $provider->provider_type ?? 'poultry') == $val) class="sr-only peer">
-                <div class="peer-checked:border-{{ $col }}-500/50 peer-checked:bg-{{ $col }}-500/10 peer-checked:text-{{ $col }}-400 border border-white/10 bg-black/20 rounded-xl px-4 py-3 flex items-center gap-3 text-zinc-500 transition-all hover:border-white/20">
-                    <i class="{{ $ico }} text-sm"></i>
-                    <span class="text-[10px] font-black uppercase tracking-widest">{{ $lbl }}</span>
+            @php $currentType = old('provider_type', $provider->provider_type ?? 'poultry'); @endphp
+
+            {{-- Proveedor de Aves --}}
+            <label class="cursor-pointer">
+                <input type="radio" name="provider_type" value="poultry" @checked($currentType == 'poultry') class="sr-only peer">
+                <div class="{{ $currentType == 'poultry' ? 'border-yellow-500/50 bg-yellow-500/10 text-yellow-400' : 'border-white/10 bg-black/20 text-zinc-500 hover:border-white/20' }} border rounded-xl px-4 py-3 flex items-center gap-3 transition-all">
+                    <i class="fas fa-feather-alt text-sm"></i>
+                    <span class="text-[10px] font-black uppercase tracking-widest">Proveedor de Aves</span>
                 </div>
             </label>
-            @endforeach
+
+            {{-- Proveedor de Gastos --}}
+            <label class="cursor-pointer">
+                <input type="radio" name="provider_type" value="expense" @checked($currentType == 'expense') class="sr-only peer">
+                <div class="{{ $currentType == 'expense' ? 'border-blue-500/50 bg-blue-500/10 text-blue-400' : 'border-white/10 bg-black/20 text-zinc-500 hover:border-white/20' }} border rounded-xl px-4 py-3 flex items-center gap-3 transition-all">
+                    <i class="fas fa-receipt text-sm"></i>
+                    <span class="text-[10px] font-black uppercase tracking-widest">Proveedor de Gastos</span>
+                </div>
+            </label>
+
+            {{-- General --}}
+            <label class="cursor-pointer">
+                <input type="radio" name="provider_type" value="general" @checked($currentType == 'general') class="sr-only peer">
+                <div class="{{ $currentType == 'general' ? 'border-zinc-400/50 bg-zinc-500/10 text-zinc-300' : 'border-white/10 bg-black/20 text-zinc-500 hover:border-white/20' }} border rounded-xl px-4 py-3 flex items-center gap-3 transition-all">
+                    <i class="fas fa-user-tie text-sm"></i>
+                    <span class="text-[10px] font-black uppercase tracking-widest">General / Otro</span>
+                </div>
+            </label>
         </div>
+
+        {{-- JS para feedback visual inmediato al hacer clic --}}
+        <script>
+        document.querySelectorAll('input[name="provider_type"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                const configs = {
+                    poultry: 'border-yellow-500/50 bg-yellow-500/10 text-yellow-400',
+                    expense: 'border-blue-500/50 bg-blue-500/10 text-blue-400',
+                    general: 'border-zinc-400/50 bg-zinc-500/10 text-zinc-300',
+                };
+                document.querySelectorAll('input[name="provider_type"]').forEach(r => {
+                    const div = r.nextElementSibling;
+                    div.className = div.className
+                        .replace(/border-yellow-500\/50|bg-yellow-500\/10|text-yellow-400/g, '')
+                        .replace(/border-blue-500\/50|bg-blue-500\/10|text-blue-400/g, '')
+                        .replace(/border-zinc-400\/50|bg-zinc-500\/10|text-zinc-300/g, '')
+                        .replace('border-white/10 bg-black/20 text-zinc-500', '')
+                        .trim();
+                    div.className += ' border-white/10 bg-black/20 text-zinc-500';
+                });
+                const sel = radio.nextElementSibling;
+                sel.className = sel.className.replace('border-white/10 bg-black/20 text-zinc-500', '').trim();
+                sel.className += ' ' + (configs[radio.value] || configs.general);
+            });
+        });
+        </script>
     </div>
 
     {{-- BLOQUE 1: IDENTIFICACIÓN LEGAL --}}

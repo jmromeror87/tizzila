@@ -174,143 +174,168 @@
         <div class="h-[1px] flex-1 bg-white/5"></div>
     </div>
 
-    {{-- Dirección --}}
-    <div class="col-span-1 md:col-span-6">
+    {{-- Dirección con autocompletado estilo Google --}}
+    <div class="col-span-1 md:col-span-6 relative">
         <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Dirección</label>
         <div class="relative group">
-            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                 <i class="fas fa-map-marker-alt text-gray-600 group-focus-within:text-yellow-500 transition-colors"></i>
             </div>
-            <input type="text" name="address_line"
-                   class="w-full bg-[#070a13] border-white/10 rounded-xl text-white text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/30 transition-all py-3.5 pl-11 pr-4"
-                   value="{{ old('address_line', $provider->address_line ?? '') }}"
-                   placeholder="Calle 10 # 5-20, Bodega 3">
-        </div>
-    </div>
-
-    {{-- Ciudad con autocompletado Mapbox --}}
-    <div class="col-span-1 md:col-span-6 relative">
-        <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Ciudad</label>
-        <div class="relative group">
-            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-                <i class="fas fa-city text-gray-600 group-focus-within:text-yellow-500 transition-colors"></i>
-            </div>
-            <input type="text" id="city_input" autocomplete="off"
+            <input type="text" id="address_input" autocomplete="off"
                    class="w-full bg-[#070a13] border-white/10 rounded-xl text-white text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/30 transition-all py-3.5 pl-11 pr-10"
-                   value="{{ old('city', $provider->city ?? '') }}"
-                   placeholder="Escribe la ciudad...">
-            <div id="city_spinner" class="absolute inset-y-0 right-4 flex items-center pointer-events-none hidden">
+                   value="{{ old('address_line', $provider->address_line ?? '') }}"
+                   placeholder="Ej: Calle 10 # 5-20 Bogotá...">
+            <div id="addr_spinner" class="absolute inset-y-0 right-4 flex items-center pointer-events-none hidden">
                 <i class="fas fa-circle-notch fa-spin text-yellow-500 text-xs"></i>
             </div>
         </div>
-        {{-- Hidden inputs que van al backend --}}
-        <input type="hidden" name="city"        id="city_value"       value="{{ old('city', $provider->city ?? '') }}">
-        <input type="hidden" name="department"  id="department_value" value="{{ old('department', $provider->department ?? '') }}">
-        <input type="hidden" name="postal_code" id="postal_code_value" value="{{ old('postal_code', $provider->postal_code ?? '') }}">
+
+        {{-- Hidden inputs → backend --}}
+        <input type="hidden" name="address_line" id="address_value"   value="{{ old('address_line', $provider->address_line ?? '') }}">
+        <input type="hidden" name="city"         id="city_value"      value="{{ old('city', $provider->city ?? '') }}">
+        <input type="hidden" name="department"   id="department_value" value="{{ old('department', $provider->department ?? '') }}">
+        <input type="hidden" name="postal_code"  id="postal_code_value" value="{{ old('postal_code', $provider->postal_code ?? '') }}">
 
         {{-- Dropdown sugerencias --}}
-        <ul id="city_suggestions"
-            class="absolute z-50 left-0 right-0 mt-1 bg-[#0d121f] border border-white/10 rounded-xl overflow-hidden shadow-2xl hidden">
+        <ul id="addr_suggestions"
+            class="absolute z-50 left-0 right-0 mt-1 bg-[#0d121f] border border-yellow-500/20 rounded-xl overflow-hidden shadow-2xl hidden divide-y divide-white/5">
         </ul>
     </div>
 
-    {{-- Departamento y CP (solo lectura, se llenan automáticamente) --}}
-    <div class="col-span-1 md:col-span-3">
-        <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Departamento <span class="text-yellow-500/50 ml-1">Auto</span></label>
+    {{-- Ciudad / Departamento / CP (solo lectura, auto) --}}
+    <div class="col-span-1 md:col-span-2">
+        <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">
+            Ciudad <span class="text-yellow-500/40 normal-case font-bold text-[9px]">↑ auto</span>
+        </label>
         <div class="relative">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <i class="fas fa-map text-gray-600 transition-colors"></i>
+                <i class="fas fa-city text-gray-700"></i>
             </div>
-            <input type="text" id="department_display" readonly
-                   class="w-full bg-[#070a13]/50 border-white/5 rounded-xl text-gray-400 text-sm py-3.5 pl-11 pr-4 cursor-default"
-                   value="{{ old('department', $provider->department ?? '') }}"
-                   placeholder="Se completa al elegir ciudad">
+            <input type="text" id="city_display" readonly
+                   class="w-full bg-black/20 border-white/5 rounded-xl text-gray-300 text-sm py-3.5 pl-11 pr-4 cursor-default"
+                   value="{{ old('city', $provider->city ?? '') }}"
+                   placeholder="—">
         </div>
     </div>
 
-    <div class="col-span-1 md:col-span-3">
-        <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Código Postal <span class="text-yellow-500/50 ml-1">Auto</span></label>
+    <div class="col-span-1 md:col-span-2">
+        <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">
+            Departamento <span class="text-yellow-500/40 normal-case font-bold text-[9px]">↑ auto</span>
+        </label>
         <div class="relative">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <i class="fas fa-hashtag text-gray-600 transition-colors"></i>
+                <i class="fas fa-map text-gray-700"></i>
+            </div>
+            <input type="text" id="department_display" readonly
+                   class="w-full bg-black/20 border-white/5 rounded-xl text-gray-300 text-sm py-3.5 pl-11 pr-4 cursor-default"
+                   value="{{ old('department', $provider->department ?? '') }}"
+                   placeholder="—">
+        </div>
+    </div>
+
+    <div class="col-span-1 md:col-span-2">
+        <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">
+            Código Postal <span class="text-yellow-500/40 normal-case font-bold text-[9px]">↑ auto</span>
+        </label>
+        <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <i class="fas fa-hashtag text-gray-700"></i>
             </div>
             <input type="text" id="postal_display" readonly
-                   class="w-full bg-[#070a13]/50 border-white/5 rounded-xl text-gray-400 text-sm py-3.5 pl-11 pr-4 cursor-default"
+                   class="w-full bg-black/20 border-white/5 rounded-xl text-gray-300 text-sm py-3.5 pl-11 pr-4 cursor-default"
                    value="{{ old('postal_code', $provider->postal_code ?? '') }}"
-                   placeholder="Se completa al elegir ciudad">
+                   placeholder="—">
         </div>
     </div>
 
     <script>
-    (function() {
-        const MAPBOX_TOKEN = '{{ config("services.mapbox.token") }}';
-        const cityInput    = document.getElementById('city_input');
-        const suggestions  = document.getElementById('city_suggestions');
-        const spinner      = document.getElementById('city_spinner');
-        const cityVal      = document.getElementById('city_value');
-        const deptVal      = document.getElementById('department_value');
-        const cpVal        = document.getElementById('postal_code_value');
-        const deptDisplay  = document.getElementById('department_display');
-        const cpDisplay    = document.getElementById('postal_display');
+    (function () {
+        const TOKEN   = '{{ config("services.mapbox.token") }}';
+        const input   = document.getElementById('address_input');
+        const list    = document.getElementById('addr_suggestions');
+        const spinner = document.getElementById('addr_spinner');
 
-        let debounce;
+        const addrVal = document.getElementById('address_value');
+        const cityVal = document.getElementById('city_value');
+        const deptVal = document.getElementById('department_value');
+        const cpVal   = document.getElementById('postal_code_value');
 
-        cityInput.addEventListener('input', function() {
-            clearTimeout(debounce);
+        const cityDisp = document.getElementById('city_display');
+        const deptDisp = document.getElementById('department_display');
+        const cpDisp   = document.getElementById('postal_display');
+
+        let timer;
+
+        input.addEventListener('input', function () {
+            clearTimeout(timer);
             const q = this.value.trim();
-            if (q.length < 2) { suggestions.classList.add('hidden'); return; }
+            if (q.length < 3) { hide(); return; }
             spinner.classList.remove('hidden');
-            debounce = setTimeout(() => fetchCities(q), 350);
+            timer = setTimeout(() => search(q), 350);
         });
 
-        async function fetchCities(q) {
+        async function search(q) {
             try {
-                const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q)}.json?country=CO&types=place&language=es&limit=6&access_token=${MAPBOX_TOKEN}`;
-                const res  = await fetch(url);
-                const data = await res.json();
+                const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q)}.json`
+                    + `?country=CO&language=es&limit=6&types=address,place,poi&access_token=${TOKEN}`;
+                const r    = await fetch(url);
+                const data = await r.json();
                 spinner.classList.add('hidden');
-                renderSuggestions(data.features || []);
-            } catch(e) { spinner.classList.add('hidden'); }
+                render(data.features || []);
+            } catch { spinner.classList.add('hidden'); }
         }
 
-        function renderSuggestions(features) {
-            suggestions.innerHTML = '';
-            if (!features.length) { suggestions.classList.add('hidden'); return; }
+        function render(features) {
+            list.innerHTML = '';
+            if (!features.length) { hide(); return; }
 
             features.forEach(f => {
-                const city    = f.text || '';
-                const context = f.context || [];
-                const dept    = context.find(c => c.id.startsWith('region'))?.text || '';
-                const cp      = context.find(c => c.id.startsWith('postcode'))?.text || '';
+                const ctx      = f.context || [];
+                const place    = f.place_name || '';
+                const street   = f.text || '';
+                const fullAddr = f.properties?.address
+                    ? f.properties.address + ' ' + street
+                    : (f.place_type?.[0] === 'address' ? place.split(',')[0] : street);
+
+                const city = ctx.find(c => c.id.startsWith('place'))?.text
+                          || (f.place_type?.[0] === 'place' ? f.text : '');
+                const dept = ctx.find(c => c.id.startsWith('region'))?.text || '';
+                const cp   = ctx.find(c => c.id.startsWith('postcode'))?.text || '';
 
                 const li = document.createElement('li');
-                li.className = 'px-4 py-3 hover:bg-white/5 cursor-pointer border-b border-white/5 last:border-0 transition-colors flex items-center gap-3';
+                li.className = 'px-4 py-3 hover:bg-yellow-500/5 cursor-pointer transition-colors flex items-start gap-3 group';
                 li.innerHTML = `
-                    <i class="fas fa-map-marker-alt text-yellow-500 text-xs w-4"></i>
-                    <div>
-                        <p class="text-xs font-black text-white">${city}</p>
-                        <p class="text-[10px] text-gray-500">${dept}${cp ? ' · CP ' + cp : ''}</p>
+                    <i class="fas fa-map-marker-alt text-yellow-500/60 group-hover:text-yellow-500 text-xs mt-0.5 w-4 shrink-0 transition-colors"></i>
+                    <div class="min-w-0">
+                        <p class="text-xs font-black text-white truncate">${place.split(',')[0]}</p>
+                        <p class="text-[10px] text-gray-500 truncate">${[city, dept, cp ? 'CP ' + cp : ''].filter(Boolean).join(' · ')}</p>
                     </div>`;
 
-                li.addEventListener('click', () => {
-                    cityInput.value       = city;
-                    cityVal.value         = city;
-                    deptVal.value         = dept;
-                    cpVal.value           = cp;
-                    deptDisplay.value     = dept;
-                    cpDisplay.value       = cp || '—';
-                    suggestions.classList.add('hidden');
+                li.addEventListener('mousedown', e => {
+                    e.preventDefault();
+                    input.value    = place.split(',')[0];
+                    addrVal.value  = place.split(',')[0];
+                    cityVal.value  = city;
+                    deptVal.value  = dept;
+                    cpVal.value    = cp;
+                    cityDisp.value = city || '—';
+                    deptDisp.value = dept || '—';
+                    cpDisp.value   = cp   || '—';
+                    hide();
+                    input.blur();
                 });
 
-                suggestions.appendChild(li);
+                list.appendChild(li);
             });
 
-            suggestions.classList.remove('hidden');
+            list.classList.remove('hidden');
         }
 
-        document.addEventListener('click', e => {
-            if (!cityInput.contains(e.target) && !suggestions.contains(e.target))
-                suggestions.classList.add('hidden');
+        function hide() { list.classList.add('hidden'); }
+
+        input.addEventListener('blur', () => setTimeout(hide, 150));
+        input.addEventListener('focus', () => {
+            if (input.value.trim().length >= 3) search(input.value.trim());
         });
     })();
     </script>

@@ -22,6 +22,7 @@ class PurchaseInvoice extends Model
         'payment_status',
         'balance',
         'notes',
+        'file_path',
     ];
 
     protected $casts = [

@@ -43,7 +43,7 @@
             </div>
         </div>
 
-        <form method="POST" action="{{ route('purchase-invoices.store', $order) }}">
+        <form method="POST" action="{{ route('purchase-invoices.store', $order) }}" enctype="multipart/form-data">
             @csrf
 
             {{-- DATOS DE LA FACTURA --}}
@@ -153,6 +153,25 @@
                         $diff = $order->quantity - $order->quantity; // placeholder, real via JS
                     @endphp
                     <div id="diff-alert" class="hidden mt-3 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest"></div>
+                </div>
+            </div>
+
+            {{-- ARCHIVO DE FACTURA --}}
+            <div class="bg-[#0d121f] border border-white/5 rounded-2xl overflow-hidden mt-5">
+                <div class="px-6 py-4 border-b border-white/5 flex items-center gap-3">
+                    <span class="text-[9px] font-black text-yellow-500 bg-yellow-500/10 border border-yellow-500/20 px-2 py-0.5 rounded-lg">03</span>
+                    <h3 class="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">Archivo de la Factura <span class="text-zinc-600 font-normal normal-case tracking-normal">(opcional)</span></h3>
+                </div>
+                <div class="p-6">
+                    <label for="file_upload"
+                        class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/10 rounded-xl cursor-pointer hover:border-yellow-500/40 hover:bg-yellow-500/5 transition-all group">
+                        <i class="fas fa-cloud-upload-alt text-2xl text-zinc-600 group-hover:text-yellow-500/60 mb-2 transition-colors"></i>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-zinc-500 group-hover:text-zinc-400">Arrastra o haz clic para subir</p>
+                        <p class="text-[9px] text-zinc-600 mt-1">PDF, JPG, PNG · Máx 10MB</p>
+                        <p id="file_name" class="text-[9px] text-yellow-400 font-black mt-2 hidden"></p>
+                        <input id="file_upload" type="file" name="file" accept=".pdf,.jpg,.jpeg,.png" class="hidden"
+                            onchange="document.getElementById('file_name').textContent = this.files[0]?.name; document.getElementById('file_name').classList.remove('hidden')">
+                    </label>
                 </div>
             </div>
 

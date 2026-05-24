@@ -131,6 +131,51 @@
             </div>
         </div>
 
+        {{-- ARCHIVO DE LA FACTURA --}}
+        <div class="bg-[#0d121f] border border-white/5 rounded-2xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+                <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Documento de la Factura</h3>
+                <form method="POST" action="{{ route('purchase-invoices.upload', $purchaseInvoice) }}" enctype="multipart/form-data" class="flex items-center gap-2">
+                    @csrf
+                    <label class="cursor-pointer h-8 px-4 bg-white/5 border border-white/10 hover:bg-white/10 text-zinc-400 hover:text-white rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
+                        <i class="fas fa-upload text-[9px]"></i> {{ $purchaseInvoice->file_path ? 'Reemplazar' : 'Subir Archivo' }}
+                        <input type="file" name="file" accept=".pdf,.jpg,.jpeg,.png" class="hidden"
+                            onchange="this.closest('form').submit()">
+                    </label>
+                </form>
+            </div>
+            @if($purchaseInvoice->file_path)
+                @php $ext = pathinfo($purchaseInvoice->file_path, PATHINFO_EXTENSION); @endphp
+                @if(in_array(strtolower($ext), ['jpg','jpeg','png']))
+                <div class="p-4">
+                    <img src="{{ asset('storage/' . $purchaseInvoice->file_path) }}"
+                         class="rounded-xl max-w-full h-auto max-h-[500px] object-contain mx-auto shadow-2xl">
+                </div>
+                @else
+                <div class="p-6 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="h-10 w-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                            <i class="fas fa-file-pdf text-red-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-black text-white">Factura PDF</p>
+                            <p class="text-[9px] text-zinc-500">{{ $purchaseInvoice->invoice_number }}</p>
+                        </div>
+                    </div>
+                    <a href="{{ asset('storage/' . $purchaseInvoice->file_path) }}" target="_blank"
+                       class="h-8 px-4 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 text-red-400 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
+                        <i class="fas fa-external-link-alt text-[9px]"></i> Abrir PDF
+                    </a>
+                </div>
+                @endif
+            @else
+            <div class="py-10 flex flex-col items-center gap-2 text-zinc-600">
+                <i class="fas fa-file-invoice text-3xl opacity-30"></i>
+                <p class="text-[9px] font-black uppercase tracking-widest">Sin archivo cargado</p>
+            </div>
+            @endif
+        </div>
+
         {{-- PAGOS A PRONAVICOLA --}}
         <div class="bg-[#0d121f] border border-white/5 rounded-2xl overflow-hidden">
             <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between">

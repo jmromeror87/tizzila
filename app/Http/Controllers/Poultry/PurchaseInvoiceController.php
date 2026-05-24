@@ -41,6 +41,7 @@ class PurchaseInvoiceController extends Controller
             'fonav_amount'         => 'nullable|numeric|min:0',
             'vaccine_amount'       => 'nullable|numeric|min:0',
             'notes'                => 'nullable|string|max:500',
+            'file'                 => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
             'items'                => 'nullable|array',
             'items.*.code'         => 'nullable|string|max:20',
             'items.*.description'  => 'required|string|max:255',
@@ -78,6 +79,9 @@ class PurchaseInvoiceController extends Controller
             'balance'                   => $total,
             'payment_status'            => 'pending',
             'notes'                     => $validated['notes'] ?? null,
+            'file_path'                 => $request->hasFile('file')
+                ? $request->file('file')->store('purchase-invoices', 'public')
+                : null,
         ]);
 
         if (!empty($validated['items'])) {
@@ -129,6 +133,20 @@ class PurchaseInvoiceController extends Controller
         return redirect()
             ->route('purchase-invoices.show', $purchaseInvoice)
             ->with('success', 'Pago registrado. Saldo pendiente: $' . number_format($newBalance, 0, ',', '.'));
+    }
+
+    public function uploadFile(Request $request, PurchaseInvoice $purchaseInvoice)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+        ]);
+
+        $path = $request->file('file')->store('purchase-invoices', 'public');
+        $purchaseInvoice->update(['file_path' => $path]);
+
+        return redirect()
+            ->route('purchase-invoices.show', $purchaseInvoice)
+            ->with('success', 'Archivo de factura cargado correctamente.');
     }
 
     public function show(PurchaseInvoice $purchaseInvoice)

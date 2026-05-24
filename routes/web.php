@@ -698,6 +698,7 @@ Route::middleware(['auth'])
         Route::post('orders/{order}', [PurchaseInvoiceController::class, 'store'])->name('store');
         Route::get('{purchaseInvoice}', [PurchaseInvoiceController::class, 'show'])->name('show');
         Route::post('{purchaseInvoice}/pay', [PurchaseInvoiceController::class, 'pay'])->name('pay');
+        Route::post('{purchaseInvoice}/upload', [PurchaseInvoiceController::class, 'uploadFile'])->name('upload');
     });
 /*
 |--------------------------------------------------------------------------

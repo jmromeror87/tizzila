@@ -122,6 +122,15 @@
                                                 <i class="fas fa-cash-register text-[9px]"></i> Cobrar
                                             </button>
                                         @endif
+                                        @if($invoice->payment_status === 'overdue' && $invoice->customer?->phone)
+                                        <form method="POST" action="{{ route('cartera.whatsapp-reminder', $invoice->customer_id) }}">
+                                            @csrf
+                                            <button type="submit" title="Enviar recordatorio WhatsApp"
+                                                class="h-8 w-8 bg-emerald-600/10 border border-emerald-600/20 rounded-lg text-emerald-500 hover:bg-emerald-600/20 flex items-center justify-center transition-all">
+                                                <i class="fab fa-whatsapp text-sm"></i>
+                                            </button>
+                                        </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

@@ -19,9 +19,17 @@ class Kernel extends ConsoleKernel
 {
     protected function schedule(Schedule $schedule): void
     {
-        // 🔥 Generar gastos recurrentes automáticamente
+        // Generar gastos recurrentes automáticamente
         $schedule->command('expenses:generate-recurring')
             ->daily()
+            ->withoutOverlapping()
+            ->onOneServer();
+
+        // Recordatorios de cobro por WhatsApp — lunes, miércoles y viernes a las 8am
+        $schedule->command('collections:remind')
+            ->weeklyOn(1, '08:00') // lunes
+            ->weeklyOn(3, '08:00') // miércoles
+            ->weeklyOn(5, '08:00') // viernes
             ->withoutOverlapping()
             ->onOneServer();
     }

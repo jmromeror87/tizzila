@@ -229,6 +229,9 @@ Route::middleware(['auth', 'role:admin,finanzas,gerencia'])->prefix('cartera')
 
         Route::get('/recibo/{payment}', [CarteraController::class, 'receipt'])
             ->name('receipt');
+
+        Route::post('/customer/{customer}/whatsapp-reminder', [CarteraController::class, 'sendCollectionReminder'])
+            ->name('whatsapp-reminder');
     });
 
 Route::middleware(['auth', 'role:admin,operaciones,comercial'])->prefix('claims')->group(function () {

@@ -122,6 +122,32 @@ class WhatsAppService
         return $this->send($phone, $message);
     }
 
+    public function sendOverdueReminder(string $phone, string $clientName, float $totalOverdue, int $daysOverdue, int $invoiceCount): bool
+    {
+        $message =
+            "*DISTRIAVICOLA SOFRAQ SAS*\n\n" .
+            "Hola *{$clientName}*,\n\n" .
+            "Le recordamos que tiene *{$invoiceCount} factura(s)* con saldo vencido:\n\n" .
+            "💰 *Total vencido: \$ " . number_format($totalOverdue, 0, ',', '.') . "*\n" .
+            "📅 Días de mora: *{$daysOverdue} días*\n\n" .
+            "Por favor comuníquese con nosotros para coordinar su pago.\n\n" .
+            "_TIZZILA APP · Sistema de Gestión Avícola_";
+
+        return $this->send($phone, $message);
+    }
+
+    public function buildOverdueMessage(string $clientName, float $totalOverdue, int $daysOverdue, int $invoiceCount): string
+    {
+        return
+            "*DISTRIAVICOLA SOFRAQ SAS*\n\n" .
+            "Hola *{$clientName}*,\n\n" .
+            "Le recordamos que tiene *{$invoiceCount} factura(s)* con saldo vencido:\n\n" .
+            "💰 *Total vencido: \$ " . number_format($totalOverdue, 0, ',', '.') . "*\n" .
+            "📅 Días de mora: *{$daysOverdue} días*\n\n" .
+            "Por favor comuníquese con nosotros para coordinar su pago.\n\n" .
+            "_TIZZILA APP · Sistema de Gestión Avícola_";
+    }
+
     // ─── Helpers ──────────────────────────────────────────────────────────
 
     private function normalizePhone(string $phone): string

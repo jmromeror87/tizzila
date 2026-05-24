@@ -21,6 +21,16 @@
                     </p>
                 </div>
             </div>
+            {{-- Botón WhatsApp cobro manual --}}
+            @if($customer->phone)
+            <form method="POST" action="{{ route('cartera.whatsapp-reminder', $customer) }}">
+                @csrf
+                <button type="submit"
+                    class="h-9 px-4 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
+                    <i class="fab fa-whatsapp text-sm"></i> Enviar Cobro
+                </button>
+            </form>
+            @endif
         </div>
     </x-slot>
 

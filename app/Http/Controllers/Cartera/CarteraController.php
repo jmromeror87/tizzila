@@ -24,6 +24,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use App\Services\Invoice\InvoicePaymentService;
 use App\Services\WhatsApp\WhatsAppService;
+use App\Models\WhatsappCollectionLog;
+use Illuminate\Support\Carbon;
 
 class CarteraController extends Controller
 {
@@ -274,6 +276,51 @@ class CarteraController extends Controller
             return back()->with('success', '¡Recibo enviado por WhatsApp correctamente!');
         } catch (\Exception $e) {
             Log::error('[WhatsApp] sendReceiptWhatsApp: ' . $e->getMessage());
+            return back()->with('error', 'Error al enviar WhatsApp: ' . $e->getMessage());
+        }
+    }
+
+    public function sendCollectionReminder(Customer $customer)
+    {
+        if (!$customer->phone) {
+            return back()->with('error', 'El cliente no tiene teléfono registrado.');
+        }
+
+        $overdueInvoices = $customer->invoices()
+            ->where('balance', '>', 0)
+            ->where('payment_status', 'overdue')
+            ->get();
+
+        if ($overdueInvoices->isEmpty()) {
+            return back()->with('error', 'El cliente no tiene facturas vencidas.');
+        }
+
+        $totalOverdue = $overdueInvoices->sum('balance');
+        $daysOverdue  = (int) Carbon::parse($overdueInvoices->min('due_date'))->diffInDays(now());
+        $wa           = app(WhatsAppService::class);
+        $message      = $wa->buildOverdueMessage($customer->name, $totalOverdue, $daysOverdue, $overdueInvoices->count());
+
+        try {
+            $sent = $wa->sendOverdueReminder($customer->phone, $customer->name, $totalOverdue, $daysOverdue, $overdueInvoices->count());
+
+            WhatsappCollectionLog::create([
+                'customer_id' => $customer->id,
+                'phone'       => $customer->phone,
+                'message'     => $message,
+                'type'        => 'manual',
+                'sent'        => $sent,
+            ]);
+
+            return back()->with('success', "Recordatorio enviado a {$customer->name} por WhatsApp.");
+        } catch (\Exception $e) {
+            WhatsappCollectionLog::create([
+                'customer_id' => $customer->id,
+                'phone'       => $customer->phone,
+                'message'     => $message,
+                'type'        => 'manual',
+                'sent'        => false,
+                'error'       => $e->getMessage(),
+            ]);
             return back()->with('error', 'Error al enviar WhatsApp: ' . $e->getMessage());
         }
     }

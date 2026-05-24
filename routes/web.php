@@ -47,6 +47,7 @@ use App\Http\Controllers\Poultry\PoultryTypeController;
 use App\Http\Controllers\Driver\DriverRouteController;
 use App\Http\Controllers\Poultry\PoultryProviderDocumentBatchController;
 use App\Http\Controllers\Poultry\PurchaseInvoiceController;
+use App\Http\Controllers\Poultry\ProjectionController;
 use App\Http\Controllers\Global\TaxCategoryController;
 use App\Http\Controllers\Invoice\InvoiceController;
 use App\Http\Controllers\Invoice\InvoicePaymentController;
@@ -692,8 +693,14 @@ Route::middleware(['auth'])
         ])->name('dss-surplus');
     });
 
+    // 📊 PROYECCIÓN COMERCIAL
+    Route::get('projection', [ProjectionController::class, 'index'])
+        ->middleware('auth')
+        ->name('poultry.projection');
+
     // 🧾 FACTURAS DE COMPRA (PRONAVICOLA)
     Route::prefix('purchase-invoices')->name('purchase-invoices.')->middleware(['auth'])->group(function () {
+        Route::get('/', [PurchaseInvoiceController::class, 'index'])->name('index');
         Route::get('orders/{order}/create', [PurchaseInvoiceController::class, 'create'])->name('create');
         Route::post('orders/{order}', [PurchaseInvoiceController::class, 'store'])->name('store');
         Route::get('{purchaseInvoice}', [PurchaseInvoiceController::class, 'show'])->name('show');

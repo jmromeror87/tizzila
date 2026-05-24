@@ -123,6 +123,12 @@
                     <a href="{{ route('poultry.provider-documents.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition-all {{ request()->routeIs('poultry.provider-documents.*') ? 'text-[#f3c444] bg-[#f3c444]/5' : 'text-gray-500 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-file-contract w-3.5 text-center"></i>Docs. Proveedor
                     </a>
+                    <a href="{{ route('purchase-invoices.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition-all {{ request()->routeIs('purchase-invoices.*') ? 'text-[#f3c444] bg-[#f3c444]/5' : 'text-gray-500 hover:text-white hover:bg-white/5' }}">
+                        <i class="fas fa-file-invoice-dollar w-3.5 text-center"></i>Ctas. por Pagar
+                    </a>
+                    <a href="{{ route('poultry.projection') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition-all {{ request()->routeIs('poultry.projection') ? 'text-[#f3c444] bg-[#f3c444]/5' : 'text-gray-500 hover:text-white hover:bg-white/5' }}">
+                        <i class="fas fa-chart-line w-3.5 text-center"></i>Proyección 3 Meses
+                    </a>
                     <a href="{{ route('claims.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition-all {{ request()->routeIs('claims.*') ? 'text-[#f3c444] bg-[#f3c444]/5' : 'text-gray-500 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-exclamation-circle w-3.5 text-center"></i>Reclamos
                     </a>

@@ -17,6 +17,28 @@ use Illuminate\Support\Facades\Auth;
 
 class PurchaseInvoiceController extends Controller
 {
+    public function index()
+    {
+        $invoices = PurchaseInvoice::with(['provider', 'order', 'payments'])
+            ->orderByDesc('invoice_date')
+            ->get();
+
+        $totalDebt     = $invoices->sum('balance');
+        $totalInvoiced = $invoices->sum('total');
+        $totalPaid     = $invoices->sum(fn($i) => $i->total - $i->balance);
+        $overdueCount  = $invoices->where('payment_status', '!=', 'paid')
+            ->filter(fn($i) => $i->due_date && $i->due_date->isPast())
+            ->count();
+
+        $dueSoon = $invoices->where('payment_status', '!=', 'paid')
+            ->filter(fn($i) => $i->due_date && $i->due_date->isFuture() && $i->due_date->diffInDays(now()) <= 5)
+            ->count();
+
+        return view('poultry.purchase-invoices.index', compact(
+            'invoices', 'totalDebt', 'totalInvoiced', 'totalPaid', 'overdueCount', 'dueSoon'
+        ));
+    }
+
     public function create(PoultryOrderSchedule $order)
     {
         if ($order->purchaseInvoice) {

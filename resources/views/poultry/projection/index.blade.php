@@ -8,160 +8,287 @@
                     Proyección <span class="text-yellow-500">3 Meses</span>
                 </h2>
             </div>
-            <p class="text-[9px] text-zinc-600 font-black uppercase tracking-widest">
-                {{ now()->translatedFormat('d F Y') }}
-            </p>
+            <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest">{{ now()->translatedFormat('d F Y') }}</p>
         </div>
     </x-slot>
 
     <div class="py-4 space-y-6">
 
-        {{-- MESES --}}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-            @foreach($projection as $i => $month)
-            @php
-                $isCurrentMonth = $i === 0;
-                $barFixed    = $month['total_programmed'] > 0 ? min(100, round(($month['fixed_committed'] / $month['total_programmed']) * 100)) : 0;
-                $barVariable = 100 - $barFixed;
-            @endphp
-            <div class="bg-[#0d121f] border {{ $isCurrentMonth ? 'border-yellow-500/30' : 'border-white/5' }} rounded-2xl overflow-hidden">
-                <div class="px-5 py-4 border-b {{ $isCurrentMonth ? 'border-yellow-500/10' : 'border-white/5' }} flex items-center justify-between">
-                    <div>
-                        <p class="text-[9px] font-black uppercase tracking-widest {{ $isCurrentMonth ? 'text-yellow-500' : 'text-zinc-500' }}">
-                            {{ $isCurrentMonth ? 'MES ACTUAL' : 'Próximo mes' }}
-                        </p>
-                        <p class="text-lg font-black text-white uppercase">{{ $month['month'] }}</p>
+        {{-- ══ PANEL IA ══ --}}
+        @php
+            $tendenciaColor = match($aiAnalysis['tendencia'] ?? 'estable') {
+                'creciendo'  => 'emerald',
+                'declinando' => 'red',
+                default      => 'yellow',
+            };
+            $tendenciaIcon = match($aiAnalysis['tendencia'] ?? 'estable') {
+                'creciendo'  => 'fa-arrow-trend-up',
+                'declinando' => 'fa-arrow-trend-down',
+                default      => 'fa-minus',
+            };
+            $alertaColor = match($aiAnalysis['alerta_tipo'] ?? null) {
+                'riesgo'      => 'red',
+                'oportunidad' => 'emerald',
+                default       => 'blue',
+            };
+        @endphp
+
+        <div class="bg-[#0d121f] border border-white/5 rounded-2xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="h-8 w-8 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center">
+                        <i class="fas fa-brain text-yellow-400 text-xs"></i>
                     </div>
-                    <span class="text-[9px] font-black px-2 py-1 rounded-lg {{ $month['orders_count'] > 0 ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/20' : 'text-zinc-600 bg-white/5 border border-white/5' }}">
-                        {{ $month['orders_count'] }} pedidos
+                    <div>
+                        <p class="text-[9px] font-black text-yellow-500 uppercase tracking-[0.3em]">Análisis Predictivo · GPT-4o</p>
+                        <p class="text-[10px] font-black text-white">Motor de Inteligencia Comercial</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 bg-{{ $tendenciaColor }}-500/10 border border-{{ $tendenciaColor }}-500/20 px-3 py-1.5 rounded-xl">
+                    <i class="fas {{ $tendenciaIcon }} text-{{ $tendenciaColor }}-400 text-xs"></i>
+                    <span class="text-[9px] font-black text-{{ $tendenciaColor }}-400 uppercase tracking-widest">
+                        {{ ucfirst($aiAnalysis['tendencia'] ?? 'estable') }}
+                        @if(($aiAnalysis['tendencia_pct'] ?? 0) > 0)
+                            {{ $aiAnalysis['tendencia_pct'] }}%
+                        @endif
                     </span>
                 </div>
+            </div>
 
-                <div class="p-5 space-y-4">
+            <div class="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 space-y-4">
+                    <p class="text-sm text-zinc-300 leading-relaxed">{{ $aiAnalysis['resumen'] ?? '' }}</p>
 
-                    {{-- Total programado --}}
-                    <div class="text-center py-3 bg-black/30 rounded-xl">
-                        <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Programado</p>
-                        <p class="text-3xl font-black text-white tracking-tighter">{{ number_format($month['total_programmed']) }}</p>
-                        <p class="text-[9px] text-zinc-600 mt-0.5">aves</p>
+                    @if(!empty($aiAnalysis['alerta']))
+                    <div class="bg-{{ $alertaColor }}-500/10 border border-{{ $alertaColor }}-500/20 rounded-xl px-4 py-3 flex items-start gap-3">
+                        <i class="fas fa-{{ $aiAnalysis['alerta_tipo'] === 'riesgo' ? 'triangle-exclamation' : ($aiAnalysis['alerta_tipo'] === 'oportunidad' ? 'lightbulb' : 'circle-info') }} text-{{ $alertaColor }}-400 text-sm mt-0.5"></i>
+                        <p class="text-xs text-{{ $alertaColor }}-300">{{ $aiAnalysis['alerta'] }}</p>
                     </div>
+                    @endif
 
-                    {{-- Barra fijo vs variable --}}
-                    <div>
-                        <div class="flex justify-between text-[9px] font-black mb-1.5">
-                            <span class="text-yellow-400">FIJO {{ $barFixed }}%</span>
-                            <span class="text-blue-400">VARIABLE {{ $barVariable }}%</span>
-                        </div>
-                        <div class="w-full h-3 rounded-full overflow-hidden bg-white/5 flex">
-                            <div class="bg-yellow-500 h-full transition-all" style="width:{{ $barFixed }}%"></div>
-                            <div class="bg-blue-500 h-full transition-all" style="width:{{ $barVariable }}%"></div>
-                        </div>
-                    </div>
-
-                    {{-- Detalle --}}
+                    @if(!empty($aiAnalysis['recomendaciones']))
                     <div class="space-y-2">
-                        <div class="flex justify-between items-center py-1.5 border-b border-white/5">
-                            <div class="flex items-center gap-2">
-                                <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
-                                <p class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Clientes Fijos</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-xs font-black text-yellow-400">{{ number_format($month['fixed_committed']) }}</p>
-                                <p class="text-[8px] text-zinc-600">{{ $month['fixed_clients'] }} clientes</p>
-                            </div>
-                        </div>
-                        <div class="flex justify-between items-center py-1.5 border-b border-white/5">
-                            <div class="flex items-center gap-2">
-                                <div class="w-2 h-2 rounded-full bg-blue-500"></div>
-                                <p class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Disponible Variable</p>
-                            </div>
-                            <p class="text-xs font-black text-blue-400">{{ number_format($month['variable_available']) }}</p>
-                        </div>
-
-                        {{-- Por tipo de ave --}}
-                        @foreach($month['by_type'] as $type => $qty)
-                        <div class="flex justify-between items-center py-1 text-[9px]">
-                            <span class="text-zinc-600 font-black uppercase">{{ $type }}</span>
-                            <span class="text-zinc-400 font-black">{{ number_format($qty) }}</span>
+                        <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Recomendaciones</p>
+                        @foreach($aiAnalysis['recomendaciones'] as $rec)
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-check-circle text-yellow-500/60 text-[10px] mt-0.5 flex-shrink-0"></i>
+                            <p class="text-[11px] text-zinc-400">{{ $rec }}</p>
                         </div>
                         @endforeach
                     </div>
+                    @endif
+                </div>
+
+                <div class="space-y-3">
+                    <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Cantidad sugerida por IA</p>
+                    @foreach($aiAnalysis['prediccion_meses'] ?? [] as $pred)
+                    @php
+                        $confColor = match($pred['confianza'] ?? 'baja') {
+                            'alta'  => 'emerald',
+                            'media' => 'yellow',
+                            default => 'zinc',
+                        };
+                    @endphp
+                    <div class="bg-black/30 border border-white/5 rounded-xl p-4">
+                        <div class="flex items-center justify-between mb-1">
+                            <p class="text-[9px] font-black text-zinc-500 uppercase">{{ $pred['mes'] }}</p>
+                            <span class="text-[8px] font-black text-{{ $confColor }}-400 bg-{{ $confColor }}-500/10 px-2 py-0.5 rounded-full uppercase">
+                                {{ $pred['confianza'] }}
+                            </span>
+                        </div>
+                        <p class="text-xl font-black text-white tracking-tighter">{{ number_format($pred['cantidad_sugerida']) }}</p>
+                        <p class="text-[9px] text-zinc-600 mt-1">{{ $pred['razon'] }}</p>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        {{-- ══ GRÁFICA HISTÓRICA ══ --}}
+        <div class="bg-[#0d121f] border border-white/5 rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Tendencia histórica</p>
+                    <p class="text-[10px] font-black text-white">Últimos 6 meses · Aves despachadas</p>
+                </div>
+                <div class="flex items-center gap-4 text-[9px] font-black uppercase tracking-widest text-zinc-500">
+                    <span class="flex items-center gap-1.5"><span class="inline-block w-3 h-1 bg-yellow-500 rounded"></span> Real</span>
+                    <span class="flex items-center gap-1.5"><span class="inline-block w-3 h-1 bg-blue-500/50 rounded"></span> Programado</span>
+                </div>
+            </div>
+
+            @php
+                $allVals = collect($historical)->pluck('total')
+                    ->concat(collect($projection)->pluck('total_programmed'))
+                    ->concat(collect($projection)->pluck('stat_prediction'));
+                $maxVal  = max($allVals->max(), 1);
+            @endphp
+
+            <div class="flex items-end gap-2" style="height:160px">
+                @foreach($historical as $h)
+                @php $pct = round(($h['total'] / $maxVal) * 100); @endphp
+                <div class="flex-1 flex flex-col items-center gap-1 group" style="height:100%">
+                    <p class="text-[8px] text-zinc-600 group-hover:text-yellow-400 transition-colors font-black leading-none">
+                        {{ $h['total'] > 0 ? number_format($h['total'] / 1000, 0).'K' : '-' }}
+                    </p>
+                    <div class="flex-1 flex items-end w-full">
+                        <div class="w-full rounded-t-lg {{ $h['total'] > 0 ? 'bg-yellow-500/70' : 'bg-white/5' }}"
+                             style="height:{{ max(2, $pct) }}%"></div>
+                    </div>
+                    <p class="text-[8px] text-zinc-600 font-black uppercase leading-none">{{ $h['month'] }}</p>
+                </div>
+                @endforeach
+
+                <div class="w-px bg-white/10 self-stretch mx-1"></div>
+
+                @foreach($projection as $i => $p)
+                @php
+                    $val    = $p['total_programmed'] ?: $p['stat_prediction'];
+                    $pct    = round(($val / $maxVal) * 100);
+                    $aiPred = collect($aiAnalysis['prediccion_meses'] ?? [])->values()->get($i);
+                    $aiPct  = $aiPred ? round(($aiPred['cantidad_sugerida'] / $maxVal) * 100) : 0;
+                @endphp
+                <div class="flex-1 flex flex-col items-center gap-1 group" style="height:100%">
+                    <p class="text-[8px] text-blue-400 font-black leading-none">
+                        {{ $val > 0 ? number_format($val / 1000, 0).'K' : '~' }}
+                    </p>
+                    <div class="flex-1 flex items-end w-full relative">
+                        <div class="w-full rounded-t-lg {{ $p['has_data'] ? 'bg-blue-500/50' : 'bg-blue-500/10 border border-blue-500/20' }}"
+                             style="height:{{ max(2, $pct) }}%"></div>
+                    </div>
+                    <p class="text-[8px] text-blue-400/70 font-black uppercase leading-none">
+                        {{ Str::words($p['month'], 1, '') }}
+                    </p>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- ══ TARJETAS 3 MESES ══ --}}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            @foreach($projection as $i => $m)
+            @php
+                $aiPred    = collect($aiAnalysis['prediccion_meses'] ?? [])->values()->get($i);
+                $aiQty     = $aiPred['cantidad_sugerida'] ?? null;
+                $aiConf    = $aiPred['confianza'] ?? 'baja';
+                $confColor = match($aiConf) { 'alta' => 'emerald', 'media' => 'yellow', default => 'zinc' };
+                $diffVsAI  = ($aiQty && $m['total_programmed'] > 0) ? ($m['total_programmed'] - $aiQty) : null;
+                $base      = max($m['total_programmed'], $m['stat_prediction'], 1);
+                $fixedPct  = min(100, round(($m['fixed_committed'] / $base) * 100));
+                $varPct    = 100 - $fixedPct;
+            @endphp
+            <div class="bg-[#0d121f] border border-{{ $m['is_current'] ? 'yellow-500/20' : 'white/5' }} rounded-2xl overflow-hidden">
+                <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+                    <div>
+                        <p class="text-[8px] font-black text-zinc-600 uppercase tracking-widest">{{ $m['month_label'] }}</p>
+                        <p class="text-base font-black text-white uppercase tracking-tight">{{ $m['month'] }}</p>
+                    </div>
+                    <span class="text-[8px] font-black text-zinc-500 bg-white/5 px-2 py-1 rounded-lg">{{ $m['orders_count'] }} pedidos</span>
+                </div>
+
+                <div class="p-5 space-y-4">
+                    <div class="text-center">
+                        <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Programado</p>
+                        <p class="text-3xl font-black text-white tracking-tighter">
+                            {{ $m['total_programmed'] > 0 ? number_format($m['total_programmed']) : '—' }}
+                        </p>
+                        @if($aiQty)
+                        <div class="flex items-center justify-center gap-2 mt-1">
+                            <p class="text-[9px] text-zinc-600">IA sugiere:</p>
+                            <p class="text-[9px] font-black text-{{ $confColor }}-400">{{ number_format($aiQty) }}</p>
+                            @if($diffVsAI !== null)
+                            <span class="text-[8px] font-black {{ $diffVsAI >= 0 ? 'text-emerald-400' : 'text-red-400' }}">
+                                ({{ $diffVsAI >= 0 ? '+' : '' }}{{ number_format($diffVsAI) }})
+                            </span>
+                            @endif
+                        </div>
+                        @elseif(!$m['has_data'])
+                        <p class="text-[9px] text-zinc-600 mt-1">Estadística: {{ number_format($m['stat_prediction']) }} aves</p>
+                        @endif
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-[8px] font-black mb-1">
+                            <span class="text-yellow-400">FIJO {{ $fixedPct }}%</span>
+                            <span class="text-blue-400">VARIABLE {{ $varPct }}%</span>
+                        </div>
+                        <div class="w-full h-2 bg-white/5 rounded-full overflow-hidden flex">
+                            <div class="h-full bg-yellow-500 transition-all" style="width:{{ $fixedPct }}%"></div>
+                            <div class="h-full bg-blue-500/50 transition-all" style="width:{{ $varPct }}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="bg-black/30 rounded-xl p-3 text-center">
+                            <p class="text-[8px] text-zinc-600 uppercase font-black">Fijos</p>
+                            <p class="text-sm font-black text-yellow-400">{{ number_format($m['fixed_committed']) }}</p>
+                            <p class="text-[8px] text-zinc-700">{{ $m['fixed_count'] }} clientes</p>
+                        </div>
+                        <div class="bg-black/30 rounded-xl p-3 text-center">
+                            <p class="text-[8px] text-zinc-600 uppercase font-black">Variable</p>
+                            <p class="text-sm font-black text-blue-400">{{ number_format($m['variable_available']) }}</p>
+                            <p class="text-[8px] text-zinc-700">por asignar</p>
+                        </div>
+                    </div>
+
+                    @if(!empty($m['by_type']))
+                    <div class="space-y-1.5 pt-1 border-t border-white/5">
+                        @foreach($m['by_type'] as $tipo => $qty)
+                        <div class="flex justify-between items-center">
+                            <p class="text-[9px] text-zinc-600 uppercase font-black">{{ $tipo }}</p>
+                            <p class="text-[9px] font-black text-zinc-400">{{ number_format($qty) }}</p>
+                        </div>
+                        @endforeach
+                    </div>
+                    @endif
                 </div>
             </div>
             @endforeach
         </div>
 
-        {{-- CLIENTES FIJOS --}}
+        {{-- ══ CLIENTES FIJOS ══ --}}
         <div class="bg-[#0d121f] border border-white/5 rounded-2xl overflow-hidden">
             <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between">
                 <div>
-                    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Clientes Fijos Comprometidos</h3>
-                    <p class="text-[9px] text-zinc-600 mt-0.5">Demanda garantizada cada semana</p>
+                    <p class="text-[9px] font-black text-yellow-500 uppercase tracking-[0.3em]">Clientes Fijos Comprometidos</p>
+                    <p class="text-[9px] text-zinc-600">Demanda garantizada cada semana</p>
                 </div>
                 <a href="{{ route('customers.index') }}"
-                   class="text-[9px] font-black text-yellow-400 hover:text-yellow-300 transition-colors">
-                    Gestionar <i class="fas fa-arrow-right text-[8px]"></i>
+                   class="text-[9px] font-black text-yellow-400 hover:text-yellow-300 uppercase tracking-widest transition-colors">
+                    Gestionar →
                 </a>
             </div>
 
             @if($fixedClients->isEmpty())
-            <div class="py-12 text-center text-zinc-600">
-                <i class="fas fa-star text-3xl opacity-20 mb-3 block"></i>
+            <div class="py-14 flex flex-col items-center gap-3 text-zinc-700">
+                <i class="fas fa-star text-4xl opacity-20"></i>
                 <p class="text-[9px] font-black uppercase tracking-widest">Sin clientes fijos configurados</p>
-                <p class="text-[9px] text-zinc-700 mt-1">Marca clientes como "fijo" en su perfil para verlos aquí</p>
+                <p class="text-[9px] text-zinc-700">Marca clientes como "fijo" en su perfil para verlos aquí</p>
             </div>
             @else
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="border-b border-white/5">
-                            <th class="px-5 py-3 text-left text-[9px] font-black uppercase tracking-widest text-zinc-500">Cliente</th>
-                            <th class="px-5 py-3 text-right text-[9px] font-black uppercase tracking-widest text-zinc-500">Aves/Semana</th>
-                            <th class="px-5 py-3 text-right text-[9px] font-black uppercase tracking-widest text-zinc-500">Est. Mensual</th>
-                            <th class="px-5 py-3 text-center text-[9px] font-black uppercase tracking-widest text-zinc-500">Efectividad Pago</th>
-                            <th class="px-5 py-3 text-right text-[9px] font-black uppercase tracking-widest text-zinc-500">Cartera Activa</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-white/[0.04]">
-                        @foreach($fixedClients as $client)
-                        <tr class="hover:bg-white/[0.02] transition-colors">
-                            <td class="px-5 py-3">
-                                <a href="{{ route('customers.show', $client) }}" class="text-xs font-black text-white hover:text-yellow-400 transition-colors">
-                                    {{ $client->name }}
-                                </a>
-                            </td>
-                            <td class="px-5 py-3 text-right text-xs font-black text-yellow-400">
-                                {{ number_format($client->fixed_weekly_quantity) }}
-                            </td>
-                            <td class="px-5 py-3 text-right text-xs font-black text-zinc-400">
-                                ~{{ number_format($client->fixed_weekly_quantity * 4) }}
-                            </td>
-                            <td class="px-5 py-3 text-center">
-                                @php
-                                    $eff = $client->effectiveness;
-                                    $color = $eff >= 90 ? 'text-emerald-400' : ($eff >= 60 ? 'text-yellow-400' : 'text-red-400');
-                                @endphp
-                                <span class="text-xs font-black {{ $color }}">{{ $eff }}%</span>
-                            </td>
-                            <td class="px-5 py-3 text-right text-xs font-black {{ ($client->total_balance ?? 0) > 0 ? 'text-red-400' : 'text-zinc-600' }}">
-                                ${{ number_format($client->total_balance ?? 0, 0, ',', '.') }}
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                    <tfoot class="border-t border-white/10">
-                        <tr>
-                            <td class="px-5 py-3 text-[9px] font-black text-zinc-500 uppercase">TOTAL</td>
-                            <td class="px-5 py-3 text-right text-sm font-black text-yellow-400">
-                                {{ number_format($fixedClients->sum('fixed_weekly_quantity')) }}/sem
-                            </td>
-                            <td class="px-5 py-3 text-right text-xs font-black text-zinc-400">
-                                ~{{ number_format($fixedClients->sum('fixed_weekly_quantity') * 4) }}/mes
-                            </td>
-                            <td colspan="2"></td>
-                        </tr>
-                    </tfoot>
-                </table>
+            <div class="divide-y divide-white/[0.04]">
+                @foreach($fixedClients as $fc)
+                @php $effColor = $fc->effectiveness >= 90 ? 'emerald' : ($fc->effectiveness >= 70 ? 'yellow' : 'red'); @endphp
+                <div class="px-6 py-3 flex items-center gap-4 hover:bg-white/[0.02] transition-colors">
+                    <div class="flex-1">
+                        <p class="text-xs font-black text-white">{{ $fc->name }}</p>
+                        <p class="text-[9px] text-zinc-600">{{ number_format($fc->fixed_weekly_quantity) }} aves/sem</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[9px] font-black text-{{ $effColor }}-400">{{ $fc->effectiveness }}% efectividad</p>
+                        @if(($fc->total_balance ?? 0) > 0)
+                        <p class="text-[9px] text-red-400">${{ number_format($fc->total_balance) }} deuda activa</p>
+                        @endif
+                    </div>
+                    <div class="w-16 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                        <div class="h-full bg-{{ $effColor }}-500 rounded-full" style="width:{{ $fc->effectiveness }}%"></div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+            <div class="px-6 py-3 border-t border-white/5 flex justify-between items-center bg-black/20">
+                <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Total comprometido / semana</p>
+                <p class="text-sm font-black text-yellow-400">{{ number_format($fixedClients->sum('fixed_weekly_quantity')) }} aves</p>
             </div>
             @endif
         </div>

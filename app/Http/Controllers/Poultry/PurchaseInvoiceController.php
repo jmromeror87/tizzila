@@ -20,7 +20,7 @@ class PurchaseInvoiceController extends Controller
     public function create(PoultryOrderSchedule $order)
     {
         if ($order->purchaseInvoice) {
-            return redirect()->route('poultry.purchase-invoices.show', $order->purchaseInvoice)
+            return redirect()->route('purchase-invoices.show', $order->purchaseInvoice)
                 ->with('info', 'Este pedido ya tiene una factura de compra registrada.');
         }
 
@@ -97,7 +97,7 @@ class PurchaseInvoiceController extends Controller
         $order->update(['verified_quantity' => $qty]);
 
         return redirect()
-            ->route('poultry.purchase-invoices.show', $invoice)
+            ->route('purchase-invoices.show', $invoice)
             ->with('success', "Factura {$invoice->invoice_number} registrada. Ahora puedes crear la distribución.");
     }
 

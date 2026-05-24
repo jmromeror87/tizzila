@@ -188,45 +188,132 @@
         </div>
     </div>
 
-    {{-- Ciudad / Departamento / Código Postal --}}
-    <div class="col-span-1 md:col-span-2">
+    {{-- Ciudad con autocompletado Mapbox --}}
+    <div class="col-span-1 md:col-span-6 relative">
         <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Ciudad</label>
         <div class="relative group">
-            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                 <i class="fas fa-city text-gray-600 group-focus-within:text-yellow-500 transition-colors"></i>
             </div>
-            <input type="text" name="city"
-                   class="w-full bg-[#070a13] border-white/10 rounded-xl text-white text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/30 transition-all py-3.5 pl-11 pr-4"
+            <input type="text" id="city_input" autocomplete="off"
+                   class="w-full bg-[#070a13] border-white/10 rounded-xl text-white text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/30 transition-all py-3.5 pl-11 pr-10"
                    value="{{ old('city', $provider->city ?? '') }}"
-                   placeholder="Bogotá">
+                   placeholder="Escribe la ciudad...">
+            <div id="city_spinner" class="absolute inset-y-0 right-4 flex items-center pointer-events-none hidden">
+                <i class="fas fa-circle-notch fa-spin text-yellow-500 text-xs"></i>
+            </div>
         </div>
+        {{-- Hidden inputs que van al backend --}}
+        <input type="hidden" name="city"        id="city_value"       value="{{ old('city', $provider->city ?? '') }}">
+        <input type="hidden" name="department"  id="department_value" value="{{ old('department', $provider->department ?? '') }}">
+        <input type="hidden" name="postal_code" id="postal_code_value" value="{{ old('postal_code', $provider->postal_code ?? '') }}">
+
+        {{-- Dropdown sugerencias --}}
+        <ul id="city_suggestions"
+            class="absolute z-50 left-0 right-0 mt-1 bg-[#0d121f] border border-white/10 rounded-xl overflow-hidden shadow-2xl hidden">
+        </ul>
     </div>
 
-    <div class="col-span-1 md:col-span-2">
-        <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Departamento</label>
-        <div class="relative group">
+    {{-- Departamento y CP (solo lectura, se llenan automáticamente) --}}
+    <div class="col-span-1 md:col-span-3">
+        <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Departamento <span class="text-yellow-500/50 ml-1">Auto</span></label>
+        <div class="relative">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <i class="fas fa-map text-gray-600 group-focus-within:text-yellow-500 transition-colors"></i>
+                <i class="fas fa-map text-gray-600 transition-colors"></i>
             </div>
-            <input type="text" name="department"
-                   class="w-full bg-[#070a13] border-white/10 rounded-xl text-white text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/30 transition-all py-3.5 pl-11 pr-4"
+            <input type="text" id="department_display" readonly
+                   class="w-full bg-[#070a13]/50 border-white/5 rounded-xl text-gray-400 text-sm py-3.5 pl-11 pr-4 cursor-default"
                    value="{{ old('department', $provider->department ?? '') }}"
-                   placeholder="Cundinamarca">
+                   placeholder="Se completa al elegir ciudad">
         </div>
     </div>
 
-    <div class="col-span-1 md:col-span-2">
-        <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Código Postal</label>
-        <div class="relative group">
+    <div class="col-span-1 md:col-span-3">
+        <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Código Postal <span class="text-yellow-500/50 ml-1">Auto</span></label>
+        <div class="relative">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <i class="fas fa-hashtag text-gray-600 group-focus-within:text-yellow-500 transition-colors"></i>
+                <i class="fas fa-hashtag text-gray-600 transition-colors"></i>
             </div>
-            <input type="text" name="postal_code"
-                   class="w-full bg-[#070a13] border-white/10 rounded-xl text-white text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/30 transition-all py-3.5 pl-11 pr-4"
+            <input type="text" id="postal_display" readonly
+                   class="w-full bg-[#070a13]/50 border-white/5 rounded-xl text-gray-400 text-sm py-3.5 pl-11 pr-4 cursor-default"
                    value="{{ old('postal_code', $provider->postal_code ?? '') }}"
-                   placeholder="110111">
+                   placeholder="Se completa al elegir ciudad">
         </div>
     </div>
+
+    <script>
+    (function() {
+        const MAPBOX_TOKEN = '{{ config("services.mapbox.token") }}';
+        const cityInput    = document.getElementById('city_input');
+        const suggestions  = document.getElementById('city_suggestions');
+        const spinner      = document.getElementById('city_spinner');
+        const cityVal      = document.getElementById('city_value');
+        const deptVal      = document.getElementById('department_value');
+        const cpVal        = document.getElementById('postal_code_value');
+        const deptDisplay  = document.getElementById('department_display');
+        const cpDisplay    = document.getElementById('postal_display');
+
+        let debounce;
+
+        cityInput.addEventListener('input', function() {
+            clearTimeout(debounce);
+            const q = this.value.trim();
+            if (q.length < 2) { suggestions.classList.add('hidden'); return; }
+            spinner.classList.remove('hidden');
+            debounce = setTimeout(() => fetchCities(q), 350);
+        });
+
+        async function fetchCities(q) {
+            try {
+                const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q)}.json?country=CO&types=place&language=es&limit=6&access_token=${MAPBOX_TOKEN}`;
+                const res  = await fetch(url);
+                const data = await res.json();
+                spinner.classList.add('hidden');
+                renderSuggestions(data.features || []);
+            } catch(e) { spinner.classList.add('hidden'); }
+        }
+
+        function renderSuggestions(features) {
+            suggestions.innerHTML = '';
+            if (!features.length) { suggestions.classList.add('hidden'); return; }
+
+            features.forEach(f => {
+                const city    = f.text || '';
+                const context = f.context || [];
+                const dept    = context.find(c => c.id.startsWith('region'))?.text || '';
+                const cp      = context.find(c => c.id.startsWith('postcode'))?.text || '';
+
+                const li = document.createElement('li');
+                li.className = 'px-4 py-3 hover:bg-white/5 cursor-pointer border-b border-white/5 last:border-0 transition-colors flex items-center gap-3';
+                li.innerHTML = `
+                    <i class="fas fa-map-marker-alt text-yellow-500 text-xs w-4"></i>
+                    <div>
+                        <p class="text-xs font-black text-white">${city}</p>
+                        <p class="text-[10px] text-gray-500">${dept}${cp ? ' · CP ' + cp : ''}</p>
+                    </div>`;
+
+                li.addEventListener('click', () => {
+                    cityInput.value       = city;
+                    cityVal.value         = city;
+                    deptVal.value         = dept;
+                    cpVal.value           = cp;
+                    deptDisplay.value     = dept;
+                    cpDisplay.value       = cp || '—';
+                    suggestions.classList.add('hidden');
+                });
+
+                suggestions.appendChild(li);
+            });
+
+            suggestions.classList.remove('hidden');
+        }
+
+        document.addEventListener('click', e => {
+            if (!cityInput.contains(e.target) && !suggestions.contains(e.target))
+                suggestions.classList.add('hidden');
+        });
+    })();
+    </script>
 
     {{-- BLOQUE 3: CONDICIONES COMERCIALES --}}
     <div class="col-span-1 md:col-span-6 flex items-center gap-3 mt-4 mb-2">

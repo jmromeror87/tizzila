@@ -12,8 +12,10 @@ use App\Models\Poultry\PoultryOrderSchedule;
 use App\Models\Poultry\PurchaseInvoice;
 use App\Models\Poultry\Provider;
 use App\Models\Poultry\PurchaseInvoicePayment;
+use App\Models\Accounting\JournalEntry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PurchaseInvoiceController extends Controller
 {
@@ -78,12 +80,8 @@ class PurchaseInvoiceController extends Controller
         $unitPrice = $validated['unit_price'];
 
         $subtotal = $qty * $unitPrice;
-        $total    = $subtotal + ($fonav * $qty / 1000) + ($vaccine * $qty / 1000);
-
-        // Recalcular total desde los ítems si se enviaron
-        if (!empty($validated['items'])) {
-            $total = collect($validated['items'])->sum(fn($i) => $i['quantity'] * $i['unit_price']);
-        }
+        $extras   = ($fonav + $vaccine) * $qty;
+        $total    = $subtotal + $extras;
 
         $invoice = PurchaseInvoice::create([
             'poultry_order_schedule_id' => $order->id,
@@ -122,9 +120,12 @@ class PurchaseInvoiceController extends Controller
         // Actualizar cantidad real en el pedido
         $order->update(['verified_quantity' => $qty]);
 
+        // Asiento contable automático
+        $this->createJournalEntry($invoice);
+
         return redirect()
             ->route('purchase-invoices.show', $invoice)
-            ->with('success', "Factura {$invoice->invoice_number} registrada. Ahora puedes crear la distribución.");
+            ->with('success', "Factura {$invoice->invoice_number} registrada. Asiento contable generado.");
     }
 
     public function pay(Request $request, PurchaseInvoice $purchaseInvoice)
@@ -155,6 +156,44 @@ class PurchaseInvoiceController extends Controller
         return redirect()
             ->route('purchase-invoices.show', $purchaseInvoice)
             ->with('success', 'Pago registrado. Saldo pendiente: $' . number_format($newBalance, 0, ',', '.'));
+    }
+
+    private function createJournalEntry(PurchaseInvoice $invoice): void
+    {
+        $companyId = DB::table('companies')->value('id') ?? 1;
+
+        $entry = JournalEntry::create([
+            'company_id'    => $companyId,
+            'date'          => $invoice->invoice_date,
+            'reference'     => $invoice->invoice_number,
+            'description'   => "Compra PRONAVICOLA · {$invoice->invoice_number} · {$invoice->quantity_invoiced} aves",
+            'module_source' => 'purchase_invoice',
+            'module_id'     => $invoice->id,
+            'status'        => 'posted',
+            'created_by'    => Auth::id(),
+            'total_debit'   => $invoice->total,
+            'total_credit'  => $invoice->total,
+        ]);
+
+        // Débito: Inventarios (1435)
+        $entry->lines()->create([
+            'account_id'       => 10, // 1435 Inventarios
+            'third_party_id'   => $invoice->provider_id,
+            'third_party_type' => 'provider',
+            'description'      => "Compra {$invoice->quantity_invoiced} aves · {$invoice->invoice_number}",
+            'debit'            => $invoice->total,
+            'credit'           => 0,
+        ]);
+
+        // Crédito: Proveedores Nacionales (2205)
+        $entry->lines()->create([
+            'account_id'       => 15, // 2205 Proveedores Nacionales
+            'third_party_id'   => $invoice->provider_id,
+            'third_party_type' => 'provider',
+            'description'      => "Por pagar PRONAVICOLA · {$invoice->invoice_number}",
+            'debit'            => 0,
+            'credit'           => $invoice->total,
+        ]);
     }
 
     public function uploadFile(Request $request, PurchaseInvoice $purchaseInvoice)

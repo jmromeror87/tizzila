@@ -80,7 +80,10 @@ class PoultryDispatchController extends Controller
         // Solo pedidos aprobados
         abort_if($order->approval_status !== 'approved', 403);
 
-        return view('poultry.dispatches.create', compact('order'));
+        // Pre-cargar distribución planeada para poblar el despacho
+        $plannedDistributions = $order->distributions()->with('customer')->get();
+
+        return view('poultry.dispatches.create', compact('order', 'plannedDistributions'));
     }
 
     /**

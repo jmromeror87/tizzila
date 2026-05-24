@@ -30,6 +30,16 @@
 
     <div class="py-4">
 
+        @if(isset($plannedDistributions) && $plannedDistributions->count() > 0)
+        <div class="mb-4 bg-blue-500/10 border border-blue-500/20 rounded-2xl px-5 py-3 flex items-center gap-3">
+            <i class="fas fa-magic text-blue-400 text-sm"></i>
+            <p class="text-[10px] font-black uppercase tracking-widest text-blue-300">
+                Pre-cargados {{ $plannedDistributions->count() }} clientes desde la distribución programada —
+                <span class="text-blue-400">{{ number_format($plannedDistributions->sum('quantity')) }} aves</span>
+            </p>
+        </div>
+        @endif
+
         @if($errors->has('credit_block'))
         <div class="mb-4 bg-red-500/10 border border-red-500/30 rounded-2xl px-5 py-4 flex items-start gap-3">
             <div class="w-8 h-8 rounded-xl bg-red-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -210,6 +220,21 @@ function removeItem(btn) {
     if (!document.getElementById('itemsWrapper').children.length) {
         document.getElementById('emptyState').classList.remove('hidden');
     }
+}
+
+// Auto-cargar distribución planeada al abrir el despacho
+const plannedItems = @json($plannedDistributions ?? []);
+if (plannedItems.length > 0) {
+    plannedItems.forEach(item => {
+        addItem();
+        const rows = document.querySelectorAll('.item-row');
+        const lastRow = rows[rows.length - 1];
+        const sel = lastRow.querySelector('select[name*="customer_id"]');
+        const qty = lastRow.querySelector('input[name*="quantity"]');
+        if (sel) sel.value = item.customer_id;
+        if (qty) { qty.value = item.quantity; }
+    });
+    updateTotals();
 }
 </script>
 </x-app-layout>

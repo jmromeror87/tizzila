@@ -119,9 +119,12 @@
     input.addEventListener('input', function () {
         clearTimeout(timer);
         const q = this.value.trim();
-        if (q.length < 3) { hide(); return; }
-        spinner.classList.remove('hidden');
-        timer = setTimeout(() => search(q), 400);
+        if (q.length < 4) { hide(); return; }
+        // Solo busca si el usuario hizo pausa de 600ms — evita llamadas por cada letra
+        timer = setTimeout(() => {
+            spinner.classList.remove('hidden');
+            search(q);
+        }, 600);
     });
 
     async function search(q) {

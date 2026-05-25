@@ -13,6 +13,17 @@ class PoultryOrderDistribution extends Model
         'poultry_order_schedule_id',
         'customer_id',
         'quantity',
+        'sale_price',
+        'vaccine_price',
+        'despique_price',
+        'beak_condition',
+        'observations',
+    ];
+
+    protected $casts = [
+        'sale_price'    => 'decimal:2',
+        'vaccine_price' => 'decimal:2',
+        'despique_price' => 'decimal:2',
     ];
 
     public function order()

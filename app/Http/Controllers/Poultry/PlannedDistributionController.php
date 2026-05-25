@@ -62,22 +62,38 @@ class PlannedDistributionController extends Controller
     public function store(Request $request, PoultryOrderSchedule $order)
     {
         $validated = $request->validate([
-            'customer_id' => 'required|exists:customers,id',
-            'quantity'    => 'required|integer|min:1',
+            'customer_id'    => 'required|exists:customers,id',
+            'quantity'       => 'required|integer|min:1',
+            'sale_price'     => 'nullable|numeric|min:0',
+            'vaccine_price'  => 'nullable|numeric|min:0',
+            'despique_price' => 'nullable|numeric|min:0',
+            'beak_condition' => 'nullable|in:con_pico,sin_pico',
+            'observations'   => 'nullable|string|max:500',
         ]);
 
-        // Evitar duplicado
         $existing = PoultryOrderDistribution::where('poultry_order_schedule_id', $order->id)
             ->where('customer_id', $validated['customer_id'])
             ->first();
 
         if ($existing) {
-            $existing->update(['quantity' => $existing->quantity + $validated['quantity']]);
+            $existing->update([
+                'quantity'       => $existing->quantity + $validated['quantity'],
+                'sale_price'     => $validated['sale_price']     ?? $existing->sale_price,
+                'vaccine_price'  => $validated['vaccine_price']  ?? $existing->vaccine_price,
+                'despique_price' => $validated['despique_price'] ?? $existing->despique_price,
+                'beak_condition' => $validated['beak_condition'] ?? $existing->beak_condition,
+                'observations'   => $validated['observations']   ?? $existing->observations,
+            ]);
         } else {
             PoultryOrderDistribution::create([
                 'poultry_order_schedule_id' => $order->id,
                 'customer_id'               => $validated['customer_id'],
                 'quantity'                  => $validated['quantity'],
+                'sale_price'                => $validated['sale_price']     ?? null,
+                'vaccine_price'             => $validated['vaccine_price']  ?? null,
+                'despique_price'            => $validated['despique_price'] ?? null,
+                'beak_condition'            => $validated['beak_condition'] ?? null,
+                'observations'              => $validated['observations']   ?? null,
             ]);
         }
 
@@ -86,9 +102,25 @@ class PlannedDistributionController extends Controller
 
     public function update(Request $request, PoultryOrderSchedule $order, PoultryOrderDistribution $distribution)
     {
-        $request->validate(['quantity' => 'required|integer|min:1']);
-        $distribution->update(['quantity' => $request->quantity]);
-        return back()->with('success', 'Cantidad actualizada.');
+        $request->validate([
+            'quantity'       => 'required|integer|min:1',
+            'sale_price'     => 'nullable|numeric|min:0',
+            'vaccine_price'  => 'nullable|numeric|min:0',
+            'despique_price' => 'nullable|numeric|min:0',
+            'beak_condition' => 'nullable|in:con_pico,sin_pico',
+            'observations'   => 'nullable|string|max:500',
+        ]);
+
+        $distribution->update([
+            'quantity'       => $request->quantity,
+            'sale_price'     => $request->sale_price,
+            'vaccine_price'  => $request->vaccine_price,
+            'despique_price' => $request->despique_price,
+            'beak_condition' => $request->beak_condition ?: null,
+            'observations'   => $request->observations,
+        ]);
+
+        return back()->with('success', 'Distribución actualizada.');
     }
 
     public function destroy(PoultryOrderSchedule $order, PoultryOrderDistribution $distribution)

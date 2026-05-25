@@ -87,6 +87,7 @@ public function create()
 
                 'municipality_id' => 'nullable|string|max:10',
                 'address'         => 'nullable|string|max:255',
+                'neighborhood'    => 'nullable|string|max:150',
                 'city'            => 'nullable|string|max:100',
                 'department'      => 'nullable|string|max:100',
 
@@ -248,6 +249,7 @@ public function create()
         'phone'           => 'nullable|string|max:50',
         'municipality_id' => 'nullable|string|max:10',
         'address'         => 'nullable|string|max:255',
+        'neighborhood'    => 'nullable|string|max:150',
         'city'            => 'nullable|string|max:100',
         'department'      => 'nullable|string|max:100',
         'payment_term_id'        => 'required|exists:payment_terms,id',

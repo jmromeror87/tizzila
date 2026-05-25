@@ -35,6 +35,7 @@ class Customer extends Model
         'type_liability_id',
         'municipality_id',
         'address',
+        'neighborhood',
         'city',
         'department',
         'delivery_zone',

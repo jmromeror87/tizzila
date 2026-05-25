@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('customers', function (Blueprint $table) {
-            $table->string('city', 100)->nullable()->after('address');
+            $table->string('neighborhood', 150)->nullable()->after('address');
+            $table->string('city', 100)->nullable()->after('neighborhood');
             $table->string('department', 100)->nullable()->after('city');
         });
     }
@@ -20,7 +21,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('customers', function (Blueprint $table) {
-            $table->dropColumn(['city', 'department']);
+            $table->dropColumn(['neighborhood', 'city', 'department']);
         });
     }
 };

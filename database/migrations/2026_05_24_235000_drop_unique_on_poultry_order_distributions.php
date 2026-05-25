@@ -8,7 +8,7 @@ return new class extends Migration
     public function up(): void
     {
         // 1. Soltar FK que depende del índice unique
-        DB::statement('ALTER TABLE poultry_order_distributions DROP FOREIGN KEY poultry_order_distributions_ibfk_1');
+        DB::statement('ALTER TABLE poultry_order_distributions DROP FOREIGN KEY pod_order_fk');
         // 2. Soltar el índice unique
         DB::statement('ALTER TABLE poultry_order_distributions DROP INDEX order_customer_unique');
         // 3. Agregar índice normal en poultry_order_schedule_id para la FK

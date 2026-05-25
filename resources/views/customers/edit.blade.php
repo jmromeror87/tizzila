@@ -146,8 +146,8 @@
                     </div>
                     <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="md:col-span-2">
-                            <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Dirección <span class="text-red-400">*</span></label>
-                            <input type="text" name="address" value="{{ old('address', $customer->address) }}" required
+                            <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Dirección</label>
+                            <input type="text" name="address" value="{{ old('address', $customer->address) }}"
                                 class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm text-white outline-none focus:border-yellow-500/50">
                         </div>
                         <div>
@@ -164,8 +164,8 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Municipio (DANE) <span class="text-red-400">*</span></label>
-                            <input type="text" name="municipality_id" value="{{ old('municipality_id', $customer->municipality_id) }}" required
+                            <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Municipio (DANE)</label>
+                            <input type="text" name="municipality_id" value="{{ old('municipality_id', $customer->municipality_id) }}"
                                 class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm font-mono text-yellow-500 outline-none focus:border-yellow-500/50">
                         </div>
                         <div>
@@ -174,8 +174,8 @@
                                 class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm text-white outline-none focus:border-yellow-500/50">
                         </div>
                         <div>
-                            <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Correo Electrónico <span class="text-red-400">*</span></label>
-                            <input type="email" name="email" value="{{ old('email', $customer->email) }}" required
+                            <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Correo Electrónico</label>
+                            <input type="email" name="email" value="{{ old('email', $customer->email) }}"
                                 class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm text-white outline-none focus:border-yellow-500/50">
                         </div>
                         <div>

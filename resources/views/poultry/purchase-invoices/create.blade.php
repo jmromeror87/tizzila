@@ -24,7 +24,7 @@
         @endif
 
         {{-- RESUMEN DEL PEDIDO --}}
-        <div class="bg-[#0d121f] border border-white/5 rounded-2xl p-5 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-[#0d121f] border border-white/5 rounded-2xl p-5 grid grid-cols-2 md:grid-cols-5 gap-4">
             <div>
                 <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Pedido</p>
                 <p class="text-sm font-black text-white">#{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</p>
@@ -41,7 +41,64 @@
                 <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Programado</p>
                 <p class="text-sm font-black text-white">{{ number_format($order->quantity) }} aves</p>
             </div>
+            <div>
+                <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Facturas registradas</p>
+                <p class="text-sm font-black {{ $existingInvoices->count() > 0 ? 'text-purple-400' : 'text-zinc-600' }}">
+                    {{ $existingInvoices->count() }} {{ $existingInvoices->count() === 1 ? 'factura' : 'facturas' }}
+                </p>
+            </div>
         </div>
+
+        {{-- FACTURAS YA REGISTRADAS --}}
+        @if($existingInvoices->count() > 0)
+        <div class="bg-[#0d121f] border border-purple-500/20 rounded-2xl overflow-hidden">
+            <div class="px-5 py-3 border-b border-purple-500/10 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-file-invoice-dollar text-purple-400 text-xs"></i>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-purple-400">Facturas de este pedido</p>
+                </div>
+                @php
+                    $totalFacturado = $existingInvoices->sum('total');
+                    $totalAves      = $existingInvoices->sum('quantity_invoiced');
+                    $diferencia     = $order->quantity - $totalAves;
+                @endphp
+                <p class="text-[9px] font-black text-zinc-500">
+                    {{ number_format($totalAves) }} aves · $ {{ number_format($totalFacturado, 0, ',', '.') }}
+                    @if($diferencia != 0)
+                    <span class="{{ $diferencia > 0 ? 'text-yellow-400' : 'text-red-400' }} ml-2">
+                        {{ $diferencia > 0 ? '▲ faltan' : '▼ excede' }} {{ number_format(abs($diferencia)) }} aves
+                    </span>
+                    @else
+                    <span class="text-emerald-400 ml-2">✓ cuadra</span>
+                    @endif
+                </p>
+            </div>
+            <div class="divide-y divide-white/[0.04]">
+                @foreach($existingInvoices as $inv)
+                <div class="px-5 py-3 flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <span class="text-[9px] font-black text-purple-300 font-mono">{{ $inv->invoice_number }}</span>
+                        <span class="text-[9px] text-zinc-600">{{ $inv->invoice_date->format('d/m/Y') }}</span>
+                        <span class="text-[9px] text-zinc-500">{{ number_format($inv->quantity_invoiced) }} aves</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-[10px] font-black text-white font-mono">$ {{ number_format($inv->total, 0, ',', '.') }}</span>
+                        <span class="text-[8px] font-black px-2 py-0.5 rounded
+                            {{ $inv->payment_status === 'paid' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                               ($inv->payment_status === 'partial' ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20' :
+                               'bg-red-500/10 text-red-400 border border-red-500/20') }}">
+                            {{ $inv->payment_status === 'paid' ? 'PAGADA' : ($inv->payment_status === 'partial' ? 'PARCIAL' : 'PENDIENTE') }}
+                        </span>
+                        <a href="{{ route('purchase-invoices.show', $inv) }}"
+                           class="text-[9px] text-zinc-500 hover:text-white transition-all">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
 
         <form method="POST" action="{{ route('purchase-invoices.store', $order) }}" enctype="multipart/form-data">
             @csrf

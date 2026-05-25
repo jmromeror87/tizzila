@@ -281,20 +281,24 @@
                                     </a>
                                     @endif
 
-                                    {{-- Factura de Compra PRONAVICOLA --}}
+                                    {{-- Factura(s) de Compra PRONAVICOLA --}}
                                     @if($isApproved && $isProgrammed)
-                                    @php $hasPurchaseInvoice = (bool)($order->purchaseInvoice ?? false); @endphp
-                                    <a href="{{ $hasPurchaseInvoice
-                                                ? route('purchase-invoices.show', $order->purchaseInvoice->id)
-                                                : route('purchase-invoices.create', $order) }}"
-                                       title="{{ $hasPurchaseInvoice ? 'Ver factura de compra' : 'Registrar factura de compra' }}"
-                                       class="h-8 w-8 rounded-xl {{ $hasPurchaseInvoice ? 'bg-purple-500/10 border-purple-500/20 hover:bg-purple-500/20 text-purple-400' : 'bg-orange-500/10 border-orange-500/20 hover:bg-orange-500/20 text-orange-400' }} border flex items-center justify-center transition-all text-[10px]">
+                                    @php
+                                        $invoiceCount = $order->purchaseInvoices->count();
+                                        $hasPurchaseInvoice = $invoiceCount > 0;
+                                    @endphp
+                                    <a href="{{ route('purchase-invoices.create', $order) }}"
+                                       title="{{ $hasPurchaseInvoice ? "Ver / agregar facturas ({$invoiceCount})" : 'Registrar factura de compra' }}"
+                                       class="h-8 px-2 rounded-xl {{ $hasPurchaseInvoice ? 'bg-purple-500/10 border-purple-500/20 hover:bg-purple-500/20 text-purple-400' : 'bg-orange-500/10 border-orange-500/20 hover:bg-orange-500/20 text-orange-400' }} border flex items-center gap-1 justify-center transition-all text-[10px]">
                                         <i class="fas fa-file-invoice-dollar"></i>
+                                        @if($invoiceCount > 1)
+                                        <span class="text-[8px] font-black">{{ $invoiceCount }}</span>
+                                        @endif
                                     </a>
                                     @endif
 
-                                    {{-- Crear/ver despacho (solo si tiene factura de compra) --}}
-                                    @if($isApproved && $isProgrammed && isset($order->purchaseInvoice) && $order->purchaseInvoice)
+                                    {{-- Crear/ver despacho (solo si tiene al menos una factura de compra) --}}
+                                    @if($isApproved && $isProgrammed && $order->purchaseInvoices->count() > 0)
                                     <a href="{{ $hasDispatch
                                                 ? route('poultry.dispatches.show', $order->dispatch->id)
                                                 : route('poultry.dispatches.create', $order) }}"

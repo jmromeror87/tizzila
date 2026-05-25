@@ -102,7 +102,12 @@ class PoultryOrderSchedule extends Model
 
     public function purchaseInvoice()
     {
-        return $this->hasOne(PurchaseInvoice::class);
+        return $this->hasOne(PurchaseInvoice::class)->latestOfMany();
+    }
+
+    public function purchaseInvoices()
+    {
+        return $this->hasMany(PurchaseInvoice::class);
     }
 
     public function documents()

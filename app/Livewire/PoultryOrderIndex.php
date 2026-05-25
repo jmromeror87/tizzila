@@ -122,6 +122,7 @@ class PoultryOrderIndex extends Component // ✅ Corregido: "extends"
                 'documents',
                 'approval.batches',
                 'purchaseInvoice',
+                'purchaseInvoices',
                 'distributions',
             ])
             ->whereMonth('dispatch_date', $this->month)

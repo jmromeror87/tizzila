@@ -43,14 +43,10 @@ class PurchaseInvoiceController extends Controller
 
     public function create(PoultryOrderSchedule $order)
     {
-        if ($order->purchaseInvoice) {
-            return redirect()->route('purchase-invoices.show', $order->purchaseInvoice)
-                ->with('info', 'Este pedido ya tiene una factura de compra registrada.');
-        }
-
         $provider = $order->provider ?? Provider::first();
+        $existingInvoices = $order->purchaseInvoices()->orderBy('invoice_date')->get();
 
-        return view('poultry.purchase-invoices.create', compact('order', 'provider'));
+        return view('poultry.purchase-invoices.create', compact('order', 'provider', 'existingInvoices'));
     }
 
     public function store(Request $request, PoultryOrderSchedule $order)

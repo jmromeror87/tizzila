@@ -85,11 +85,11 @@ public function create()
                 'type_regime_id'       => 'required|string',
                 'type_liability_id'    => 'required|string',
 
-                'municipality_id' => 'required|string|max:10',
-                'address'         => 'required|string|max:255',
+                'municipality_id' => 'nullable|string|max:10',
+                'address'         => 'nullable|string|max:255',
 
                 'email' => [
-                    'required',
+                    'nullable',
                     'email',
                     Rule::unique('customers', 'email'),
                 ],
@@ -110,17 +110,13 @@ public function create()
         |--------------------------------------------------------------------------
         */
 
-        $fullAddress = $validated['address'] . ', Colombia';
-        $coords = $this->geocodeAddress($fullAddress);
-
-        if (!$coords) {
-            return back()
-                ->withInput()
-                ->withErrors(['address' => 'No se pudo validar la dirección. Verifique que sea correcta.']);
+        if (!empty($validated['address'])) {
+            $coords = $this->geocodeAddress($validated['address'] . ', Colombia');
+            if ($coords) {
+                $validated['latitude']  = $coords['latitude'];
+                $validated['longitude'] = $coords['longitude'];
+            }
         }
-
-        $validated['latitude']  = $coords['latitude'];
-        $validated['longitude'] = $coords['longitude'];
 
         Customer::create($validated);
 
@@ -241,14 +237,14 @@ public function create()
         'type_liability_id'    => 'required|string',
 
         'email' => [
-            'required',
+            'nullable',
             'email',
             Rule::unique('customers', 'email')->ignore($customer->id),
         ],
 
         'phone'           => 'nullable|string|max:50',
-        'municipality_id' => 'required|string|max:10',
-        'address'         => 'required|string|max:255',
+        'municipality_id' => 'nullable|string|max:10',
+        'address'         => 'nullable|string|max:255',
         'payment_term_id'        => 'required|exists:payment_terms,id',
         'credit_limit'           => 'nullable|numeric|min:0',
         'is_fixed_client'        => 'nullable|boolean',

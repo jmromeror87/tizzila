@@ -103,7 +103,7 @@ class ExpenseController extends Controller
 
             DB::transaction(function () use ($data) {
 
-                $companyId = Auth::user()->company_id ?? 1;
+                $companyId = Auth::user()->company_id ?? \App\Models\Global\Company::first()?->id ?? 1;
 
                 $expense = Expense::create([
                     'company_id'       => $companyId,

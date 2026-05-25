@@ -49,15 +49,18 @@ class PoultryOrderScheduleController extends Controller
         $month = $request->integer('month', now()->month);
         $year  = $request->integer('year', now()->year);
 
+        $showCancelled = $request->boolean('canceladas', false);
+
         $orders = PoultryOrderSchedule::query()
             ->with(['provider', 'poultryType', 'dispatch'])
             ->withExists('dispatch')
             ->whereMonth('dispatch_date', $month)
             ->whereYear('dispatch_date', $year)
+            ->when(!$showCancelled, fn($q) => $q->where('status', '!=', 'cancelled'))
             ->orderBy('dispatch_date')
             ->get();
 
-        return view('poultry.orders.index', compact('orders', 'month', 'year'));
+        return view('poultry.orders.index', compact('orders', 'month', 'year', 'showCancelled'));
     }
 
     /* ============================================================

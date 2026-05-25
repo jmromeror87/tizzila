@@ -27,6 +27,7 @@ class PoultryOrderIndex extends Component // ✅ Corregido: "extends"
     public $search = '';
     public $month;
     public $year;
+    public $showCancelled = false;
 
     // Propiedades del Modal
     public $showApprovalModal = false;
@@ -124,7 +125,8 @@ class PoultryOrderIndex extends Component // ✅ Corregido: "extends"
                 'distributions',
             ])
             ->whereMonth('dispatch_date', $this->month)
-            ->whereYear('dispatch_date', $this->year);
+            ->whereYear('dispatch_date', $this->year)
+            ->when(!$this->showCancelled, fn($q) => $q->where('status', '!=', 'cancelled'));
 
         // Filtro de búsqueda
         if ($this->search) {

@@ -93,6 +93,14 @@
                 class="w-full pl-9 pr-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-xs font-bold text-white placeholder-zinc-700 outline-none focus:border-yellow-500/50 uppercase tracking-wide">
         </div>
         <div class="flex items-center gap-2 shrink-0">
+            {{-- Toggle órdenes anuladas --}}
+            <button wire:click="$toggle('showCancelled')"
+                    class="h-9 px-3 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2
+                        {{ $showCancelled ? 'bg-red-500/10 border-red-500/30 text-red-400' : 'bg-black/40 border-white/10 text-zinc-600 hover:text-zinc-400' }}">
+                <i class="fas fa-ban text-[9px]"></i>
+                {{ $showCancelled ? 'Ocultando anuladas' : 'Ver anuladas' }}
+            </button>
+
             <select wire:model.live="month"
                 class="bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-[10px] font-black text-white uppercase outline-none focus:border-yellow-500/50">
                 @php
@@ -156,7 +164,21 @@
                             $hasDispatch = (bool)($order->dispatch_exists ?? $order->dispatch ?? false);
                         @endphp
 
-                        <div class="bg-[#0d121f] border {{ $isToday ? 'border-yellow-500/10' : 'border-white/5' }} hover:border-yellow-500/20 rounded-2xl px-5 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 group transition-all">
+                        <div class="bg-[#0d121f] border {{ $order->status === 'cancelled' ? 'border-red-500/20 opacity-60' : ($isToday ? 'border-yellow-500/10' : 'border-white/5') }} hover:border-yellow-500/20 rounded-2xl overflow-hidden group transition-all">
+                        @if($order->status === 'cancelled')
+                        <div class="px-5 py-2 bg-red-500/10 border-b border-red-500/20 flex items-center gap-2">
+                            <i class="fas fa-ban text-red-400 text-[9px]"></i>
+                            <p class="text-[9px] font-black text-red-400 uppercase tracking-widest">Anulada</p>
+                            @if($order->cancellation_reason)
+                            <span class="text-zinc-500 text-[9px]">·</span>
+                            <p class="text-[9px] text-zinc-400 truncate">{{ $order->cancellation_reason }}</p>
+                            @endif
+                            @if($order->cancelled_at)
+                            <span class="ml-auto text-[9px] text-zinc-600 shrink-0">{{ $order->cancelled_at->format('d/m/Y') }}</span>
+                            @endif
+                        </div>
+                        @endif
+                        <div class="px-5 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
 
                             {{-- ID + Info --}}
                             <div class="flex items-center gap-4 flex-1 min-w-0">
@@ -300,7 +322,8 @@
                                     </button>
                                 </div>
                             </div>
-                        </div>
+                        </div>{{-- cierre inner div --}}
+                        </div>{{-- cierre card --}}
                     @endforeach
                 </div>
             </div>

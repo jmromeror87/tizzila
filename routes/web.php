@@ -691,6 +691,11 @@ Route::middleware(['auth'])
             'incident'
         ])->name('incident');
 
+        Route::post('{order}/cancel', [
+            PoultryOrderScheduleController::class,
+            'cancel'
+        ])->name('cancel');
+
         Route::get('{order}/dss-surplus', [
             PoultryOrderScheduleController::class,
             'dssSurplus'

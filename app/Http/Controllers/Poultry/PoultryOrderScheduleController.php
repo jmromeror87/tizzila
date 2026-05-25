@@ -310,6 +310,29 @@ class PoultryOrderScheduleController extends Controller
     }
 
 
+    public function cancel(Request $request, PoultryOrderSchedule $order)
+    {
+        $request->validate([
+            'cancellation_reason' => 'required|string|max:500',
+        ], [
+            'cancellation_reason.required' => 'Debes indicar el motivo de la anulación.',
+        ]);
+
+        if ($order->status === 'paid') {
+            return back()->withErrors(['cancellation_reason' => 'No se puede anular un pedido ya pagado.']);
+        }
+
+        $order->update([
+            'status'              => 'cancelled',
+            'cancellation_reason' => $request->cancellation_reason,
+            'cancelled_at'        => now(),
+        ]);
+
+        return redirect()
+            ->route('poultry.orders.index')
+            ->with('success', "Pedido #{$order->id} anulado. Motivo: {$request->cancellation_reason}");
+    }
+
     public function previewDocument(PoultryProviderDocument $document)
     {
         if (!Storage::disk('public')->exists($document->file_path)) {

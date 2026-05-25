@@ -162,13 +162,31 @@
                     </div>
 
                     {{-- 3. PIE DE ACCIONES --}}
-                    <div class="p-6 md:p-10 bg-black/40 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-                        
-                        <a href="{{ route('poultry.orders.index') }}"
-                           class="flex items-center gap-2 text-[10px] font-black text-gray-600 hover:text-white uppercase tracking-widest transition-all group">
-                            <i class="fas fa-times text-[8px] group-hover:rotate-90 transition-transform"></i>
-                            Descartar Cambios
-                        </a>
+                    <div class="p-6 md:p-10 bg-black/40 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+
+                        <div class="flex items-center gap-4">
+                            <a href="{{ route('poultry.orders.index') }}"
+                               class="flex items-center gap-2 text-[10px] font-black text-gray-600 hover:text-white uppercase tracking-widest transition-all group">
+                                <i class="fas fa-times text-[8px] group-hover:rotate-90 transition-transform"></i>
+                                Descartar Cambios
+                            </a>
+
+                            @if($order->status !== 'cancelled' && $order->status !== 'paid')
+                            {{-- Botón Anular --}}
+                            <button type="button" @click="$dispatch('open-cancel-modal')"
+                                    class="flex items-center gap-2 text-[10px] font-black text-red-500/70 hover:text-red-400 uppercase tracking-widest transition-all group border border-red-500/20 hover:border-red-500/40 px-4 py-2 rounded-xl">
+                                <i class="fas fa-ban text-[9px]"></i>
+                                Anular Orden
+                            </button>
+                            @endif
+
+                            @if($order->status === 'cancelled')
+                            <div class="flex items-center gap-2 text-[10px] font-black text-red-400 uppercase tracking-widest border border-red-500/20 px-4 py-2 rounded-xl bg-red-500/5">
+                                <i class="fas fa-ban text-[9px]"></i>
+                                Orden Anulada
+                            </div>
+                            @endif
+                        </div>
 
                         <button type="submit"
                                 :disabled="loading"
@@ -179,6 +197,17 @@
                             </span>
                         </button>
                     </div>
+
+                    {{-- Mostrar razón de anulación si ya fue anulada --}}
+                    @if($order->status === 'cancelled' && $order->cancellation_reason)
+                    <div class="px-6 md:px-10 py-4 bg-red-500/5 border-t border-red-500/20">
+                        <p class="text-[9px] font-black uppercase tracking-widest text-red-400 mb-1">Motivo de Anulación</p>
+                        <p class="text-sm text-red-300">{{ $order->cancellation_reason }}</p>
+                        @if($order->cancelled_at)
+                        <p class="text-[9px] text-zinc-600 mt-1">{{ $order->cancelled_at->format('d/m/Y H:i') }}</p>
+                        @endif
+                    </div>
+                    @endif
                 </div>
 
                 {{-- INFO SISTEMA --}}
@@ -194,4 +223,59 @@
 
         </div>
     </div>
+
+    {{-- ══ MODAL ANULAR ORDEN ══ --}}
+    @if($order->status !== 'cancelled' && $order->status !== 'paid')
+    <div x-data="{ open: false }"
+         @open-cancel-modal.window="open = true"
+         x-show="open"
+         x-transition.opacity
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+         style="display:none">
+
+        <div @click.outside="open = false"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             class="bg-[#0d121f] border border-red-500/30 rounded-2xl p-8 w-full max-w-md shadow-2xl">
+
+            <div class="flex items-center gap-3 mb-6">
+                <div class="h-10 w-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                    <i class="fas fa-ban text-red-400"></i>
+                </div>
+                <div>
+                    <p class="text-[9px] font-black uppercase tracking-widest text-red-400">Anular Pedido</p>
+                    <p class="text-lg font-black text-white leading-none">#{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }} · {{ $order->dispatch_date->format('d/m/Y') }}</p>
+                </div>
+            </div>
+
+            <p class="text-xs text-zinc-400 mb-5">Esta acción marcará el pedido como <span class="text-red-400 font-black">ANULADO</span>. Indica el motivo — el proveedor pudo haber quitado aves, cambio de condiciones u otro evento.</p>
+
+            <form method="POST" action="{{ route('poultry.orders.cancel', $order) }}">
+                @csrf
+                <div class="mb-5">
+                    <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-2">Motivo de Anulación <span class="text-red-400">*</span></label>
+                    <textarea name="cancellation_reason" rows="4" required
+                        placeholder="Ej: El proveedor redujo la disponibilidad de aves por enfermedad en la granja. Se reprogramará para la próxima semana..."
+                        class="w-full px-4 py-3 rounded-xl bg-black/40 border border-red-500/20 text-sm text-white outline-none focus:border-red-500/50 resize-none placeholder-zinc-600"></textarea>
+                    @error('cancellation_reason')
+                    <p class="text-red-400 text-[10px] mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="flex gap-3">
+                    <button type="button" @click="open = false"
+                            class="flex-1 py-3 rounded-xl border border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-white hover:border-white/20 transition-all">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            class="flex-1 py-3 rounded-xl bg-red-500 hover:bg-red-400 text-[10px] font-black uppercase tracking-widest text-white transition-all flex items-center justify-center gap-2">
+                        <i class="fas fa-ban text-[9px]"></i> Confirmar Anulación
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    @endif
+
 </x-app-layout>

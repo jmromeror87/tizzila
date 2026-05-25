@@ -39,12 +39,15 @@ class PoultryOrderSchedule extends Model
         'notes',
         'date_override_reason',
         'provider_document_id',
+        'cancellation_reason',
+        'cancelled_at',
     ];
 
     protected $casts = [
         'dispatch_date'    => 'date',
         'payment_due_date' => 'date',
         'approved_at'      => 'datetime',
+        'cancelled_at'     => 'datetime',
     ];
 
     /* ============================================================

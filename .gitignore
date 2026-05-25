@@ -22,3 +22,15 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+.env.digitalocean
+*.backup.zip
+*.xlsx
+*.mov
+ater_*.csv
+ater_*.sql
+.env.digitalocean
+*.backup.zip
+*.xlsx
+*.mov
+ater_*.csv
+ater_*.sql

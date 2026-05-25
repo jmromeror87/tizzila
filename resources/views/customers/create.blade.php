@@ -145,36 +145,8 @@
                         <h3 class="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">Contacto y Ubicación</h3>
                     </div>
                     <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="md:col-span-2">
-                            <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Dirección</label>
-                            <input type="text" name="address" value="{{ old('address') }}"
-                                placeholder="Dirección completa de correspondencia"
-                                class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm text-white outline-none focus:border-yellow-500/50">
-                        </div>
-                        <div>
-                            <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Municipio (DANE)</label>
-                            <input type="text" name="municipality_id" value="{{ old('municipality_id') }}"
-                                placeholder="Ej: 05001"
-                                class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm font-mono text-yellow-500 outline-none focus:border-yellow-500/50">
-                        </div>
-                        <div>
-                            <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Teléfono</label>
-                            <input type="text" name="phone" value="{{ old('phone') }}"
-                                placeholder="300 000 0000"
-                                class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm text-white outline-none focus:border-yellow-500/50">
-                        </div>
-                        <div>
-                            <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Correo Electrónico</label>
-                            <input type="email" name="email" value="{{ old('email') }}"
-                                placeholder="correo@empresa.com"
-                                class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm text-white outline-none focus:border-yellow-500/50">
-                        </div>
-                        <div>
-                            <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Código Postal</label>
-                            <input type="text" name="postal_code" value="{{ old('postal_code') }}"
-                                placeholder="Opcional"
-                                class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm text-white outline-none focus:border-yellow-500/50">
-                        </div>
+                        @php $customer = null; @endphp
+                        @include('customers.partials.address-autocomplete')
                     </div>
                 </div>
 

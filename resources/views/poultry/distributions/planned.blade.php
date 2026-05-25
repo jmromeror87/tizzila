@@ -46,7 +46,7 @@
             <div class="bg-[#0d121f] border border-emerald-500/20 rounded-2xl p-5 text-center">
                 <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-2">Asignadas a Clientes</p>
                 <p class="text-4xl font-black text-emerald-400 tracking-tighter" id="total-assigned">{{ number_format($totalAssigned) }}</p>
-                <p class="text-[9px] text-zinc-600 mt-1">{{ $order->distributions->count() }} clientes</p>
+                <p class="text-[9px] text-zinc-600 mt-1">{{ $order->distributions->pluck('customer_id')->unique()->count() }} clientes · {{ $order->distributions->count() }} líneas</p>
             </div>
 
             {{-- Disponibles --}}
@@ -129,7 +129,12 @@
                     <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
                         <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Distribución Programada</h3>
                         @if($order->distributions->count() > 0)
-                        <span class="text-[9px] font-black text-zinc-500">{{ $order->distributions->count() }} clientes</span>
+                        <span class="text-[9px] font-black text-zinc-500">
+                            {{ $order->distributions->pluck('customer_id')->unique()->count() }} clientes
+                            @if($order->distributions->count() > $order->distributions->pluck('customer_id')->unique()->count())
+                            · {{ $order->distributions->count() }} líneas
+                            @endif
+                        </span>
                         @endif
                     </div>
 
@@ -140,8 +145,14 @@
                         <p class="text-[9px] text-zinc-700">Carga los fijos o agrega manualmente</p>
                     </div>
                     @else
+                    @php $prevCustomerId = null; @endphp
                     <div class="divide-y divide-white/[0.04]">
                         @foreach($order->distributions as $dist)
+                        {{-- Separador de grupo cuando cambia de cliente --}}
+                        @if($prevCustomerId !== null && $prevCustomerId !== $dist->customer_id)
+                        <div class="h-px bg-yellow-500/10 mx-5"></div>
+                        @endif
+                        @php $prevCustomerId = $dist->customer_id; @endphp
                         {{-- Fila resumen (siempre visible) --}}
                         <div x-data="{ open: false }" class="group">
                             <div class="px-5 py-3 flex items-center gap-3 hover:bg-white/[0.02] transition-colors cursor-pointer"

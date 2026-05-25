@@ -71,31 +71,18 @@ class PlannedDistributionController extends Controller
             'observations'   => 'nullable|string|max:500',
         ]);
 
-        $existing = PoultryOrderDistribution::where('poultry_order_schedule_id', $order->id)
-            ->where('customer_id', $validated['customer_id'])
-            ->first();
-
-        if ($existing) {
-            $existing->update([
-                'quantity'       => $existing->quantity + $validated['quantity'],
-                'sale_price'     => $validated['sale_price']     ?? $existing->sale_price,
-                'vaccine_price'  => $validated['vaccine_price']  ?? $existing->vaccine_price,
-                'despique_price' => $validated['despique_price'] ?? $existing->despique_price,
-                'beak_condition' => $validated['beak_condition'] ?? $existing->beak_condition,
-                'observations'   => $validated['observations']   ?? $existing->observations,
-            ]);
-        } else {
-            PoultryOrderDistribution::create([
-                'poultry_order_schedule_id' => $order->id,
-                'customer_id'               => $validated['customer_id'],
-                'quantity'                  => $validated['quantity'],
-                'sale_price'                => $validated['sale_price']     ?? null,
-                'vaccine_price'             => $validated['vaccine_price']  ?? null,
-                'despique_price'            => $validated['despique_price'] ?? null,
-                'beak_condition'            => $validated['beak_condition'] ?? null,
-                'observations'              => $validated['observations']   ?? null,
-            ]);
-        }
+        // Cada línea es independiente — el mismo cliente puede tener múltiples líneas
+        // con distintas especificaciones (con pico / sin pico, vacuna, etc.)
+        PoultryOrderDistribution::create([
+            'poultry_order_schedule_id' => $order->id,
+            'customer_id'               => $validated['customer_id'],
+            'quantity'                  => $validated['quantity'],
+            'sale_price'                => $validated['sale_price']     ?? null,
+            'vaccine_price'             => $validated['vaccine_price']  ?? null,
+            'despique_price'            => $validated['despique_price'] ?? null,
+            'beak_condition'            => $validated['beak_condition'] ?? null,
+            'observations'              => $validated['observations']   ?? null,
+        ]);
 
         return back()->with('success', 'Cliente agregado a la distribución.');
     }

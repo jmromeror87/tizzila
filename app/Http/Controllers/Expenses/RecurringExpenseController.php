@@ -26,7 +26,7 @@ class RecurringExpenseController extends Controller
 {
     public function index()
     {
-        $companyId = Auth::user()->company_id ?? 1;
+        $companyId = Auth::user()->company_id ?? DB::table("companies")->value("id") ?? 1;
 
         $recurrings = RecurringExpense::with(['category', 'provider'])
             ->where('company_id', $companyId)
@@ -58,7 +58,7 @@ class RecurringExpenseController extends Controller
             'description'         => 'nullable|string|max:500',        // ✅ nuevo
         ]);
 
-        $companyId = Auth::user()->company_id ?? 1;
+        $companyId = Auth::user()->company_id ?? DB::table("companies")->value("id") ?? 1;
 
         $data['company_id']    = $companyId;
         $data['next_run_date'] = $data['start_date'];
@@ -184,7 +184,7 @@ class RecurringExpenseController extends Controller
     public function calendar()
     {
         // ✅ FIX: Auth::id() retorna int, no objeto — usar Auth::user()
-        $companyId = Auth::user()->company_id ?? 1;
+        $companyId = Auth::user()->company_id ?? DB::table("companies")->value("id") ?? 1;
 
         $events = RecurringExpense::where('company_id', $companyId)
             ->where('is_active', true)
@@ -230,7 +230,7 @@ class RecurringExpenseController extends Controller
     // ========================================
     private function authorizeCompany($model)
     {
-        $companyId = Auth::user()->company_id ?? 1;
+        $companyId = Auth::user()->company_id ?? DB::table("companies")->value("id") ?? 1;
 
         if ($model->company_id != $companyId) {
             abort(403, 'No autorizado');

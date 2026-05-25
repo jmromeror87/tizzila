@@ -104,7 +104,8 @@ public function create()
             ]
         );
 
-        $validated['credit_limit'] = $request->input('credit_limit', 0) ?? 0;
+        $validated['credit_limit']   = $request->input('credit_limit', 0) ?? 0;
+        $validated['municipality_id'] = $validated['municipality_id'] ?? '';
 
         /*
         |--------------------------------------------------------------------------
@@ -257,6 +258,7 @@ public function create()
     ]);
 
     $validated['credit_limit']          = $request->input('credit_limit', 0) ?? 0;
+    $validated['municipality_id']       = $validated['municipality_id'] ?? '';
     $validated['is_fixed_client']       = $request->boolean('is_fixed_client');
     $validated['fixed_weekly_quantity'] = $request->input('fixed_weekly_quantity', 0) ?? 0;
     $validated['delivery_zone']         = $request->input('delivery_zone') ?: null;

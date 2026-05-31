@@ -13,10 +13,16 @@
                     <p class="text-[9px] text-zinc-500 uppercase tracking-[0.3em] font-bold mt-1">Control de Egresos y Operaciones</p>
                 </div>
             </div>
-            <a href="{{ route('expenses.create') }}"
-               class="bg-yellow-500 hover:bg-yellow-400 text-black px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shadow-[0_8px_20px_rgba(234,179,8,0.2)]">
-                <i class="fas fa-plus"></i> Nuevo Gasto
-            </a>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('expenses.import.form') }}"
+                   class="bg-white/5 border border-white/10 hover:bg-white/10 text-zinc-300 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
+                    <i class="fas fa-file-csv"></i> Importar CSV
+                </a>
+                <a href="{{ route('expenses.create') }}"
+                   class="bg-yellow-500 hover:bg-yellow-400 text-black px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shadow-[0_8px_20px_rgba(234,179,8,0.2)]">
+                    <i class="fas fa-plus"></i> Nuevo Gasto
+                </a>
+            </div>
         </div>
     </x-slot>
 

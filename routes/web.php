@@ -413,6 +413,8 @@ Route::middleware(['auth', 'role:admin,finanzas,gerencia'])->prefix('expenses')
         // Importación masiva CSV
         Route::get('/import', [\App\Http\Controllers\Expenses\ExpenseImportController::class, 'form'])
             ->name('import.form');
+        Route::get('/import/template', [\App\Http\Controllers\Expenses\ExpenseImportController::class, 'template'])
+            ->name('import.template');
         Route::post('/import/preview', [\App\Http\Controllers\Expenses\ExpenseImportController::class, 'preview'])
             ->name('import.preview');
         Route::post('/import/store', [\App\Http\Controllers\Expenses\ExpenseImportController::class, 'import'])

@@ -55,6 +55,33 @@ class ExpenseImportController extends Controller
         return view('expenses.import');
     }
 
+    public function template()
+    {
+        $rows = [
+            ['MEDIO DE PAGO', 'DOC-SOPORTE', 'FECHA', 'DETALLE', 'VALOR'],
+            ['EFECTIVO',      'GT-001',      '1/6/26', 'PEAJE MORRISON',                        '14100'],
+            ['TRANSFERENCIA', 'GT-002',      '1/8/26', 'SERVICIO PARQUEADERO SOBRERUEDAS',      '160000'],
+            ['EFECTIVO',      'GT-003',      '1/8/26', 'RESTAURANTE EL CARBON',                 '49000'],
+            ['TRANSFERENCIA', 'GT-004',      '1/10/26','COMBUSTIBLE EDS AUTOGAS',               '101292'],
+            ['TRANSFERENCIA', 'GT-005',      '1/15/26','HONORARIOS CONTADOR',                   '550000'],
+            ['EFECTIVO',      'GT-006',      '1/20/26','PEAJE PAMPLONA',                        '20700'],
+            ['TRANSFERENCIA', 'GT-007',      '1/31/26','SEGURIDAD SOCIAL LINA CABRALES',        '855000'],
+        ];
+
+        $output = fopen('php://temp', 'w');
+        foreach ($rows as $row) {
+            fputcsv($output, $row);
+        }
+        rewind($output);
+        $csv = stream_get_contents($output);
+        fclose($output);
+
+        return response($csv, 200, [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="plantilla_gastos_tizzila.csv"',
+        ]);
+    }
+
     public function preview(Request $request)
     {
         $request->validate([

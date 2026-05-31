@@ -28,65 +28,76 @@
 
     <div class="py-4 space-y-5">
 
-        {{-- KPIs --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-[#0d121f] border border-red-500/20 rounded-2xl p-5">
-                <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-2">Total Gastos</p>
-                <h2 class="text-2xl font-black text-red-400">${{ number_format($total, 0, ',', '.') }}</h2>
-                <div class="mt-3 h-0.5 w-full bg-red-500/20 rounded-full"></div>
-            </div>
-            <div class="bg-[#0d121f] border border-orange-500/20 rounded-2xl p-5">
-                <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-2">Gasto del Mes</p>
-                <h2 class="text-2xl font-black text-orange-400">${{ number_format($thisMonth, 0, ',', '.') }}</h2>
-                <div class="mt-3 h-0.5 w-full bg-orange-500/20 rounded-full"></div>
-            </div>
-            <div class="bg-[#0d121f] border border-white/5 rounded-2xl p-5">
-                <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-2">Documentos</p>
-                <h2 class="text-2xl font-black text-white">{{ $expenses->total() }} <span class="text-yellow-500 text-lg font-bold">Docs</span></h2>
-                <div class="mt-3 h-0.5 w-full bg-white/5 rounded-full"></div>
-            </div>
-            <div class="bg-[#0d121f] border border-blue-500/20 rounded-2xl p-5">
-                <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-2">Promedio Gasto</p>
-                <h2 class="text-2xl font-black text-blue-400">${{ number_format($expenses->total() > 0 ? $total / $expenses->total() : 0, 0, ',', '.') }}</h2>
-                <div class="mt-3 h-0.5 w-full bg-blue-500/20 rounded-full"></div>
-            </div>
-        </div>
+        {{-- KPIs + FILTROS integrados --}}
+        <div class="bg-[#0d121f] border border-white/5 rounded-2xl overflow-hidden">
 
-        {{-- FILTROS --}}
-        <div class="bg-[#0d121f] border border-white/5 rounded-2xl p-5">
-            <form method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-                <div>
-                    <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Desde</label>
-                    <input type="date" name="from" value="{{ request('from') }}"
-                        class="w-full bg-black/40 border border-white/10 rounded-xl text-white text-xs font-bold px-4 py-3 focus:border-yellow-500/50 focus:ring-0 transition-all">
+            {{-- KPIs --}}
+            <div class="grid grid-cols-2 lg:grid-cols-4 divide-x divide-white/5">
+                <div class="p-5">
+                    <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Gastos</p>
+                    <h2 class="text-2xl font-black text-red-400">${{ number_format($total, 0, ',', '.') }}</h2>
+                    <div class="mt-2 h-0.5 w-full bg-red-500/20 rounded-full"></div>
                 </div>
-                <div>
-                    <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Hasta</label>
-                    <input type="date" name="to" value="{{ request('to') }}"
-                        class="w-full bg-black/40 border border-white/10 rounded-xl text-white text-xs font-bold px-4 py-3 focus:border-yellow-500/50 focus:ring-0 transition-all">
+                <div class="p-5">
+                    <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Gasto del Mes</p>
+                    <h2 class="text-2xl font-black text-orange-400">${{ number_format($thisMonth, 0, ',', '.') }}</h2>
+                    <div class="mt-2 h-0.5 w-full bg-orange-500/20 rounded-full"></div>
                 </div>
-                <div>
-                    <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Categoría</label>
-                    <select name="category_id" class="w-full bg-black/40 border border-white/10 rounded-xl text-white text-xs font-bold px-4 py-3 focus:border-yellow-500/50 focus:ring-0 transition-all">
-                        <option value="">TODAS</option>
-                        @foreach(\App\Models\Expenses\ExpenseCategory::all() as $cat)
-                            <option value="{{ $cat->id }}" @selected(request('category_id') == $cat->id)>{{ $cat->name }}</option>
-                        @endforeach
-                    </select>
+                <div class="p-5">
+                    <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Documentos</p>
+                    <h2 class="text-2xl font-black text-white">{{ $expenses->total() }} <span class="text-yellow-500 text-lg font-bold">Docs</span></h2>
+                    <div class="mt-2 h-0.5 w-full bg-white/5 rounded-full"></div>
                 </div>
-                <div>
-                    <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Proveedor</label>
-                    <select name="provider_id" class="w-full bg-black/40 border border-white/10 rounded-xl text-white text-xs font-bold px-4 py-3 focus:border-yellow-500/50 focus:ring-0 transition-all">
-                        <option value="">TODOS</option>
-                        @foreach(\App\Models\Poultry\Provider::where('status','active')->get() as $p)
-                            <option value="{{ $p->id }}" @selected(request('provider_id') == $p->id)>{{ $p->business_name }}</option>
-                        @endforeach
-                    </select>
+                <div class="p-5">
+                    <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Promedio por Gasto</p>
+                    <h2 class="text-2xl font-black text-blue-400">${{ number_format($expenses->total() > 0 ? $total / $expenses->total() : 0, 0, ',', '.') }}</h2>
+                    <div class="mt-2 h-0.5 w-full bg-blue-500/20 rounded-full"></div>
                 </div>
-                <button class="h-[46px] bg-white/5 hover:bg-white/10 border border-white/10 hover:border-yellow-500/30 text-white font-black text-[10px] uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2">
-                    <i class="fas fa-filter text-yellow-500"></i> Aplicar Filtros
-                </button>
-            </form>
+            </div>
+
+            {{-- FILTROS --}}
+            <div class="border-t border-white/5 px-5 py-4 bg-black/20">
+                <form method="GET" class="flex flex-wrap gap-3 items-end">
+                    <div class="flex-1 min-w-[140px]">
+                        <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5">Desde</label>
+                        <input type="date" name="from" value="{{ request('from') }}"
+                            class="w-full bg-black/40 border border-white/10 rounded-xl text-white text-xs font-bold px-3 py-2.5 focus:border-yellow-500/50 focus:ring-0 transition-all outline-none">
+                    </div>
+                    <div class="flex-1 min-w-[140px]">
+                        <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5">Hasta</label>
+                        <input type="date" name="to" value="{{ request('to') }}"
+                            class="w-full bg-black/40 border border-white/10 rounded-xl text-white text-xs font-bold px-3 py-2.5 focus:border-yellow-500/50 focus:ring-0 transition-all outline-none">
+                    </div>
+                    <div class="flex-1 min-w-[160px]">
+                        <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5">Categoría</label>
+                        <select name="category_id" class="w-full bg-black/40 border border-white/10 rounded-xl text-white text-xs font-bold px-3 py-2.5 focus:border-yellow-500/50 focus:ring-0 transition-all outline-none">
+                            <option value="">Todas las categorías</option>
+                            @foreach(\App\Models\Expenses\ExpenseCategory::orderBy('name')->get() as $cat)
+                                <option value="{{ $cat->id }}" @selected(request('category_id') == $cat->id)>{{ $cat->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="flex-1 min-w-[160px]">
+                        <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5">Proveedor / Tercero</label>
+                        <select name="provider_id" class="w-full bg-black/40 border border-white/10 rounded-xl text-white text-xs font-bold px-3 py-2.5 focus:border-yellow-500/50 focus:ring-0 transition-all outline-none">
+                            <option value="">Todos los proveedores</option>
+                            @foreach(\App\Models\Poultry\Provider::where('status','active')->orderBy('business_name')->get() as $p)
+                                <option value="{{ $p->id }}" @selected(request('provider_id') == $p->id)>{{ $p->business_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="submit" class="h-[38px] px-5 bg-yellow-500 hover:bg-yellow-400 text-black font-black text-[9px] uppercase tracking-widest rounded-xl transition-all flex items-center gap-2">
+                            <i class="fas fa-filter text-[9px]"></i> Filtrar
+                        </button>
+                        @if(request()->hasAny(['from','to','category_id','provider_id']))
+                        <a href="{{ route('expenses.index') }}" class="h-[38px] px-4 bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-400 hover:text-white font-black text-[9px] uppercase tracking-widest rounded-xl transition-all flex items-center gap-2">
+                            <i class="fas fa-times text-[9px]"></i> Limpiar
+                        </a>
+                        @endif
+                    </div>
+                </form>
+            </div>
         </div>
 
         {{-- TABLA --}}

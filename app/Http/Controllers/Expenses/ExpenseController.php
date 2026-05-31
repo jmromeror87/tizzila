@@ -228,7 +228,101 @@ class ExpenseController extends Controller
 
     public function update(Request $request, $id)
     {
-        return back()->with('info', 'Actualizar gasto pendiente de lógica contable');
+        $expense = Expense::findOrFail($id);
+
+        $data = $request->validate([
+            'provider_id'      => 'nullable|exists:providers,id',
+            'category_id'      => 'required|exists:expense_categories,id',
+            'document_type'    => 'required|in:invoice,equivalent,support_doc',
+            'document_number'  => 'nullable|string|max:100',
+            'tax_base'         => 'required|numeric|min:0',
+            'iva'              => 'nullable|numeric|min:0',
+            'retefuente'       => 'nullable|numeric|min:0',
+            'total'            => 'required|numeric|min:0',
+            'expense_date'     => 'required|date',
+            'payment_method'   => 'required|in:cash,transfer,card,other',
+            'description'      => 'nullable|string|max:500',
+            'support_document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+        ]);
+
+        $data['iva']        = $data['iva'] ?? 0;
+        $data['retefuente'] = $data['retefuente'] ?? 0;
+
+        $calculated = ($data['tax_base'] + $data['iva']) - $data['retefuente'];
+        if (round($calculated, 2) != round($data['total'], 2)) {
+            return back()->withInput()->with('error', 'El total no coincide con la base + IVA - Retefuente.');
+        }
+
+        try {
+            DB::transaction(function () use ($request, $data, $expense) {
+
+                // Reemplazar soporte si se sube uno nuevo
+                if ($request->hasFile('support_document')) {
+                    $data['support_document'] = $request->file('support_document')
+                        ->store('expenses_support', 'public');
+                }
+
+                $expense->update([
+                    'provider_id'      => $data['provider_id'] ?? null,
+                    'category_id'      => $data['category_id'],
+                    'document_type'    => $data['document_type'],
+                    'document_number'  => $data['document_number'] ?? null,
+                    'tax_base'         => $data['tax_base'],
+                    'iva'              => $data['iva'],
+                    'retefuente'       => $data['retefuente'],
+                    'total'            => $data['total'],
+                    'expense_date'     => $data['expense_date'],
+                    'payment_method'   => $data['payment_method'],
+                    'description'      => $data['description'] ?? null,
+                    'support_document' => $data['support_document'] ?? $expense->support_document,
+                ]);
+
+                // Reversar asiento anterior y crear uno nuevo si cambiaron valores
+                if ($expense->journalEntry) {
+                    AccountingService::reverseEntry($expense->journalEntry);
+                }
+
+                // Nuevo asiento contable
+                $companyId = Auth::user()->company_id ?? DB::table('companies')->value('id') ?? 1;
+                $category  = \App\Models\Expenses\ExpenseCategory::find($data['category_id']);
+
+                $expenseAccount = ChartOfAccount::where('code', $category?->account_code ?? '5240')->first()
+                    ?? ChartOfAccount::where('type', 'expense')->first();
+
+                $cashAccount = $data['payment_method'] === 'transfer'
+                    ? ChartOfAccount::where('code', '111005')->first()
+                    : ChartOfAccount::where('code', '110505')->first();
+
+                if ($expenseAccount && $cashAccount) {
+                    $entry = \App\Models\Accounting\JournalEntry::create([
+                        'company_id'    => $companyId,
+                        'date'          => $data['expense_date'],
+                        'reference'     => $data['document_number'] ?? 'GT-EDIT',
+                        'description'   => 'Gasto actualizado: ' . ($category?->name ?? ''),
+                        'module_source' => 'expense',
+                        'module_id'     => $expense->id,
+                        'status'        => 'posted',
+                        'created_by'    => Auth::id(),
+                        'total_debit'   => $data['total'],
+                        'total_credit'  => $data['total'],
+                    ]);
+
+                    $entry->lines()->createMany([
+                        ['account_id' => $expenseAccount->id, 'description' => $category?->name ?? 'Gasto', 'debit' => $data['total'], 'credit' => 0],
+                        ['account_id' => $cashAccount->id,    'description' => 'Pago ' . $data['payment_method'],                       'debit' => 0,             'credit' => $data['total']],
+                    ]);
+
+                    $expense->update(['journal_entry_id' => $entry->id]);
+                }
+            });
+
+            return redirect()
+                ->route('expenses.index')
+                ->with('success', 'Gasto actualizado correctamente.');
+
+        } catch (\Throwable $e) {
+            return back()->withInput()->with('error', 'Error al actualizar: ' . $e->getMessage());
+        }
     }
 
     public function destroy($id)

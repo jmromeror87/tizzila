@@ -56,45 +56,47 @@
             </div>
 
             {{-- FILTROS --}}
-            <div class="border-t border-white/5 bg-black/20">
-                <form method="GET" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-px bg-white/5">
-                    <div class="bg-[#0d121f] px-4 py-3">
-                        <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5">Desde</label>
+            <div class="border-t border-white/5 px-5 py-4 bg-black/20">
+                <form method="GET" class="flex flex-wrap gap-3 items-end">
+                    <div class="flex-1 min-w-[130px]">
+                        <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Desde</label>
                         <input type="date" name="from" value="{{ request('from') }}"
-                            class="w-full bg-transparent text-white text-xs font-bold outline-none focus:text-yellow-400 transition-all">
+                               class="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs font-bold outline-none focus:border-yellow-500/50 transition-all">
                     </div>
-                    <div class="bg-[#0d121f] px-4 py-3">
-                        <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5">Hasta</label>
+                    <div class="flex-1 min-w-[130px]">
+                        <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Hasta</label>
                         <input type="date" name="to" value="{{ request('to') }}"
-                            class="w-full bg-transparent text-white text-xs font-bold outline-none focus:text-yellow-400 transition-all">
+                               class="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs font-bold outline-none focus:border-yellow-500/50 transition-all">
                     </div>
-                    <div class="bg-[#0d121f] px-4 py-3">
-                        <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5">Categoría</label>
-                        <select name="category_id" class="w-full bg-transparent text-white text-xs font-bold outline-none">
-                            <option value="">Todas</option>
+                    <div class="flex-1 min-w-[160px]">
+                        <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Categoría</label>
+                        <select name="category_id"
+                                class="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs font-bold outline-none focus:border-yellow-500/50 transition-all">
+                            <option value="" class="bg-[#0d121f]">Todas las categorías</option>
                             @foreach(\App\Models\Expenses\ExpenseCategory::orderBy('name')->get() as $cat)
                                 <option value="{{ $cat->id }}" @selected(request('category_id') == $cat->id) class="bg-[#0d121f]">{{ $cat->name }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="bg-[#0d121f] px-4 py-3">
-                        <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5">Proveedor</label>
-                        <select name="provider_id" class="w-full bg-transparent text-white text-xs font-bold outline-none">
-                            <option value="">Todos</option>
+                    <div class="flex-1 min-w-[160px]">
+                        <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Proveedor / Tercero</label>
+                        <select name="provider_id"
+                                class="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs font-bold outline-none focus:border-yellow-500/50 transition-all">
+                            <option value="" class="bg-[#0d121f]">Todos los proveedores</option>
                             @foreach(\App\Models\Poultry\Provider::where('status','active')->orderBy('business_name')->get() as $p)
                                 <option value="{{ $p->id }}" @selected(request('provider_id') == $p->id) class="bg-[#0d121f]">{{ $p->business_name }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="bg-[#0d121f] px-4 py-3 flex items-end gap-2 col-span-2 md:col-span-4 lg:col-span-1">
+                    <div class="flex gap-2 shrink-0">
                         <button type="submit"
-                                class="flex-1 h-9 bg-yellow-500 hover:bg-yellow-400 text-black font-black text-[9px] uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2">
-                            <i class="fas fa-search text-[9px]"></i> Aplicar
+                                class="h-[38px] px-6 bg-yellow-500 hover:bg-yellow-400 text-black font-black text-[9px] uppercase tracking-widest rounded-xl transition-all flex items-center gap-2 shadow-[0_4px_12px_rgba(234,179,8,0.2)]">
+                            <i class="fas fa-filter text-[9px]"></i> Filtrar
                         </button>
                         @if(request()->hasAny(['from','to','category_id','provider_id']))
                         <a href="{{ route('expenses.index') }}"
-                           class="h-9 w-9 bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-500 hover:text-white rounded-xl transition-all flex items-center justify-center shrink-0">
-                            <i class="fas fa-times text-[9px]"></i>
+                           class="h-[38px] px-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-zinc-400 hover:text-white font-black text-[9px] uppercase tracking-widest rounded-xl transition-all flex items-center gap-2">
+                            <i class="fas fa-times text-[9px]"></i> Limpiar
                         </a>
                         @endif
                     </div>

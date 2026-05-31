@@ -88,7 +88,8 @@ class ExpenseImportController extends Controller
                     $total = (float) str_replace([',', ' ', '$'], '', $row['total']);
                     if ($total <= 0) { $skipped++; continue; }
 
-                    $payMethod = str_contains(strtolower($row['payment_method'] ?? ''), 'trans') ? 'transfer' : 'cash';
+                    $pm = strtolower(trim($row['payment_method'] ?? ''));
+                    $payMethod = (str_contains($pm, 'trans') || str_contains($pm, 'transf')) ? 'transfer' : 'cash';
 
                     // Evitar duplicados por document_number
                     if (!empty($row['document_number']) &&

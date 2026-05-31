@@ -84,8 +84,9 @@
                                     </select>
                                 </td>
                                 <td class="px-3 py-2.5">
-                                    <span class="text-[9px] {{ str_contains(strtolower($row['payment_method']), 'trans') ? 'text-blue-400' : 'text-zinc-400' }}">
-                                        {{ str_contains(strtolower($row['payment_method']), 'trans') ? 'Transferencia' : 'Efectivo' }}
+                                    @php $isTransfer = str_contains(strtolower($row['payment_method']), 'trans'); @endphp
+                                    <span class="text-[9px] {{ $isTransfer ? 'text-blue-400' : 'text-zinc-400' }}">
+                                        {{ $isTransfer ? 'Transferencia' : 'Efectivo' }}
                                     </span>
                                 </td>
                                 <td class="px-3 py-2.5 text-right">

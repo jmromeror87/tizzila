@@ -131,12 +131,20 @@ class ExpenseImportController extends Controller
     private function parseCsv(string $path): array
     {
         $rows = [];
-        $handle = fopen($path, 'r');
+        // Convertir a UTF-8 limpio si viene en otro encoding
+        $content = file_get_contents($path);
+        $content = mb_convert_encoding($content, 'UTF-8', 'UTF-8,ISO-8859-1,Windows-1252');
+        // Quitar BOM
+        $content = preg_replace('/^\xEF\xBB\xBF/', '', $content);
+        $tmpPath = tempnam(sys_get_temp_dir(), 'csv_');
+        file_put_contents($tmpPath, $content);
+
+        $handle = fopen($tmpPath, 'r');
         $header = null;
 
         while (($line = fgetcsv($handle, 1000, ',')) !== false) {
-            // Limpiar BOM y espacios
-            $line = array_map(fn($v) => trim(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $v)), $line);
+            // Limpiar caracteres de control pero NO los acentos
+            $line = array_map(fn($v) => trim(preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', '', $v)), $line);
 
             if (!$header) {
                 $header = array_map('strtolower', $line);
@@ -175,6 +183,7 @@ class ExpenseImportController extends Controller
         }
 
         fclose($handle);
+        @unlink($tmpPath);
         return $rows;
     }
 }

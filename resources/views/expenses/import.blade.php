@@ -60,8 +60,14 @@
                 @csrf
                 <div>
                     <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-2">Selecciona el archivo CSV</label>
-                    <input type="file" name="csv_file" accept=".csv,.txt" required
-                           class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-sm text-white outline-none focus:border-yellow-500/50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-black file:bg-yellow-500/10 file:text-yellow-400">
+                    <label class="w-full flex items-center gap-4 px-4 py-3 rounded-xl bg-black/40 border border-white/10 cursor-pointer hover:border-yellow-500/30 transition-all group">
+                        <span class="h-8 px-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-[9px] font-black uppercase tracking-widest group-hover:bg-yellow-500/20 transition-all flex items-center gap-2 shrink-0">
+                            <i class="fas fa-folder-open text-[9px]"></i> Seleccionar archivo
+                        </span>
+                        <span class="text-[10px] text-zinc-500" id="file-label">Ningún archivo seleccionado</span>
+                        <input type="file" name="csv_file" accept=".csv,.txt" required class="hidden"
+                               onchange="document.getElementById('file-label').textContent = this.files[0]?.name ?? 'Ningún archivo seleccionado'">
+                    </label>
                 </div>
                 <button type="submit"
                         class="w-full bg-yellow-500 hover:bg-yellow-400 text-black py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2">

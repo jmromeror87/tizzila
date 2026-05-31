@@ -282,6 +282,61 @@ class ExpenseController extends Controller
                     'description'      => $data['description'] ?? null,
                     'support_document' => $data['support_document'] ?? $expense->support_document,
                 ]);
+
+                $expense->refresh();
+
+                // Reversar asiento anterior
+                if ($expense->journalEntry) {
+                    AccountingService::reverseEntry($expense->journalEntry);
+                }
+
+                // Nuevo asiento — misma lógica que store()
+                $companyId      = Auth::user()->company_id ?? DB::table('companies')->value('id') ?? 1;
+                $expenseAccount = null;
+
+                if ($expense->category && $expense->category->puc_code) {
+                    $expenseAccount = ChartOfAccount::where('code', $expense->category->puc_code)
+                        ->where('company_id', $companyId)->value('id');
+                }
+                if (!$expenseAccount) {
+                    $expenseAccount = AccountingService::getAccount('expense_default');
+                }
+
+                $cashAccount  = AccountingService::getAccount('cash');
+                $ivaAccount   = $expense->iva > 0        ? AccountingService::getAccount('iva_creditable') : null;
+                $reteAccount  = $expense->retefuente > 0 ? AccountingService::getAccount('retefuente')     : null;
+                $providerId   = $expense->provider_id ?? null;
+
+                $lines = [[
+                    'account_id'       => (int) $expenseAccount,
+                    'debit'            => (float) $expense->tax_base,
+                    'third_party_id'   => $providerId,
+                    'third_party_type' => 'provider',
+                ]];
+
+                if ($ivaAccount)  $lines[] = ['account_id' => (int) $ivaAccount,  'debit'  => (float) $expense->iva,          'third_party_id' => $providerId, 'third_party_type' => 'provider'];
+                if ($reteAccount) $lines[] = ['account_id' => (int) $reteAccount, 'credit' => (float) $expense->retefuente,   'third_party_id' => $providerId, 'third_party_type' => 'provider'];
+
+                $lines[] = [
+                    'account_id'       => (int) $cashAccount,
+                    'credit'           => (float) $expense->total,
+                    'third_party_id'   => $providerId,
+                    'third_party_type' => 'provider',
+                ];
+
+                $entry = AccountingService::createEntry([
+                    'company_id'    => $companyId,
+                    'date'          => $expense->expense_date,
+                    'description'   => 'Gasto #' . $expense->id . ' (modificado)',
+                    'reference'     => $expense->id,
+                    'module_source' => 'expense',
+                    'module_id'     => $expense->id,
+                    'lines'         => $lines,
+                ]);
+
+                if ($entry) {
+                    $expense->update(['journal_entry_id' => $entry->id]);
+                }
             });
 
             return redirect()

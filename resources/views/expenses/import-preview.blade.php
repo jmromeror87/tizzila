@@ -61,6 +61,7 @@
                                 </td>
                                 <td class="px-3 py-2.5">
                                     <input type="hidden" name="rows[{{ $i }}][document_number]" value="{{ $row['document_number'] }}">
+                                    <input type="hidden" name="rows[{{ $i }}][tercero]"         value="{{ $row['tercero'] ?? '' }}">
                                     <input type="hidden" name="rows[{{ $i }}][description]"     value="{{ $row['description'] }}">
                                     <input type="hidden" name="rows[{{ $i }}][total]"           value="{{ $row['total'] }}">
                                     <input type="hidden" name="rows[{{ $i }}][expense_date]"    value="{{ $row['expense_date'] }}">

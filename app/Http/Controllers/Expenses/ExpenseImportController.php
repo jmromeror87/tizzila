@@ -115,14 +115,22 @@ class ExpenseImportController extends Controller
                     $total = (float) str_replace([',', ' ', '$'], '', $row['total']);
                     if ($total <= 0) { $skipped++; continue; }
 
-                    $pm = strtolower(trim($row['payment_method'] ?? ''));
-                    $payMethod = (str_contains($pm, 'trans') || str_contains($pm, 'transf')) ? 'transfer' : 'cash';
+                    $pm        = strtolower(trim($row['payment_method'] ?? ''));
+                    $payMethod = str_contains($pm, 'trans') ? 'transfer' : 'cash';
+                    $descFinal = !empty($row['tercero']) ? $row['tercero'] : $row['description'];
 
-                    // Evitar duplicados por document_number
-                    if (!empty($row['document_number']) &&
-                        Expense::where('document_number', $row['document_number'])->exists()) {
-                        $skipped++;
-                        continue;
+                    // Si ya existe → actualizar tercero, medio de pago y categoría
+                    if (!empty($row['document_number'])) {
+                        $existing = Expense::where('document_number', $row['document_number'])->first();
+                        if ($existing) {
+                            $existing->update([
+                                'description'    => $descFinal,
+                                'payment_method' => $payMethod,
+                                'category_id'    => $row['category_id'],
+                            ]);
+                            $imported++;
+                            continue;
+                        }
                     }
 
                     Expense::create([
@@ -136,7 +144,7 @@ class ExpenseImportController extends Controller
                         'total'           => $total,
                         'expense_date'    => $row['expense_date'],
                         'payment_method'  => $payMethod,
-                        'description'     => $row['description'],
+                        'description'     => $descFinal,
                         'created_by'      => Auth::id(),
                         'status'          => 'approved',
                     ]);
@@ -180,12 +188,21 @@ class ExpenseImportController extends Controller
 
             if (count($line) < 4) continue;
 
-            // Columnas: MEDIO DE PAGO, DOC-SOPORTE, FECHA, DETALLE, VALOR
+            // Formato 5 col: PAGO, DOC, FECHA, DETALLE, VALOR
+            // Formato 6 col: PAGO, DOC, FECHA, TERCERO, DETALLE, VALOR
+            $cols = count($line);
             $payMethod   = trim($line[0] ?? '');
             $docNumber   = trim($line[1] ?? '');
             $dateRaw     = trim($line[2] ?? '');
-            $description = trim($line[3] ?? '');
-            $valueRaw    = trim($line[4] ?? '');
+            if ($cols >= 6) {
+                $tercero     = trim($line[3] ?? '');
+                $description = trim($line[4] ?? '') ?: $tercero;
+                $valueRaw    = trim($line[5] ?? '');
+            } else {
+                $tercero     = '';
+                $description = trim($line[3] ?? '');
+                $valueRaw    = trim($line[4] ?? '');
+            }
 
             // Parsear fecha M/D/YY → Y-m-d
             $date = null;
@@ -199,13 +216,14 @@ class ExpenseImportController extends Controller
             $catId = $this->detectCategory($description);
 
             $rows[] = [
-                'payment_method' => $payMethod,
-                'document_number'=> $docNumber,
-                'expense_date'   => $date,
-                'description'    => $description,
-                'total'          => $total,
-                'category_id'    => $catId,
-                'import'         => '1',
+                'payment_method'  => $payMethod,
+                'document_number' => $docNumber,
+                'expense_date'    => $date,
+                'tercero'         => $tercero,
+                'description'     => $description,
+                'total'           => $total,
+                'category_id'     => $catId,
+                'import'          => '1',
             ];
         }
 

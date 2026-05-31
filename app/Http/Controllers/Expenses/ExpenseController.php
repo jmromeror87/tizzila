@@ -292,12 +292,13 @@ class ExpenseController extends Controller
                 $companyId = Auth::user()->company_id ?? DB::table('companies')->value('id') ?? 1;
                 $category  = \App\Models\Expenses\ExpenseCategory::find($data['category_id']);
 
-                $expenseAccount = ChartOfAccount::where('code', $category?->account_code ?? '5240')->first()
-                    ?? ChartOfAccount::where('type', 'expense')->first();
+                $expenseAccount = ChartOfAccount::where('code', $category?->account_code ?? '5240')
+                    ->where('is_posting', true)->first()
+                    ?? ChartOfAccount::where('type', 'expense')->where('is_posting', true)->first();
 
                 $cashAccount = $data['payment_method'] === 'transfer'
-                    ? ChartOfAccount::where('code', '111005')->first()
-                    : ChartOfAccount::where('code', '110505')->first();
+                    ? ChartOfAccount::where('code', '111005')->where('is_posting', true)->first()
+                    : ChartOfAccount::where('code', '110505')->where('is_posting', true)->first();
 
                 if ($expenseAccount && $cashAccount) {
                     $entry = \App\Models\Accounting\JournalEntry::create([

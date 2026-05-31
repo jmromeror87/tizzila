@@ -61,7 +61,6 @@
                                 </td>
                                 <td class="px-3 py-2.5">
                                     <input type="hidden" name="rows[{{ $i }}][document_number]" value="{{ $row['document_number'] }}">
-                                    <input type="hidden" name="rows[{{ $i }}][payment_method]"  value="{{ $row['payment_method'] }}">
                                     <input type="hidden" name="rows[{{ $i }}][description]"     value="{{ $row['description'] }}">
                                     <input type="hidden" name="rows[{{ $i }}][total]"           value="{{ $row['total'] }}">
                                     <input type="hidden" name="rows[{{ $i }}][expense_date]"    value="{{ $row['expense_date'] }}">
@@ -85,9 +84,12 @@
                                 </td>
                                 <td class="px-3 py-2.5">
                                     @php $isTransfer = str_contains(strtolower($row['payment_method']), 'trans'); @endphp
-                                    <span class="text-[9px] {{ $isTransfer ? 'text-blue-400' : 'text-zinc-400' }}">
-                                        {{ $isTransfer ? 'Transferencia' : 'Efectivo' }}
-                                    </span>
+                                    <select name="rows[{{ $i }}][payment_method]"
+                                            class="bg-black/40 border border-white/10 rounded-lg px-2 py-1 text-[9px] font-black text-white outline-none focus:border-yellow-500/50">
+                                        <option value="transfer" {{ $isTransfer ? 'selected' : '' }}>Transferencia</option>
+                                        <option value="cash"     {{ !$isTransfer ? 'selected' : '' }}>Efectivo</option>
+                                        <option value="card">Tarjeta</option>
+                                    </select>
                                 </td>
                                 <td class="px-3 py-2.5 text-right">
                                     <span class="text-[10px] font-black text-red-400 font-mono">

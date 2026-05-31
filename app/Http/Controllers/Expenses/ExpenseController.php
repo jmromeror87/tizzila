@@ -45,7 +45,13 @@ class ExpenseController extends Controller
         }
 
         $expenses  = $query->latest()->paginate(20);
-        $total     = Expense::sum('total');
+        // KPIs reflejan el filtro activo
+        $filteredQuery = Expense::query();
+        if ($request->filled('category_id')) $filteredQuery->where('category_id', $request->category_id);
+        if ($request->filled('provider_id'))  $filteredQuery->where('provider_id', $request->provider_id);
+        if ($request->filled('from'))         $filteredQuery->whereDate('expense_date', '>=', $request->from);
+        if ($request->filled('to'))           $filteredQuery->whereDate('expense_date', '<=', $request->to);
+        $total     = (clone $filteredQuery)->sum('total');
         $thisMonth = Expense::thisMonth()->sum('total');
 
         // ✅ FIX: la vista necesita estas listas para los filtros

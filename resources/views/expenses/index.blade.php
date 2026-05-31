@@ -56,43 +56,45 @@
             </div>
 
             {{-- FILTROS --}}
-            <div class="border-t border-white/5 px-5 py-4 bg-black/20">
-                <form method="GET" class="flex flex-wrap gap-3 items-end">
-                    <div class="flex-1 min-w-[140px]">
+            <div class="border-t border-white/5 bg-black/20">
+                <form method="GET" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-px bg-white/5">
+                    <div class="bg-[#0d121f] px-4 py-3">
                         <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5">Desde</label>
                         <input type="date" name="from" value="{{ request('from') }}"
-                            class="w-full bg-black/40 border border-white/10 rounded-xl text-white text-xs font-bold px-3 py-2.5 focus:border-yellow-500/50 focus:ring-0 transition-all outline-none">
+                            class="w-full bg-transparent text-white text-xs font-bold outline-none focus:text-yellow-400 transition-all">
                     </div>
-                    <div class="flex-1 min-w-[140px]">
+                    <div class="bg-[#0d121f] px-4 py-3">
                         <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5">Hasta</label>
                         <input type="date" name="to" value="{{ request('to') }}"
-                            class="w-full bg-black/40 border border-white/10 rounded-xl text-white text-xs font-bold px-3 py-2.5 focus:border-yellow-500/50 focus:ring-0 transition-all outline-none">
+                            class="w-full bg-transparent text-white text-xs font-bold outline-none focus:text-yellow-400 transition-all">
                     </div>
-                    <div class="flex-1 min-w-[160px]">
+                    <div class="bg-[#0d121f] px-4 py-3">
                         <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5">Categoría</label>
-                        <select name="category_id" class="w-full bg-black/40 border border-white/10 rounded-xl text-white text-xs font-bold px-3 py-2.5 focus:border-yellow-500/50 focus:ring-0 transition-all outline-none">
-                            <option value="">Todas las categorías</option>
+                        <select name="category_id" class="w-full bg-transparent text-white text-xs font-bold outline-none">
+                            <option value="">Todas</option>
                             @foreach(\App\Models\Expenses\ExpenseCategory::orderBy('name')->get() as $cat)
-                                <option value="{{ $cat->id }}" @selected(request('category_id') == $cat->id)>{{ $cat->name }}</option>
+                                <option value="{{ $cat->id }}" @selected(request('category_id') == $cat->id) class="bg-[#0d121f]">{{ $cat->name }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="flex-1 min-w-[160px]">
-                        <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5">Proveedor / Tercero</label>
-                        <select name="provider_id" class="w-full bg-black/40 border border-white/10 rounded-xl text-white text-xs font-bold px-3 py-2.5 focus:border-yellow-500/50 focus:ring-0 transition-all outline-none">
-                            <option value="">Todos los proveedores</option>
+                    <div class="bg-[#0d121f] px-4 py-3">
+                        <label class="block text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5">Proveedor</label>
+                        <select name="provider_id" class="w-full bg-transparent text-white text-xs font-bold outline-none">
+                            <option value="">Todos</option>
                             @foreach(\App\Models\Poultry\Provider::where('status','active')->orderBy('business_name')->get() as $p)
-                                <option value="{{ $p->id }}" @selected(request('provider_id') == $p->id)>{{ $p->business_name }}</option>
+                                <option value="{{ $p->id }}" @selected(request('provider_id') == $p->id) class="bg-[#0d121f]">{{ $p->business_name }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="flex gap-2">
-                        <button type="submit" class="h-[38px] px-5 bg-yellow-500 hover:bg-yellow-400 text-black font-black text-[9px] uppercase tracking-widest rounded-xl transition-all flex items-center gap-2">
-                            <i class="fas fa-filter text-[9px]"></i> Filtrar
+                    <div class="bg-[#0d121f] px-4 py-3 flex items-end gap-2 col-span-2 md:col-span-4 lg:col-span-1">
+                        <button type="submit"
+                                class="flex-1 h-9 bg-yellow-500 hover:bg-yellow-400 text-black font-black text-[9px] uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2">
+                            <i class="fas fa-search text-[9px]"></i> Aplicar
                         </button>
                         @if(request()->hasAny(['from','to','category_id','provider_id']))
-                        <a href="{{ route('expenses.index') }}" class="h-[38px] px-4 bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-400 hover:text-white font-black text-[9px] uppercase tracking-widest rounded-xl transition-all flex items-center gap-2">
-                            <i class="fas fa-times text-[9px]"></i> Limpiar
+                        <a href="{{ route('expenses.index') }}"
+                           class="h-9 w-9 bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-500 hover:text-white rounded-xl transition-all flex items-center justify-center shrink-0">
+                            <i class="fas fa-times text-[9px]"></i>
                         </a>
                         @endif
                     </div>

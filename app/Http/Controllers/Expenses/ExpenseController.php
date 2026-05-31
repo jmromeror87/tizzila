@@ -282,45 +282,6 @@ class ExpenseController extends Controller
                     'description'      => $data['description'] ?? null,
                     'support_document' => $data['support_document'] ?? $expense->support_document,
                 ]);
-
-                // Reversar asiento anterior y crear uno nuevo si cambiaron valores
-                if ($expense->journalEntry) {
-                    AccountingService::reverseEntry($expense->journalEntry);
-                }
-
-                // Nuevo asiento contable
-                $companyId = Auth::user()->company_id ?? DB::table('companies')->value('id') ?? 1;
-                $category  = \App\Models\Expenses\ExpenseCategory::find($data['category_id']);
-
-                $expenseAccount = ChartOfAccount::where('code', $category?->account_code ?? '5240')
-                    ->where('is_posting', true)->first()
-                    ?? ChartOfAccount::where('type', 'expense')->where('is_posting', true)->first();
-
-                $cashAccount = $data['payment_method'] === 'transfer'
-                    ? ChartOfAccount::where('code', '111005')->where('is_posting', true)->first()
-                    : ChartOfAccount::where('code', '110505')->where('is_posting', true)->first();
-
-                if ($expenseAccount && $cashAccount) {
-                    $entry = \App\Models\Accounting\JournalEntry::create([
-                        'company_id'    => $companyId,
-                        'date'          => $data['expense_date'],
-                        'reference'     => $data['document_number'] ?? 'GT-EDIT',
-                        'description'   => 'Gasto actualizado: ' . ($category?->name ?? ''),
-                        'module_source' => 'expense',
-                        'module_id'     => $expense->id,
-                        'status'        => 'posted',
-                        'created_by'    => Auth::id(),
-                        'total_debit'   => $data['total'],
-                        'total_credit'  => $data['total'],
-                    ]);
-
-                    $entry->lines()->createMany([
-                        ['account_id' => $expenseAccount->id, 'description' => $category?->name ?? 'Gasto', 'debit' => $data['total'], 'credit' => 0],
-                        ['account_id' => $cashAccount->id,    'description' => 'Pago ' . $data['payment_method'],                       'debit' => 0,             'credit' => $data['total']],
-                    ]);
-
-                    $expense->update(['journal_entry_id' => $entry->id]);
-                }
             });
 
             return redirect()

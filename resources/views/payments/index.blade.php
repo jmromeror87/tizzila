@@ -107,7 +107,7 @@
                                     </span>
                                 </td>
                                 <td class="px-5 py-4">
-                                    <p class="text-[10px] font-black text-white uppercase">{{ $payment->created_at->format('d M, Y') }}</p>
+                                    <p class="text-[10px] font-black text-white uppercase">{{ $payment->created_at->translatedFormat('d M, Y') }}</p>
                                     <p class="text-[9px] text-gray-600 font-bold">{{ $payment->created_at->format('h:i A') }}</p>
                                 </td>
                                 <td class="px-5 py-4 text-right">

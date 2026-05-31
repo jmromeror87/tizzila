@@ -176,7 +176,7 @@
                             </span>
                         </td>
                         <td class="px-4 py-4">
-                            <p class="text-xs text-zinc-400 font-bold">{{ $doc->created_at->format('d M Y') }}</p>
+                            <p class="text-xs text-zinc-400 font-bold">{{ $doc->created_at->translatedFormat('d M Y') }}</p>
                             <p class="text-[9px] text-zinc-600 font-mono">{{ $doc->created_at->format('H:i') }}</p>
                         </td>
                         <td class="px-4 py-4 text-right">

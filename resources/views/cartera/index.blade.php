@@ -103,7 +103,7 @@
                                     <span class="text-sm font-black text-rose-500">${{ number_format($invoice->balance, 0, ',', '.') }}</span>
                                 </td>
                                 <td class="px-5 py-4">
-                                    <span class="text-[10px] font-black text-gray-400">{{ $invoice->due_date->format('d M, Y') }}</span>
+                                    <span class="text-[10px] font-black text-gray-400">{{ $invoice->due_date->translatedFormat('d M, Y') }}</span>
                                 </td>
                                 <td class="px-5 py-4">
                                     <span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border {{ $stClass }}">

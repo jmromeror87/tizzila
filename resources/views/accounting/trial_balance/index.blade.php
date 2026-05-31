@@ -17,7 +17,7 @@
                 <div class="hidden md:block text-right">
                     <p class="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Periodo Actual</p>
                     <p class="text-xs font-black text-white uppercase">
-                        {{ \Carbon\Carbon::parse($from)->format('d M') }} — {{ \Carbon\Carbon::parse($to)->format('d M, Y') }}
+                        {{ \Carbon\Carbon::parse($from)->translatedFormat('d M') }} — {{ \Carbon\Carbon::parse($to)->translatedFormat('d M, Y') }}
                     </p>
                 </div>
                 <a href="{{ route('trial.balance.pdf', request()->all()) }}"

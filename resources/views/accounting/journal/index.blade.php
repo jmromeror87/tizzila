@@ -170,7 +170,7 @@
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <div class="text-center bg-black/40 px-2 py-1.5 rounded-xl border border-white/5 min-w-[44px]">
-                                            <p class="text-[7px] font-black text-zinc-600 uppercase">{{ \Carbon\Carbon::parse($entry->date)->format('M') }}</p>
+                                            <p class="text-[7px] font-black text-zinc-600 uppercase">{{ \Carbon\Carbon::parse($entry->date)->translatedFormat('M') }}</p>
                                             <p class="text-base font-black text-white leading-none">{{ \Carbon\Carbon::parse($entry->date)->format('d') }}</p>
                                             <p class="text-[7px] font-black text-zinc-600">{{ \Carbon\Carbon::parse($entry->date)->format('Y') }}</p>
                                         </div>

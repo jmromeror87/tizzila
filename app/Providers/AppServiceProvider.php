@@ -14,6 +14,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Carbon\Carbon;
 
 use App\Models\Invoice\Invoice;
 use App\Models\Expenses\Expense;
@@ -48,6 +49,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Carbon::setLocale('es');
+
         Invoice::observe(InvoiceObserver::class);
         Expense::observe(ExpenseObserver::class);
         InvoicePayment::observe(InvoicePaymentObserver::class);

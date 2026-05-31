@@ -138,18 +138,18 @@
                     <div class="w-full space-y-2 mt-2 text-left">
                         <div class="flex justify-between">
                             <span class="text-[9px] text-zinc-600 font-black uppercase">Creado</span>
-                            <span class="text-[9px] text-zinc-400 font-bold">{{ $claim->created_at->format('d M Y H:i') }}</span>
+                            <span class="text-[9px] text-zinc-400 font-bold">{{ $claim->created_at->translatedFormat('d M Y H:i') }}</span>
                         </div>
                         @if($claim->submitted_at)
                         <div class="flex justify-between">
                             <span class="text-[9px] text-zinc-600 font-black uppercase">Enviado</span>
-                            <span class="text-[9px] text-blue-400 font-bold">{{ $claim->submitted_at->format('d M Y H:i') }}</span>
+                            <span class="text-[9px] text-blue-400 font-bold">{{ $claim->submitted_at->translatedFormat('d M Y H:i') }}</span>
                         </div>
                         @endif
                         @if($claim->resolved_at)
                         <div class="flex justify-between">
                             <span class="text-[9px] text-zinc-600 font-black uppercase">Resuelto</span>
-                            <span class="text-[9px] text-emerald-400 font-bold">{{ $claim->resolved_at->format('d M Y H:i') }}</span>
+                            <span class="text-[9px] text-emerald-400 font-bold">{{ $claim->resolved_at->translatedFormat('d M Y H:i') }}</span>
                         </div>
                         @endif
                     </div>
@@ -252,7 +252,7 @@
                     @if($claim->status == 'credited' || $claim->status == 'rejected')
                         <div class="w-full text-center py-4">
                             <p class="text-[10px] font-black uppercase tracking-widest text-zinc-600">
-                                Este reclamo está cerrado · {{ $claim->resolved_at?->format('d M Y') ?? '—' }}
+                                Este reclamo está cerrado · {{ $claim->resolved_at?->translatedFormat('d M Y') ?? '—' }}
                             </p>
                         </div>
                     @endif

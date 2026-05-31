@@ -17,7 +17,7 @@
                         Recibo de <span class="text-yellow-500">Pago</span>
                     </h2>
                     <p class="text-[10px] text-gray-500 font-bold uppercase tracking-[0.3em] mt-1">
-                        #REC-{{ str_pad($payment->id, 6, '0', STR_PAD_LEFT) }} · {{ optional($payment->created_at)->format('d M, Y') }}
+                        #REC-{{ str_pad($payment->id, 6, '0', STR_PAD_LEFT) }} · {{ optional($payment->created_at)->translatedFormat('d M, Y') }}
                     </p>
                 </div>
             </div>
@@ -48,7 +48,7 @@
             </div>
             <div class="bg-[#0d121f] border border-white/5 rounded-2xl p-4">
                 <p class="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2">Fecha</p>
-                <p class="text-sm font-black text-white">{{ optional($payment->created_at)->format('d M, Y') }}</p>
+                <p class="text-sm font-black text-white">{{ optional($payment->created_at)->translatedFormat('d M, Y') }}</p>
                 <p class="text-[9px] text-gray-600 uppercase">{{ optional($payment->created_at)->format('H:i') }}</p>
             </div>
             <div class="bg-[#0d121f] border border-white/5 rounded-2xl p-4">

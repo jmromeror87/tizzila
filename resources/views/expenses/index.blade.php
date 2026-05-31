@@ -120,7 +120,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-[11px] font-black text-zinc-400 uppercase">
-                                    {{ $expense->expense_date->format('d M, Y') }}
+                                    {{ $expense->expense_date->translatedFormat('d M, Y') }}
                                 </td>
                                 <td class="px-6 py-4">
                                     <span class="text-sm font-black text-red-400 font-mono">${{ number_format($expense->total, 0, ',', '.') }}</span>

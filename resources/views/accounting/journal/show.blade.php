@@ -48,7 +48,7 @@
             <div class="bg-[#0a0a0c] p-6 rounded-[2rem] border border-white/5 shadow-2xl">
                 <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-2">Fecha de Emisión</p>
                 <h3 class="text-xl font-black text-white uppercase leading-none">
-                    {{ \Carbon\Carbon::parse($entry->date)->format('d M, Y') }}
+                    {{ \Carbon\Carbon::parse($entry->date)->translatedFormat('d M, Y') }}
                 </h3>
             </div>
 

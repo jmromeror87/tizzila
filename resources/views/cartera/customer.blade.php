@@ -151,7 +151,7 @@
                                                     <div class="flex items-center gap-2 bg-white/[0.03] px-3 py-1.5 rounded-xl border border-white/5 hover:border-emerald-500/20 transition-colors">
                                                         <i class="fas fa-check text-emerald-500 text-[8px]"></i>
                                                         <span class="text-[9px] font-black text-white">${{ number_format($payment->amount, 0, ',', '.') }}</span>
-                                                        <span class="text-[8px] text-gray-600 uppercase">{{ $payment->created_at->format('d M') }} · {{ strtoupper($payment->payment_method) }}</span>
+                                                        <span class="text-[8px] text-gray-600 uppercase">{{ $payment->created_at->translatedFormat('d M') }} · {{ strtoupper($payment->payment_method) }}</span>
                                                     </div>
                                                 @endforeach
                                             </div>

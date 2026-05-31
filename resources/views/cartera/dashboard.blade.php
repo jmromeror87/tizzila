@@ -129,7 +129,7 @@
                         </div>
                         <div class="text-right">
                             <p class="text-sm font-black text-white">${{ number_format($invoice->balance, 0, ',', '.') }}</p>
-                            <p class="text-[9px] text-gray-600 font-bold uppercase">{{ optional($invoice->due_date)->format('d M, Y') }}</p>
+                            <p class="text-[9px] text-gray-600 font-bold uppercase">{{ optional($invoice->due_date)->translatedFormat('d M, Y') }}</p>
                         </div>
                     </div>
                 @empty

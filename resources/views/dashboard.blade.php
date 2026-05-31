@@ -35,7 +35,7 @@
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
                 <span class="text-[10px] font-black text-white uppercase tracking-[0.2em]">Sincronizado</span>
-                <span class="text-[9px] text-zinc-600 font-bold">{{ now()->format('d M Y · H:i') }}</span>
+                <span class="text-[9px] text-zinc-600 font-bold">{{ now()->translatedFormat('d M Y · H:i') }}</span>
             </div>
         </div>
     </x-slot>

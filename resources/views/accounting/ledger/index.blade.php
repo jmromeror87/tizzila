@@ -79,7 +79,7 @@
                         @forelse($lines as $line)
                             <tr class="group hover:bg-white/[0.02] transition-all">
                                 <td class="px-6 py-4 text-[11px] font-black text-zinc-400 uppercase whitespace-nowrap">
-                                    {{ \Carbon\Carbon::parse($line->journalEntry->date)->format('d M, Y') }}
+                                    {{ \Carbon\Carbon::parse($line->journalEntry->date)->translatedFormat('d M, Y') }}
                                 </td>
                                 <td class="px-6 py-4">
                                     <span class="text-sm font-black text-white uppercase group-hover:text-yellow-500 transition-colors">

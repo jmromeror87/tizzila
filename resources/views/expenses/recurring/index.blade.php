@@ -64,7 +64,7 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 text-center">
-                                        <p class="text-xs font-black text-white uppercase">{{ \Carbon\Carbon::parse($r->next_run_date)->format('d M, Y') }}</p>
+                                        <p class="text-xs font-black text-white uppercase">{{ \Carbon\Carbon::parse($r->next_run_date)->translatedFormat('d M, Y') }}</p>
                                         <p class="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">{{ \Carbon\Carbon::parse($r->next_run_date)->diffForHumans() }}</p>
                                     </td>
                                     <td class="px-6 py-4 text-center">

@@ -126,7 +126,7 @@
                             <div class="flex gap-5">
                                 <div>
                                     <span class="text-[8px] font-black text-gray-600 uppercase tracking-widest block">Fecha</span>
-                                    <span class="text-[10px] font-black text-white uppercase">{{ $dispatch->dispatch_date->format('d M') }}</span>
+                                    <span class="text-[10px] font-black text-white uppercase">{{ $dispatch->dispatch_date->translatedFormat('d M') }}</span>
                                 </div>
                                 <div>
                                     <span class="text-[8px] font-black text-gray-600 uppercase tracking-widest block">Salida</span>

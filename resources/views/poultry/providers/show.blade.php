@@ -144,7 +144,7 @@
 
                     <div class="pt-3 border-t border-white/5">
                         <p class="text-[9px] font-black uppercase tracking-widest text-zinc-600">Registro</p>
-                        <p class="text-[10px] text-zinc-500 mt-0.5">{{ $provider->created_at->format('d M Y') }}</p>
+                        <p class="text-[10px] text-zinc-500 mt-0.5">{{ $provider->created_at->translatedFormat('d M Y') }}</p>
                     </div>
                 </div>
             </div>
@@ -233,7 +233,7 @@
                                     <span class="font-mono text-[10px] text-zinc-400">#{{ str_pad($order->id, 3, '0', STR_PAD_LEFT) }}</span>
                                 </td>
                                 <td class="px-4 py-3">
-                                    <p class="text-xs font-bold text-zinc-300">{{ $order->dispatch_date->format('d M Y') }}</p>
+                                    <p class="text-xs font-bold text-zinc-300">{{ $order->dispatch_date->translatedFormat('d M Y') }}</p>
                                 </td>
                                 <td class="px-4 py-3 text-center">
                                     <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg border

@@ -16,27 +16,39 @@
 
     <div class="py-4 space-y-4">
 
-        {{-- Resumen --}}
-        <div class="grid grid-cols-5 gap-3">
-            <div class="bg-[#0d121f] border border-white/5 rounded-2xl p-4 text-center">
-                <p class="text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">Total Aves</p>
-                <p class="text-xl font-black text-white">{{ number_format(collect($rows)->sum('cantidad'), 0, ',', '.') }}</p>
-            </div>
-            <div class="bg-[#0d121f] border border-white/5 rounded-2xl p-4 text-center">
-                <p class="text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">Total Venta</p>
-                <p class="text-lg font-black text-emerald-400">$ {{ number_format($totalVenta, 0, ',', '.') }}</p>
-            </div>
-            <div class="bg-[#0d121f] border border-white/5 rounded-2xl p-4 text-center">
-                <p class="text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">Total Compra</p>
-                <p class="text-lg font-black text-red-400">$ {{ number_format($totalCompra, 0, ',', '.') }}</p>
-            </div>
-            <div class="bg-[#0d121f] border border-white/5 rounded-2xl p-4 text-center">
-                <p class="text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">Utilidad</p>
-                <p class="text-lg font-black text-yellow-400">$ {{ number_format($totalUtilidad, 0, ',', '.') }}</p>
-            </div>
-            <div class="bg-[#0d121f] border border-white/5 rounded-2xl p-4 text-center">
-                <p class="text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">Facturadas / Sin</p>
-                <p class="text-lg font-black text-white"><span class="text-emerald-400">{{ $facturadas }}</span> / <span class="text-orange-400">{{ $sinFactura }}</span></p>
+        {{-- Resumen KPIs --}}
+        <div class="bg-[#0d121f] border border-white/5 rounded-2xl p-5">
+            <div class="grid grid-cols-5 gap-0 divide-x divide-white/5">
+                <div class="px-5 text-center first:pl-0 last:pr-0">
+                    <p class="text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">Total Aves</p>
+                    <p class="text-2xl font-black text-white">{{ number_format(collect($rows)->sum('cantidad'), 0, ',', '.') }}</p>
+                    <p class="text-[8px] text-zinc-600 mt-0.5">{{ count($rows) }} registros</p>
+                </div>
+                <div class="px-5 text-center">
+                    <p class="text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">Total Venta</p>
+                    <p class="text-2xl font-black text-emerald-400">$ {{ number_format($totalVenta, 0, ',', '.') }}</p>
+                    <p class="text-[8px] text-zinc-600 mt-0.5">ingresos brutos</p>
+                </div>
+                <div class="px-5 text-center">
+                    <p class="text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">Total Compra</p>
+                    <p class="text-2xl font-black text-red-400">$ {{ number_format($totalCompra, 0, ',', '.') }}</p>
+                    <p class="text-[8px] text-zinc-600 mt-0.5">costo de ventas</p>
+                </div>
+                <div class="px-5 text-center">
+                    <p class="text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">Utilidad</p>
+                    <p class="text-2xl font-black text-yellow-400">$ {{ number_format($totalUtilidad, 0, ',', '.') }}</p>
+                    @php $margen = $totalVenta > 0 ? round(($totalUtilidad / $totalVenta) * 100, 1) : 0; @endphp
+                    <p class="text-[8px] text-zinc-600 mt-0.5">margen {{ $margen }}%</p>
+                </div>
+                <div class="px-5 text-center last:pr-0">
+                    <p class="text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">Facturas</p>
+                    <p class="text-2xl font-black text-white">
+                        <span class="text-emerald-400">{{ $facturadas }}</span>
+                        <span class="text-zinc-600 text-lg"> / </span>
+                        <span class="text-orange-400">{{ $sinFactura }}</span>
+                    </p>
+                    <p class="text-[8px] text-zinc-600 mt-0.5">oficial / informal</p>
+                </div>
             </div>
         </div>
 

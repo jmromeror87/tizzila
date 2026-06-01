@@ -243,6 +243,131 @@ class InvoiceService
 
     /*
     |--------------------------------------------------------------------------
+    | IMPORTACIÓN CSV — respeta número original, fecha original
+    |--------------------------------------------------------------------------
+    */
+
+    public function createFromImport(array $data): Invoice
+    {
+        return DB::transaction(function () use ($data) {
+
+            $companyId = $data['company_id'];
+            $customer  = Customer::findOrFail($data['customer_id']);
+
+            $issueDate = $data['issue_date']; // YYYY-MM-DD string
+            $now       = \Carbon\Carbon::parse($issueDate);
+            $dueDate   = $now->copy()->addDays(30); // crédito 30 días por defecto
+
+            // Factura con número exacto del CSV
+            $invoice = Invoice::create([
+                'company_id'             => $companyId,
+                'company_tax_profile_id' => 1,
+                'customer_id'            => $customer->id,
+                'payment_term_id'        => $customer->payment_term_id,
+                'due_date'               => $dueDate,
+                'document_type'          => 'FVE',
+                'number'                 => $data['number'],
+                'issue_datetime'         => $now,
+                'environment'            => 'imported',
+                'status'                 => 'imported',
+                'subtotal'               => 0,
+                'tax_total'              => 0,
+                'total'                  => 0,
+                'balance'                => 0,
+                'payment_status'         => 'pending',
+            ]);
+
+            $subtotal = 0;
+            $taxTotal = 0;
+
+            foreach ($data['items'] as $item) {
+                $taxCategory   = TaxCategory::find($item['tax_category_id'] ?? 5) ?? TaxCategory::find(5);
+                $quantity      = (float) $item['quantity'];
+                $unitPrice     = (float) $item['unit_price'];
+                $lineExtension = round($quantity * $unitPrice, 2);
+                $taxAmount     = round(($lineExtension * $taxCategory->percent) / 100, 2);
+                $totalLine     = round($lineExtension + $taxAmount, 2);
+
+                InvoiceItem::create([
+                    'invoice_id'      => $invoice->id,
+                    'description'     => $item['description'],
+                    'quantity'        => $quantity,
+                    'unit_price'      => $unitPrice,
+                    'line_extension'  => $lineExtension,
+                    'tax_category_id' => $taxCategory->id,
+                    'tax_amount'      => $taxAmount,
+                    'total_line'      => $totalLine,
+                ]);
+
+                $subtotal += $lineExtension;
+                $taxTotal += $taxAmount;
+            }
+
+            $subtotal = round($subtotal, 2);
+            $taxTotal = round($taxTotal, 2);
+            $total    = round($subtotal + $taxTotal, 2);
+
+            $invoice->update([
+                'subtotal'       => $subtotal,
+                'tax_total'      => $taxTotal,
+                'total'          => $total,
+                'balance'        => $total,
+                'payment_status' => 'pending',
+            ]);
+
+            // Contabilidad — cuentas por cobrar
+            $receivableAccount = AccountingService::getAccount('accounts_receivable');
+            $salesAccount      = AccountingService::getAccount('sales_income');
+
+            $lines = [
+                [
+                    'account_id'       => $receivableAccount,
+                    'debit'            => $total,
+                    'third_party_id'   => $customer->id,
+                    'third_party_type' => 'customer',
+                ],
+                [
+                    'account_id'       => $salesAccount,
+                    'credit'           => $subtotal,
+                    'third_party_id'   => $customer->id,
+                    'third_party_type' => 'customer',
+                ],
+            ];
+
+            if ($taxTotal > 0) {
+                $taxAccount = AccountingService::getAccount('tax_payable');
+                $lines[] = [
+                    'account_id'       => $taxAccount,
+                    'credit'           => $taxTotal,
+                    'third_party_id'   => $customer->id,
+                    'third_party_type' => 'customer',
+                ];
+            }
+
+            AccountingService::createEntry([
+                'company_id'    => $companyId,
+                'date'          => $now,
+                'description'   => 'Factura importada #' . $invoice->number,
+                'reference'     => $invoice->id,
+                'module_source' => 'invoice',
+                'module_id'     => $invoice->id,
+                'lines'         => $lines,
+            ]);
+
+            InvoiceAudit::create([
+                'invoice_id' => $invoice->id,
+                'company_id' => $companyId,
+                'event_type' => 'imported',
+                'new_status' => 'imported',
+                'payload'    => $invoice->fresh()->toArray(),
+            ]);
+
+            return $invoice->fresh(['items']);
+        });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | FACTURACIÓN AUTOMÁTICA (YA HEREDA CONTABILIDAD)
     |--------------------------------------------------------------------------
     */

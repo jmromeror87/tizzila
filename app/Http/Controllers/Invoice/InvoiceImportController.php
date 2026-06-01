@@ -7,8 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Invoice\Invoice;
-use App\Models\Invoice\InvoiceItem;
 use App\Models\Customer\Customer;
+use App\Services\Invoice\InvoiceService;
 
 class InvoiceImportController extends Controller
 {
@@ -20,10 +20,10 @@ class InvoiceImportController extends Controller
     public function template()
     {
         $rows = [
-            ['NUMERO', 'FECHA', 'NIT_CLIENTE', 'DESCRIPCION', 'CANTIDAD', 'PRECIO_UNITARIO', 'TOTAL_LINEA', 'TOTAL_FACTURA'],
-            ['006826', '2026-01-09', '88032951',    'POLLITO BB',   '1050', '11000', '11550000', '11550000'],
-            ['006827', '2026-01-09', '77023217',    'POLLITO BB',   '600',  '11000', '6600000',  '6600000'],
-            ['006828', '2026-01-09', '1090485643',  'POLLITA BB',   '600',  '11000', '6600000',  '6600000'],
+            ['FECHA', 'NUMERO_FACTURA', 'NIT_CLIENTE', 'NOMBRE_CLIENTE', 'ZONA', 'TIPO_PRODUCTO', 'LINEA', 'OBSERVACION', 'CANTIDAD', 'PRECIO_COMPRA', 'PRECIO_VENTA', 'TOTAL_VENTA', 'FACTURADO'],
+            ['2026-01-09', 'FVE6826', '88032951',   'JUAN CARLOS CAMARGO JEREZ',        'PAMPLONA',   'POLLITO', 'BROILER', 'NINGUNA',  '3500', '2620', '3300', '11550000', 'SI'],
+            ['2026-01-09', 'FVE6827', '77023217',   'NELSON CASTRO RUEDAS',             'PAMPLONITA', 'POLLITO', 'BROILER', 'NINGUNA',  '2000', '2620', '3300',  '6600000', 'SI'],
+            ['2026-01-16', 'FVE6840', '901885356',  'DISTRIBUIDORA AGROPECUARIA GOMEZ', 'CUCUTA',     'POLLITA', 'LOHMAN',  'DESPIQUE',  '500', '4490', '4970',  '2485000', 'SI'],
         ];
 
         $output = fopen('php://temp', 'w');
@@ -46,25 +46,31 @@ class InvoiceImportController extends Controller
             'csv_file' => 'required|file|mimes:csv,txt|max:5120',
         ]);
 
-        $path = $request->file('csv_file')->getRealPath();
-        $rows = $this->parseCsv($path);
+        $rows = $this->parseCsv($request->file('csv_file')->getRealPath());
 
-        // Agrupar por número de factura para mostrar resumen en preview
-        $invoices = collect($rows)->groupBy('number')->map(function ($items) {
+        // Solo las facturadas (SI) van a este módulo
+        $rows = array_filter($rows, fn($r) => $r['facturado'] === 'SI');
+        $rows = array_values($rows);
+
+        // Agrupar por número para mostrar resumen
+        $invoices = collect($rows)->groupBy('invoice_number')->map(function ($items) {
             return [
-                'number'      => $items->first()['number'],
-                'issue_date'  => $items->first()['issue_date'],
-                'nit_cliente' => $items->first()['nit_cliente'],
-                'total'       => $items->first()['total_factura'],
-                'items'       => $items->toArray(),
-                'import'      => '1',
+                'invoice_number' => $items->first()['invoice_number'],
+                'issue_date'     => $items->first()['issue_date'],
+                'nit_cliente'    => $items->first()['nit_cliente'],
+                'nombre_cliente' => $items->first()['nombre_cliente'],
+                'total'          => $items->sum('total_linea'),
+                'items_count'    => $items->count(),
+                'items'          => $items->toArray(),
             ];
         })->values()->toArray();
 
-        return view('invoice.import-preview', compact('invoices', 'rows'));
+        $totalVenta = collect($invoices)->sum('total');
+
+        return view('invoice.import-preview', compact('invoices', 'rows', 'totalVenta'));
     }
 
-    public function import(Request $request)
+    public function import(Request $request, InvoiceService $service)
     {
         $rows      = $request->input('rows', []);
         $companyId = Auth::user()->company_id ?? DB::table('companies')->value('id') ?? 1;
@@ -73,73 +79,85 @@ class InvoiceImportController extends Controller
         $skipped  = 0;
         $errors   = [];
 
-        // Agrupar filas por número de factura
+        // Agrupar por número de factura
         $grouped = collect($rows)
             ->filter(fn($r) => !empty($r['import']) && $r['import'] == '1')
-            ->groupBy('number');
+            ->groupBy('invoice_number');
 
-        DB::transaction(function () use ($grouped, $companyId, &$imported, &$skipped, &$errors) {
-            foreach ($grouped as $number => $items) {
-                try {
-                    $number = trim($number);
+        foreach ($grouped as $number => $items) {
+            try {
+                $number = trim($number);
 
-                    if (Invoice::where('number', $number)->exists()) {
-                        $skipped++;
-                        continue;
-                    }
-
-                    $first      = $items->first();
-                    $totalFac   = (float) str_replace([',', ' ', '$'], '', $first['total_factura']);
-                    $nit        = trim($first['nit_cliente']);
-                    $customer   = Customer::where('identification_number', $nit)->first();
-
-                    $invoice = Invoice::create([
-                        'company_id'      => $companyId,
-                        'customer_id'     => $customer?->id,
-                        'number'          => $number,
-                        'document_type'   => 'FVE',
-                        'issue_datetime'  => $first['issue_date'] . ' 00:00:00',
-                        'subtotal'        => $totalFac,
-                        'taxable_amount'  => 0,
-                        'exempt_amount'   => 0,
-                        'excluded_amount' => $totalFac,
-                        'tax_total'       => 0,
-                        'total'           => $totalFac,
-                        'balance'         => $totalFac,
-                        'payment_status'  => 'pending',
-                        'status'          => 'imported',
-                        'environment'     => 'imported',
-                    ]);
-
-                    foreach ($items as $item) {
-                        $cantidad   = (float) str_replace([',', ' '], '', $item['cantidad'] ?? 1);
-                        $precioUnit = (float) str_replace([',', ' ', '$'], '', $item['precio_unitario'] ?? 0);
-                        $totalLinea = (float) str_replace([',', ' ', '$'], '', $item['total_linea'] ?? ($cantidad * $precioUnit));
-
-                        if ($cantidad <= 0) $cantidad = 1;
-                        if ($precioUnit <= 0 && $totalLinea > 0) $precioUnit = $totalLinea / $cantidad;
-
-                        InvoiceItem::create([
-                            'invoice_id'      => $invoice->id,
-                            'description'     => $item['description'],
-                            'quantity'        => $cantidad,
-                            'unit_price'      => $precioUnit,
-                            'line_extension'  => $totalLinea,
-                            'tax_category_id' => 5, // Excluido de IVA
-                            'tax_amount'      => 0,
-                            'total_line'      => $totalLinea,
-                        ]);
-                    }
-
-                    $imported++;
-                } catch (\Throwable $e) {
-                    $errors[] = "Factura {$number}: " . $e->getMessage();
+                if (Invoice::where('number', $number)->exists()) {
+                    $skipped++;
+                    continue;
                 }
-            }
-        });
 
-        $msg = "{$imported} facturas importadas.";
-        if ($skipped)       $msg .= " {$skipped} omitidas (duplicadas).";
+                $first      = $items->first();
+                $nit        = trim($first['nit_cliente'] ?? '');
+                $nombre     = trim($first['nombre_cliente'] ?? 'CLIENTE SIN NOMBRE');
+
+                // Buscar o crear cliente
+                $customer = Customer::where('identification_number', $nit)->first();
+                if (!$customer && $nit) {
+                    $customer = Customer::create([
+                        'identification_number' => $nit,
+                        'name'                  => $nombre,
+                        'type_document_id'      => 31,
+                        'type_organization_id'  => 2,
+                        'type_regime_id'        => 49,
+                        'type_liability_id'     => 'R-99-PN',
+                        'municipality_id'       => null,
+                        'payment_term_id'       => 1,
+                        'credit_limit'          => 0,
+                    ]);
+                }
+
+                if (!$customer) {
+                    $errors[] = "Factura {$number}: sin NIT válido.";
+                    continue;
+                }
+
+                // Construir ítems
+                $invoiceItems = $items->map(function ($item) {
+                    $cantidad    = (float) str_replace([',', ' '], '', $item['cantidad'] ?? 1);
+                    $precioVenta = (float) str_replace([',', ' ', '$'], '', $item['precio_venta'] ?? 0);
+                    $totalLinea  = (float) str_replace([',', ' ', '$'], '', $item['total_linea'] ?? ($cantidad * $precioVenta));
+
+                    if ($cantidad > 0 && $precioVenta == 0 && $totalLinea > 0) {
+                        $precioVenta = $totalLinea / $cantidad;
+                    }
+
+                    $descripcion = strtoupper(trim($item['tipo_producto'] ?? 'POLLITO'));
+                    if (!empty($item['linea'])) $descripcion .= ' ' . $item['linea'];
+                    if (!empty($item['observacion']) && $item['observacion'] !== 'NINGUNA') {
+                        $descripcion .= ' - ' . $item['observacion'];
+                    }
+
+                    return [
+                        'description'    => $descripcion,
+                        'quantity'       => $cantidad,
+                        'unit_price'     => $precioVenta,
+                        'tax_category_id'=> 5, // Excluido de IVA
+                    ];
+                })->toArray();
+
+                $service->createFromImport([
+                    'company_id'  => $companyId,
+                    'customer_id' => $customer->id,
+                    'number'      => $number,
+                    'issue_date'  => $first['issue_date'],
+                    'items'       => $invoiceItems,
+                ]);
+
+                $imported++;
+            } catch (\Throwable $e) {
+                $errors[] = "Factura {$number}: " . $e->getMessage();
+            }
+        }
+
+        $msg = "{$imported} facturas importadas con contabilidad y cartera.";
+        if ($skipped)       $msg .= " {$skipped} omitidas (ya existían).";
         if (count($errors)) $msg .= " " . count($errors) . " errores.";
 
         return redirect()->route('invoices.index')->with('success', $msg);
@@ -167,37 +185,52 @@ class InvoiceImportController extends Controller
                 continue;
             }
 
-            if (count($line) < 7) continue;
+            if (count($line) < 12) continue;
 
-            // Formato: NUMERO, FECHA, NIT_CLIENTE, DESCRIPCION, CANTIDAD, PRECIO_UNITARIO, TOTAL_LINEA, TOTAL_FACTURA
-            $number        = trim($line[0] ?? '');
-            $dateRaw       = trim($line[1] ?? '');
-            $nitCliente    = trim($line[2] ?? '');
-            $description   = trim($line[3] ?? '');
-            $cantidad      = trim($line[4] ?? '1');
-            $precioUnit    = trim($line[5] ?? '0');
-            $totalLinea    = trim($line[6] ?? '0');
-            $totalFactura  = trim($line[7] ?? $totalLinea);
+            // FECHA, NUMERO_FACTURA, NIT_CLIENTE, NOMBRE_CLIENTE, ZONA,
+            // TIPO_PRODUCTO, LINEA, OBSERVACION, CANTIDAD,
+            // PRECIO_COMPRA, PRECIO_VENTA, TOTAL_VENTA, FACTURADO
+            $dateRaw      = trim($line[0] ?? '');
+            $invoiceNum   = trim($line[1] ?? '');
+            $nit          = trim($line[2] ?? '');
+            $nombre       = trim($line[3] ?? '');
+            $zona         = trim($line[4] ?? '');
+            $tipo         = strtoupper(trim($line[5] ?? 'POLLITO'));
+            $linea        = strtoupper(trim($line[6] ?? ''));
+            $observacion  = strtoupper(trim($line[7] ?? ''));
+            $cantidad     = (float) str_replace([',', ' '], '', $line[8] ?? '0');
+            $precioCompra = (float) str_replace([',', ' ', '$'], '', $line[9] ?? '0');
+            $precioVenta  = (float) str_replace([',', ' ', '$'], '', $line[10] ?? '0');
+            $totalVenta   = (float) str_replace([',', ' ', '$'], '', $line[11] ?? '0');
+            $facturado    = strtoupper(trim($line[12] ?? 'NO'));
 
-            // Parsear fecha YYYY-MM-DD o M/D/YY
+            // Parsear fecha
             $date = null;
             if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $dateRaw)) {
                 $date = $dateRaw;
             } elseif (preg_match('|(\d+)/(\d+)/(\d+)|', $dateRaw, $m)) {
-                $year = $m[3] < 100 ? 2000 + (int)$m[3] : (int)$m[3];
+                $year = (int)$m[3] < 100 ? 2000 + (int)$m[3] : (int)$m[3];
                 $date = sprintf('%04d-%02d-%02d', $year, $m[1], $m[2]);
             }
 
+            $totalLinea = $totalVenta ?: ($cantidad * $precioVenta);
+
             $rows[] = [
-                'number'          => $number,
-                'issue_date'      => $date,
-                'nit_cliente'     => $nitCliente,
-                'description'     => $description,
-                'cantidad'        => $cantidad,
-                'precio_unitario' => $precioUnit,
-                'total_linea'     => $totalLinea,
-                'total_factura'   => $totalFactura,
-                'import'          => '1',
+                'issue_date'     => $date,
+                'invoice_number' => $invoiceNum === 'SIN' ? null : $invoiceNum,
+                'nit_cliente'    => $nit,
+                'nombre_cliente' => $nombre,
+                'zona'           => $zona,
+                'tipo_producto'  => $tipo,
+                'linea'          => $linea,
+                'observacion'    => $observacion,
+                'cantidad'       => $cantidad,
+                'precio_compra'  => $precioCompra,
+                'precio_venta'   => $precioVenta,
+                'total_linea'    => $totalLinea,
+                'total_venta'    => $totalVenta,
+                'facturado'      => $facturado,
+                'import'         => '1',
             ];
         }
 

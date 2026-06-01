@@ -100,7 +100,6 @@ class InvoiceImportController extends Controller
                 // Buscar o crear cliente
                 $customer = Customer::where('identification_number', $nit)->first();
                 if (!$customer && $nit) {
-                    $defaultMunicipality = DB::table('municipalities')->value('id') ?? 1;
                     $customer = Customer::create([
                         'identification_number' => $nit,
                         'name'                  => $nombre,
@@ -108,7 +107,7 @@ class InvoiceImportController extends Controller
                         'type_organization_id'  => 2,
                         'type_regime_id'        => 49,
                         'type_liability_id'     => 'R-99-PN',
-                        'municipality_id'       => $defaultMunicipality,
+                        'municipality_id'       => '54001', // Cúcuta (código DANE por defecto)
                         'payment_term_id'       => 1,
                         'credit_limit'          => 0,
                     ]);

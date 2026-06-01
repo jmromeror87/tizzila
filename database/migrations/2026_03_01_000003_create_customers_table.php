@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string('type_regime_id', 5);
             $table->string('type_liability_id', 10)->default('R-99-PN')->nullable();
             $table->string('municipality_id', 10);
-            $table->string('address');
+            $table->string('address')->nullable()->default(null);
             $table->string('postal_code', 10)->nullable();
             $table->string('email')->unique();
             $table->string('phone', 50)->nullable();

@@ -53,6 +53,7 @@ use App\Http\Controllers\Global\TaxCategoryController;
 use App\Http\Controllers\Invoice\InvoiceController;
 use App\Http\Controllers\Invoice\InvoicePaymentController;
 use App\Http\Controllers\Invoice\InvoiceImportController;
+use App\Http\Controllers\Sales\SaleImportController;
 
 use App\Http\Controllers\Claim\SupplierClaimController;
 
@@ -95,6 +96,15 @@ Route::prefix('accounting/settings')->group(function () {
 
 
 use App\Http\Controllers\Accounting\JournalEntryController;
+
+// Rutas de Ventas
+Route::middleware(['auth', 'role:admin,finanzas,gerencia,comercial'])->prefix('sales')->name('sales.')->group(function () {
+    Route::get('/', [SaleImportController::class, 'index'])->name('index');
+    Route::get('/import', [SaleImportController::class, 'form'])->name('import.form');
+    Route::get('/import/template', [SaleImportController::class, 'template'])->name('import.template');
+    Route::post('/import/preview', [SaleImportController::class, 'preview'])->name('import.preview');
+    Route::post('/import/store', [SaleImportController::class, 'import'])->name('import.store');
+});
 
 Route::middleware(['auth'])->group(function () {
 

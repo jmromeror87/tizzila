@@ -17,37 +17,37 @@
     <div class="py-4 space-y-4">
 
         {{-- Resumen KPIs --}}
-        <div class="bg-[#0d121f] border border-white/5 rounded-2xl p-5">
-            <div class="grid grid-cols-5 gap-0 divide-x divide-white/5">
-                <div class="px-5 text-center first:pl-0 last:pr-0">
-                    <p class="text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">Total Aves</p>
-                    <p class="text-2xl font-black text-white">{{ number_format(collect($rows)->sum('cantidad'), 0, ',', '.') }}</p>
-                    <p class="text-[8px] text-zinc-600 mt-0.5">{{ count($rows) }} registros</p>
+        @php $margen = $totalVenta > 0 ? round(($totalUtilidad / $totalVenta) * 100, 1) : 0; @endphp
+        <div class="bg-[#0d121f] border border-white/5 rounded-2xl overflow-hidden">
+            <div class="grid grid-cols-2 lg:grid-cols-5 divide-x divide-white/5">
+                <div class="p-5">
+                    <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Aves</p>
+                    <h2 class="text-2xl font-black text-white">{{ number_format(collect($rows)->sum('cantidad'), 0, ',', '.') }} <span class="text-yellow-500 text-lg font-bold">Aves</span></h2>
+                    <div class="mt-2 h-0.5 w-full bg-white/5 rounded-full"></div>
                 </div>
-                <div class="px-5 text-center">
-                    <p class="text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">Total Venta</p>
-                    <p class="text-2xl font-black text-emerald-400">$ {{ number_format($totalVenta, 0, ',', '.') }}</p>
-                    <p class="text-[8px] text-zinc-600 mt-0.5">ingresos brutos</p>
+                <div class="p-5">
+                    <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Venta</p>
+                    <h2 class="text-2xl font-black text-emerald-400">${{ number_format($totalVenta, 0, ',', '.') }}</h2>
+                    <div class="mt-2 h-0.5 w-full bg-emerald-500/20 rounded-full"></div>
                 </div>
-                <div class="px-5 text-center">
-                    <p class="text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">Total Compra</p>
-                    <p class="text-2xl font-black text-red-400">$ {{ number_format($totalCompra, 0, ',', '.') }}</p>
-                    <p class="text-[8px] text-zinc-600 mt-0.5">costo de ventas</p>
+                <div class="p-5">
+                    <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Compra</p>
+                    <h2 class="text-2xl font-black text-red-400">${{ number_format($totalCompra, 0, ',', '.') }}</h2>
+                    <div class="mt-2 h-0.5 w-full bg-red-500/20 rounded-full"></div>
                 </div>
-                <div class="px-5 text-center">
-                    <p class="text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">Utilidad</p>
-                    <p class="text-2xl font-black text-yellow-400">$ {{ number_format($totalUtilidad, 0, ',', '.') }}</p>
-                    @php $margen = $totalVenta > 0 ? round(($totalUtilidad / $totalVenta) * 100, 1) : 0; @endphp
-                    <p class="text-[8px] text-zinc-600 mt-0.5">margen {{ $margen }}%</p>
+                <div class="p-5">
+                    <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Utilidad <span class="text-yellow-500">{{ $margen }}%</span></p>
+                    <h2 class="text-2xl font-black text-yellow-400">${{ number_format($totalUtilidad, 0, ',', '.') }}</h2>
+                    <div class="mt-2 h-0.5 w-full bg-yellow-500/20 rounded-full"></div>
                 </div>
-                <div class="px-5 text-center last:pr-0">
-                    <p class="text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">Facturas</p>
-                    <p class="text-2xl font-black text-white">
+                <div class="p-5">
+                    <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Facturas</p>
+                    <h2 class="text-2xl font-black text-white">
                         <span class="text-emerald-400">{{ $facturadas }}</span>
                         <span class="text-zinc-600 text-lg"> / </span>
                         <span class="text-orange-400">{{ $sinFactura }}</span>
-                    </p>
-                    <p class="text-[8px] text-zinc-600 mt-0.5">oficial / informal</p>
+                    </h2>
+                    <div class="mt-2 h-0.5 w-full bg-white/5 rounded-full"></div>
                 </div>
             </div>
         </div>

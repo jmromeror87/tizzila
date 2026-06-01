@@ -192,6 +192,9 @@
                     <a href="{{ route('invoices.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition-all {{ request()->routeIs('invoices.index') ? 'text-[#f3c444] bg-[#f3c444]/5' : 'text-gray-500 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-list-alt w-3.5 text-center"></i>Historial
                     </a>
+                    <a href="{{ route('invoices.import.form') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition-all {{ request()->routeIs('invoices.import.*') ? 'text-[#f3c444] bg-[#f3c444]/5' : 'text-gray-500 hover:text-white hover:bg-white/5' }}">
+                        <i class="fas fa-file-import w-3.5 text-center"></i>Importar CSV
+                    </a>
                 </div>
             </div>
             @endif

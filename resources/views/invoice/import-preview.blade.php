@@ -62,6 +62,18 @@
             </div>
 
             {{-- Hidden rows --}}
+            @php
+                // Mapa invoice_number → índices de rows (para syncHidden)
+                $invoiceRowMap = [];
+                foreach($rows as $i => $row) {
+                    $invoiceRowMap[$row['invoice_number']][] = $i;
+                }
+                // Mapa fi (invoice index) → índices de rows
+                $fiRowMap = [];
+                foreach($invoices as $fi => $inv) {
+                    $fiRowMap[$fi] = $invoiceRowMap[$inv['invoice_number']] ?? [];
+                }
+            @endphp
             @foreach($rows as $i => $row)
                 <input type="hidden" name="rows[{{ $i }}][invoice_number]" value="{{ $row['invoice_number'] }}">
                 <input type="hidden" name="rows[{{ $i }}][issue_date]"     value="{{ $row['issue_date'] }}">
@@ -75,6 +87,7 @@
                 <input type="hidden" name="rows[{{ $i }}][precio_venta]"   value="{{ $row['precio_venta'] }}">
                 <input type="hidden" name="rows[{{ $i }}][total_linea]"    value="{{ $row['total_linea'] }}">
                 <input type="hidden" name="rows[{{ $i }}][facturado]"      value="{{ $row['facturado'] }}">
+                <input type="hidden" name="rows[{{ $i }}][import]" id="import-row-{{ $i }}" value="1">
             @endforeach
 
             {{-- Tabla por factura --}}
@@ -159,12 +172,18 @@
     </div>
 
     <script>
+        const fiRowMap = @json($fiRowMap);
+
         function toggleAll(state) {
             document.querySelectorAll('.invoice-check').forEach(cb => cb.checked = state);
             document.querySelectorAll('input[name*="[import]"]').forEach(h => h.value = state ? '1' : '0');
         }
         function syncHidden(cb, fi) {
-            // no hay hidden de import por factura — se maneja en el backend por invoice_number
+            const val = cb.checked ? '1' : '0';
+            (fiRowMap[fi] || []).forEach(i => {
+                const el = document.getElementById('import-row-' + i);
+                if (el) el.value = val;
+            });
         }
     </script>
 </x-app-layout>

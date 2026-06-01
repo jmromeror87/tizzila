@@ -79,7 +79,51 @@ class InvoiceImportController extends Controller
         $skipped  = 0;
         $errors   = [];
 
-        // Agrupar por número de factura
+        // Guardar todos los rows en sale_records (facturados y no facturados)
+        $now = now();
+        foreach ($rows as $row) {
+            if (empty($row['invoice_number'])) continue;
+            $cantidad    = (float) str_replace([',', ' '], '', $row['cantidad'] ?? 0);
+            $precioC     = (float) str_replace([',', ' ', '$'], '', $row['precio_compra'] ?? 0);
+            $precioV     = (float) str_replace([',', ' ', '$'], '', $row['precio_venta'] ?? 0);
+            $totalVenta  = (float) str_replace([',', ' ', '$'], '', $row['total_linea'] ?? ($cantidad * $precioV));
+            $totalCompra = round($cantidad * $precioC, 2);
+            $utilidad    = round($totalVenta - $totalCompra, 2);
+            $facturado   = strtoupper(trim($row['facturado'] ?? 'NO')) === 'SI';
+
+            $exists = DB::table('sale_records')
+                ->where('invoice_number', $row['invoice_number'])
+                ->where('tipo_producto', $row['tipo_producto'] ?? '')
+                ->where('cantidad', $cantidad)
+                ->exists();
+            if ($exists) continue;
+
+            $tipoProducto = strtolower(trim($row['tipo_producto'] ?? 'pollito'));
+            if (!in_array($tipoProducto, ['pollito', 'pollita'])) $tipoProducto = 'pollito';
+
+            DB::table('sale_records')->insert([
+                'company_id'     => $companyId,
+                'sale_date'      => $row['issue_date'],
+                'invoice_number' => $row['invoice_number'] === 'SIN FACTURA' ? null : $row['invoice_number'],
+                'invoice_status' => $facturado ? 'facturado' : 'sin_factura',
+                'nit_cliente'    => $row['nit_cliente'] ?? null,
+                'nombre_cliente' => $row['nombre_cliente'] ?? 'SIN NOMBRE',
+                'zona'           => $row['zona'] ?? null,
+                'tipo_producto'  => $tipoProducto,
+                'linea'          => $row['linea'] ?? null,
+                'observacion'    => ($row['observacion'] ?? 'NINGUNA') === 'NINGUNA' ? null : $row['observacion'],
+                'cantidad'       => $cantidad,
+                'precio_compra'  => $precioC,
+                'precio_venta'   => $precioV,
+                'total_venta'    => $totalVenta,
+                'total_compra'   => $totalCompra,
+                'utilidad'       => $utilidad,
+                'created_at'     => $now,
+                'updated_at'     => $now,
+            ]);
+        }
+
+        // Agrupar por número de factura (solo FACTURADO=SI para contabilidad)
         $grouped = collect($rows)
             ->filter(fn($r) => !empty($r['import']) && $r['import'] == '1')
             ->groupBy('invoice_number');

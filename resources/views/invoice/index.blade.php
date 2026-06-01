@@ -40,6 +40,14 @@
                 <i class="fas fa-triangle-exclamation"></i> {{ session('error') }}
             </div>
         @endif
+        @if(session('import_errors'))
+            <div class="px-4 py-3 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-300 text-xs font-bold space-y-1">
+                <p class="flex items-center gap-2"><i class="fas fa-bug"></i> Detalle de errores de importación:</p>
+                @foreach(session('import_errors') as $err)
+                    <p class="pl-4 text-orange-400 font-mono text-[10px]">• {{ $err }}</p>
+                @endforeach
+            </div>
+        @endif
 
         {{-- FILTROS --}}
         <form method="GET" action="{{ route('invoices.index') }}">

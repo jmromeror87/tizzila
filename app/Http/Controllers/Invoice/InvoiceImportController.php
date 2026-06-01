@@ -158,7 +158,13 @@ class InvoiceImportController extends Controller
 
         $msg = "{$imported} facturas importadas con contabilidad y cartera.";
         if ($skipped)       $msg .= " {$skipped} omitidas (ya existían).";
-        if (count($errors)) $msg .= " " . count($errors) . " errores.";
+
+        if (count($errors)) {
+            $msg .= " " . count($errors) . " errores.";
+            return redirect()->route('invoices.index')
+                ->with($imported > 0 ? 'success' : 'error', $msg)
+                ->with('import_errors', $errors);
+        }
 
         return redirect()->route('invoices.index')->with('success', $msg);
     }

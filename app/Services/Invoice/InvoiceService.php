@@ -269,7 +269,7 @@ class InvoiceService
                 'number'                 => $data['number'],
                 'issue_datetime'         => $now,
                 'environment'            => 'testing',
-                'status'                 => 'imported',
+                'status'                 => 'draft',
                 'subtotal'               => 0,
                 'tax_total'              => 0,
                 'total'                  => 0,

@@ -268,7 +268,7 @@ class InvoiceService
                 'document_type'          => 'FVE',
                 'number'                 => $data['number'],
                 'issue_datetime'         => $now,
-                'environment'            => 'imported',
+                'environment'            => 'testing',
                 'status'                 => 'imported',
                 'subtotal'               => 0,
                 'tax_total'              => 0,

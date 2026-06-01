@@ -173,12 +173,12 @@
             <div class="nav-section"><i class="fas fa-coins opacity-40 text-[8px]"></i>Finanzas</div>
             @endif
 
-            {{-- VENTAS --}}
+            {{-- VENTAS (unificado) --}}
             @if($can('facturacion'))
-            <div x-data="{ open: {{ request()->routeIs('sales.*') ? 'true':'false' }} }">
+            <div x-data="{ open: {{ request()->routeIs('sales.*') || request()->routeIs('invoices.*') ? 'true':'false' }} }">
                 <button @click="open = !open"
                     class="w-full flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all border
-                        {{ request()->routeIs('sales.*') ? 'nav-group-active border-[#f3c444]/12' : 'text-gray-400 hover:text-white hover:bg-white/5 border-transparent' }}">
+                        {{ request()->routeIs('sales.*') || request()->routeIs('invoices.*') ? 'nav-group-active border-[#f3c444]/12' : 'text-gray-400 hover:text-white hover:bg-white/5 border-transparent' }}">
                     <div class="flex items-center gap-3">
                         <i class="fas fa-chart-line w-4 text-center text-sm"></i>
                         <span class="text-xs">Ventas</span>
@@ -186,36 +186,16 @@
                     <i class="fas fa-chevron-right text-[9px] opacity-40 transition-transform duration-200" :class="open && 'rotate-90'"></i>
                 </button>
                 <div x-show="open" x-cloak class="ml-4 mt-0.5 space-y-0.5 border-l border-white/5 pl-3">
-                    <a href="{{ route('sales.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition-all {{ request()->routeIs('sales.index') ? 'text-[#f3c444] bg-[#f3c444]/5' : 'text-gray-500 hover:text-white hover:bg-white/5' }}">
-                        <i class="fas fa-list w-3.5 text-center"></i>Registro de Ventas
-                    </a>
-                    <a href="{{ route('sales.import.form') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition-all {{ request()->routeIs('sales.import.*') ? 'text-[#f3c444] bg-[#f3c444]/5' : 'text-gray-500 hover:text-white hover:bg-white/5' }}">
-                        <i class="fas fa-file-import w-3.5 text-center"></i>Importar CSV
-                    </a>
-                </div>
-            </div>
-            @endif
-
-            @if($can('facturacion'))
-            <div x-data="{ open: {{ request()->routeIs('invoices.*') ? 'true':'false' }} }">
-                <button @click="open = !open"
-                    class="w-full flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all border
-                        {{ request()->routeIs('invoices.*') ? 'nav-group-active border-[#f3c444]/12' : 'text-gray-400 hover:text-white hover:bg-white/5 border-transparent' }}">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-file-invoice-dollar text-xs w-4 text-center"></i>
-                        <span>Facturación</span>
-                    </div>
-                    <i class="fas fa-chevron-right text-[9px] opacity-40 transition-transform duration-200" :class="open && 'rotate-90'"></i>
-                </button>
-                <div x-show="open" x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 -translate-y-1" x-cloak
-                    class="ml-4 mt-0.5 space-y-0.5 border-l border-white/5 pl-3">
                     <a href="{{ route('invoices.create') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition-all {{ request()->routeIs('invoices.create') ? 'text-[#f3c444] bg-[#f3c444]/5' : 'text-gray-500 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-plus-circle w-3.5 text-center"></i>Nueva Factura
                     </a>
                     <a href="{{ route('invoices.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition-all {{ request()->routeIs('invoices.index') ? 'text-[#f3c444] bg-[#f3c444]/5' : 'text-gray-500 hover:text-white hover:bg-white/5' }}">
-                        <i class="fas fa-list-alt w-3.5 text-center"></i>Historial
+                        <i class="fas fa-list-alt w-3.5 text-center"></i>Historial Facturas
                     </a>
-                    <a href="{{ route('invoices.import.form') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition-all {{ request()->routeIs('invoices.import.*') ? 'text-[#f3c444] bg-[#f3c444]/5' : 'text-gray-500 hover:text-white hover:bg-white/5' }}">
+                    <a href="{{ route('sales.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition-all {{ request()->routeIs('sales.index') ? 'text-[#f3c444] bg-[#f3c444]/5' : 'text-gray-500 hover:text-white hover:bg-white/5' }}">
+                        <i class="fas fa-list w-3.5 text-center"></i>Registro de Ventas
+                    </a>
+                    <a href="{{ route('invoices.import.form') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition-all {{ request()->routeIs('invoices.import.*') || request()->routeIs('sales.import.*') ? 'text-[#f3c444] bg-[#f3c444]/5' : 'text-gray-500 hover:text-white hover:bg-white/5' }}">
                         <i class="fas fa-file-import w-3.5 text-center"></i>Importar CSV
                     </a>
                 </div>

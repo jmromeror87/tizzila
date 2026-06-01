@@ -103,13 +103,14 @@ class InvoiceImportController extends Controller
                     ]);
 
                     InvoiceItem::create([
-                        'invoice_id'     => $invoice->id,
-                        'description'    => $row['description'],
-                        'quantity'       => 1,
-                        'unit_price'     => $total,
-                        'line_extension' => $total,
-                        'tax_amount'     => 0,
-                        'total_line'     => $total,
+                        'invoice_id'      => $invoice->id,
+                        'description'     => $row['description'],
+                        'quantity'        => 1,
+                        'unit_price'      => $total,
+                        'line_extension'  => $total,
+                        'tax_category_id' => 5, // Excluido de IVA (pollito BB)
+                        'tax_amount'      => 0,
+                        'total_line'      => $total,
                     ]);
 
                     $imported++;

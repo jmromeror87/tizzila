@@ -52,6 +52,7 @@ use App\Http\Controllers\Poultry\PlannedDistributionController;
 use App\Http\Controllers\Global\TaxCategoryController;
 use App\Http\Controllers\Invoice\InvoiceController;
 use App\Http\Controllers\Invoice\InvoicePaymentController;
+use App\Http\Controllers\Invoice\InvoiceImportController;
 
 use App\Http\Controllers\Claim\SupplierClaimController;
 
@@ -267,8 +268,14 @@ Route::middleware(['auth', 'role:admin,finanzas,gerencia,comercial'])->prefix('i
     Route::get('/', [InvoiceController::class, 'index'])->name('index');
     Route::get('/create', [InvoiceController::class, 'create'])->name('create');
     Route::post('/', [InvoiceController::class, 'store'])->name('store');
+
+    // Importación masiva CSV desde sistema externo
+    Route::get('/import', [InvoiceImportController::class, 'form'])->name('import.form');
+    Route::get('/import/template', [InvoiceImportController::class, 'template'])->name('import.template');
+    Route::post('/import/preview', [InvoiceImportController::class, 'preview'])->name('import.preview');
+    Route::post('/import/store', [InvoiceImportController::class, 'import'])->name('import.store');
+
     Route::get('/{invoice}', [InvoiceController::class, 'show'])->name('show');
-  
 });
 Route::post('/dispatch/routes/{route}/notify-driver',
     [DispatchRouteController::class, 'sendDriverWhatsApp']

@@ -44,8 +44,8 @@
                         <thead>
                             <tr class="border-b border-white/5 bg-white/[0.02]">
                                 <th class="px-3 py-3 text-[8px] font-black uppercase tracking-widest text-zinc-500 text-center w-8">✓</th>
-                                <th class="px-3 py-3 text-[8px] font-black uppercase tracking-widest text-zinc-500 text-left">Doc</th>
                                 <th class="px-3 py-3 text-[8px] font-black uppercase tracking-widest text-zinc-500 text-left">Fecha</th>
+                                <th class="px-3 py-3 text-[8px] font-black uppercase tracking-widest text-zinc-500 text-left">Tercero · NIT</th>
                                 <th class="px-3 py-3 text-[8px] font-black uppercase tracking-widest text-zinc-500 text-left">Detalle</th>
                                 <th class="px-3 py-3 text-[8px] font-black uppercase tracking-widest text-zinc-500 text-left">Categoría</th>
                                 <th class="px-3 py-3 text-[8px] font-black uppercase tracking-widest text-zinc-500 text-left">Pago</th>
@@ -61,17 +61,23 @@
                                 </td>
                                 <td class="px-3 py-2.5">
                                     <input type="hidden" name="rows[{{ $i }}][document_number]" value="{{ $row['document_number'] }}">
+                                    <input type="hidden" name="rows[{{ $i }}][nit_tercero]"     value="{{ $row['nit_tercero'] ?? '' }}">
                                     <input type="hidden" name="rows[{{ $i }}][tercero]"         value="{{ $row['tercero'] ?? '' }}">
                                     <input type="hidden" name="rows[{{ $i }}][description]"     value="{{ $row['description'] }}">
                                     <input type="hidden" name="rows[{{ $i }}][total]"           value="{{ $row['total'] }}">
                                     <input type="hidden" name="rows[{{ $i }}][expense_date]"    value="{{ $row['expense_date'] }}">
-                                    <span class="text-[9px] font-black text-yellow-400 font-mono">{{ $row['document_number'] }}</span>
-                                </td>
-                                <td class="px-3 py-2.5">
                                     <span class="text-[9px] text-zinc-400">{{ $row['expense_date'] }}</span>
                                 </td>
-                                <td class="px-3 py-2.5 max-w-xs">
+                                <td class="px-3 py-2.5 max-w-[220px]">
+                                    @if(!empty($row['tercero']))
+                                    <p class="text-[10px] font-bold text-white truncate">{{ $row['tercero'] }}</p>
+                                    <p class="text-[8px] text-orange-400 font-mono">{{ $row['nit_tercero'] ?? '' }}</p>
+                                    @else
                                     <span class="text-[10px] text-white truncate block">{{ $row['description'] }}</span>
+                                    @endif
+                                </td>
+                                <td class="px-3 py-2.5 max-w-[180px]">
+                                    <span class="text-[9px] text-zinc-400 truncate block">{{ $row['description'] }}</span>
                                 </td>
                                 <td class="px-3 py-2.5">
                                     <select name="rows[{{ $i }}][category_id]"
@@ -102,7 +108,7 @@
                         </tbody>
                         <tfoot>
                             <tr class="border-t border-white/10 bg-black/20">
-                                <td colspan="6" class="px-3 py-3 text-[9px] font-black uppercase tracking-widest text-zinc-500">Total</td>
+                                <td colspan="7" class="px-3 py-3 text-[9px] font-black uppercase tracking-widest text-zinc-500">Total</td>
                                 <td class="px-3 py-3 text-right text-sm font-black text-white font-mono">
                                     $ {{ number_format(collect($rows)->sum('total'), 0, ',', '.') }}
                                 </td>

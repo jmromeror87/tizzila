@@ -58,17 +58,17 @@ class ExpenseImportController extends Controller
     public function template()
     {
         $rows = [
-            ['FECHA', 'TERCERO', 'DETALLE', 'VALOR'],
-            ['2/4/26',  'RESTAURANTE MONTANAS AZULES HI',         'ALIMENTACION',                   '38500'],
-            ['2/4/26',  'PARQUEADERO RUITOQUE GARDEN',            'PARQUEADERO',                    '15600'],
-            ['2/5/26',  'SERVICIO AUTOMOTRIZ SOBRERUEDAS',        'PARQUEADERO CENTRO',             '160000'],
-            ['2/6/26',  'ROSMARY CAJAS',                          'MARCAR CAJAS EN GIRON',          '7800'],
-            ['2/8/26',  'ALKOSTO',                                'MCAFEE ANTIVIRUS MICROSOFT',     '299900'],
-            ['2/11/26', 'INVERSIA SAS',                           'PAN DE BONO',                    '19000'],
-            ['2/13/26', 'JOSE LUIS CARVAJALINO',                  'REMESAS CUCUTA',                 '50000'],
-            ['2/21/26', 'ARMASIL DISTRIBUCIONES SAS',             'SEGURIDAD',                      '153919'],
-            ['2/26/26', 'ALCALDIA OCANA',                         'IMPUESTO INDUSTRIA Y COMERCIO',  '51989000'],
-            ['2/27/26', 'JOSE LUIS CARVAJALINO',                  'CUENTA COBRO FLETE POLLITO',     '400000'],
+            ['FECHA', 'NIT_TERCERO', 'TERCERO', 'DETALLE', 'VALOR'],
+            ['2/4/26',  '900123456', 'RESTAURANTE MONTANAS AZULES HI',         'ALIMENTACION',                   '38500'],
+            ['2/4/26',  '800987654', 'PARQUEADERO RUITOQUE GARDEN',            'PARQUEADERO',                    '15600'],
+            ['2/5/26',  '901243904', 'SERVICIO AUTOMOTRIZ SOBRERUEDAS',        'PARQUEADERO CENTRO',             '160000'],
+            ['2/6/26',  '88032951',  'ROSMARY CAJAS',                          'MARCAR CAJAS EN GIRON',          '7800'],
+            ['2/8/26',  '860502609', 'ALKOSTO',                                'MCAFEE ANTIVIRUS MICROSOFT',     '299900'],
+            ['2/11/26', '901885356', 'INVERSIA SAS',                           'PAN DE BONO',                    '19000'],
+            ['2/13/26', '88032951',  'JOSE LUIS CARVAJALINO',                  'REMESAS CUCUTA',                 '50000'],
+            ['2/21/26', '900456789', 'ARMASIL DISTRIBUCIONES SAS',             'SEGURIDAD',                      '153919'],
+            ['2/26/26', '890985122', 'ALCALDIA OCANA',                         'IMPUESTO INDUSTRIA Y COMERCIO',  '51989000'],
+            ['2/27/26', '88032951',  'JOSE LUIS CARVAJALINO',                  'CUENTA COBRO FLETE POLLITO',     '400000'],
         ];
 
         $output = fopen('php://temp', 'w');
@@ -190,20 +190,33 @@ class ExpenseImportController extends Controller
 
             $cols = count($line);
 
-            // Formato nuevo (4 col): FECHA, TERCERO, DETALLE, VALOR
-            // Formato viejo (5 col): PAGO, DOC, FECHA, DETALLE, VALOR
+            // Formato nuevo (5 col): FECHA, NIT_TERCERO, TERCERO, DETALLE, VALOR
+            // Formato viejo (5 col): PAGO, DOC, FECHA, DETALLE, VALOR  ← detectado por header
             // Formato viejo extendido (6 col): PAGO, DOC, FECHA, TERCERO, DETALLE, VALOR
+            $isNewFormat = in_array('nit_tercero', $header) || in_array('nit tercero', $header);
+
             if ($cols <= 4) {
                 $dateRaw     = trim($line[0] ?? '');
+                $nitTercero  = '';
                 $tercero     = trim($line[1] ?? '');
                 $description = trim($line[2] ?? '') ?: $tercero;
                 $valueRaw    = trim($line[3] ?? $line[2] ?? '');
+                $payMethod   = 'TRANSFERENCIA';
+                $docNumber   = null;
+            } elseif ($cols === 5 && $isNewFormat) {
+                // FECHA, NIT_TERCERO, TERCERO, DETALLE, VALOR
+                $dateRaw     = trim($line[0] ?? '');
+                $nitTercero  = trim($line[1] ?? '');
+                $tercero     = trim($line[2] ?? '');
+                $description = trim($line[3] ?? '') ?: $tercero;
+                $valueRaw    = trim($line[4] ?? '');
                 $payMethod   = 'TRANSFERENCIA';
                 $docNumber   = null;
             } elseif ($cols >= 6) {
                 $payMethod   = trim($line[0] ?? '');
                 $docNumber   = trim($line[1] ?? '');
                 $dateRaw     = trim($line[2] ?? '');
+                $nitTercero  = '';
                 $tercero     = trim($line[3] ?? '');
                 $description = trim($line[4] ?? '') ?: $tercero;
                 $valueRaw    = trim($line[5] ?? '');
@@ -211,6 +224,7 @@ class ExpenseImportController extends Controller
                 $payMethod   = trim($line[0] ?? '');
                 $docNumber   = trim($line[1] ?? '');
                 $dateRaw     = trim($line[2] ?? '');
+                $nitTercero  = '';
                 $tercero     = '';
                 $description = trim($line[3] ?? '');
                 $valueRaw    = trim($line[4] ?? '');
@@ -238,6 +252,7 @@ class ExpenseImportController extends Controller
                 'payment_method'  => $payMethod,
                 'document_number' => $docNumber,
                 'expense_date'    => $date,
+                'nit_tercero'     => $nitTercero ?? '',
                 'tercero'         => $tercero,
                 'description'     => $description ?: $tercero,
                 'total'           => $total,

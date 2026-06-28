@@ -28,12 +28,17 @@
                 </a>
             </div>
             <div class="bg-black/40 rounded-xl p-4 font-mono text-[9px] text-zinc-400 overflow-x-auto space-y-1">
-                <p class="text-yellow-500">FECHA, TERCERO, DETALLE, VALOR</p>
-                <p>2/4/26, <span class="text-blue-400">RESTAURANTE MONTANAS AZULES HI</span>, ALIMENTACION, 38500</p>
-                <p>2/5/26, <span class="text-blue-400">SERVICIO AUTOMOTRIZ SOBRERUEDAS</span>, PARQUEADERO CENTRO, 160000</p>
-                <p>2/27/26, <span class="text-blue-400">JOSE LUIS CARVAJALINO</span>, CUENTA COBRO FLETE POLLITO, 400000</p>
+                <p class="text-yellow-500">FECHA, NIT_TERCERO, TERCERO, DETALLE, VALOR</p>
+                <p>2/4/26, <span class="text-orange-400">900123456</span>, <span class="text-blue-400">RESTAURANTE MONTANAS AZULES HI</span>, ALIMENTACION, 38500</p>
+                <p>2/5/26, <span class="text-orange-400">901243904</span>, <span class="text-blue-400">SOBRERUEDAS</span>, PARQUEADERO CENTRO, 160000</p>
+                <p>2/27/26, <span class="text-orange-400">88032951</span>, <span class="text-blue-400">JOSE LUIS CARVAJALINO</span>, CUENTA COBRO FLETE POLLITO, 400000</p>
             </div>
-            <div class="grid grid-cols-2 gap-3 text-[9px] text-zinc-500">
+            <div class="grid grid-cols-3 gap-3 text-[9px] text-zinc-500">
+                <div class="bg-black/20 rounded-lg p-3">
+                    <p class="font-black text-zinc-400 mb-1">NIT_TERCERO</p>
+                    <p>NIT o cédula de quien cobra</p>
+                    <p class="text-zinc-600 mt-1">Sin dígito de verificación</p>
+                </div>
                 <div class="bg-black/20 rounded-lg p-3">
                     <p class="font-black text-zinc-400 mb-1">TERCERO</p>
                     <p>Nombre del proveedor o persona</p>
@@ -42,7 +47,7 @@
                 <div class="bg-black/20 rounded-lg p-3">
                     <p class="font-black text-zinc-400 mb-1">VALOR</p>
                     <p class="text-emerald-400">38500 ✓</p>
-                    <p class="text-red-400">$38.500 ✗ — sin $ ni puntos</p>
+                    <p class="text-red-400">$38.500 ✗ sin $ ni puntos</p>
                 </div>
             </div>
             <p class="text-[9px] text-zinc-500"><i class="fas fa-magic text-yellow-600 mr-1"></i>La categoría se detecta automáticamente por el texto. Puedes corregirla antes de importar.</p>

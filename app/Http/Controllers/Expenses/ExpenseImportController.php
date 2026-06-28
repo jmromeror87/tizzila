@@ -58,14 +58,17 @@ class ExpenseImportController extends Controller
     public function template()
     {
         $rows = [
-            ['MEDIO DE PAGO', 'DOC-SOPORTE', 'FECHA', 'DETALLE', 'VALOR'],
-            ['EFECTIVO',      'GT-001',      '1/6/26', 'PEAJE MORRISON',                        '14100'],
-            ['TRANSFERENCIA', 'GT-002',      '1/8/26', 'SERVICIO PARQUEADERO SOBRERUEDAS',      '160000'],
-            ['EFECTIVO',      'GT-003',      '1/8/26', 'RESTAURANTE EL CARBON',                 '49000'],
-            ['TRANSFERENCIA', 'GT-004',      '1/10/26','COMBUSTIBLE EDS AUTOGAS',               '101292'],
-            ['TRANSFERENCIA', 'GT-005',      '1/15/26','HONORARIOS CONTADOR',                   '550000'],
-            ['EFECTIVO',      'GT-006',      '1/20/26','PEAJE PAMPLONA',                        '20700'],
-            ['TRANSFERENCIA', 'GT-007',      '1/31/26','SEGURIDAD SOCIAL LINA CABRALES',        '855000'],
+            ['FECHA', 'TERCERO', 'DETALLE', 'VALOR'],
+            ['2/4/26',  'RESTAURANTE MONTANAS AZULES HI',         'ALIMENTACION',                   '38500'],
+            ['2/4/26',  'PARQUEADERO RUITOQUE GARDEN',            'PARQUEADERO',                    '15600'],
+            ['2/5/26',  'SERVICIO AUTOMOTRIZ SOBRERUEDAS',        'PARQUEADERO CENTRO',             '160000'],
+            ['2/6/26',  'ROSMARY CAJAS',                          'MARCAR CAJAS EN GIRON',          '7800'],
+            ['2/8/26',  'ALKOSTO',                                'MCAFEE ANTIVIRUS MICROSOFT',     '299900'],
+            ['2/11/26', 'INVERSIA SAS',                           'PAN DE BONO',                    '19000'],
+            ['2/13/26', 'JOSE LUIS CARVAJALINO',                  'REMESAS CUCUTA',                 '50000'],
+            ['2/21/26', 'ARMASIL DISTRIBUCIONES SAS',             'SEGURIDAD',                      '153919'],
+            ['2/26/26', 'ALCALDIA OCANA',                         'IMPUESTO INDUSTRIA Y COMERCIO',  '51989000'],
+            ['2/27/26', 'JOSE LUIS CARVAJALINO',                  'CUENTA COBRO FLETE POLLITO',     '400000'],
         ];
 
         $output = fopen('php://temp', 'w');
@@ -166,10 +169,8 @@ class ExpenseImportController extends Controller
     private function parseCsv(string $path): array
     {
         $rows = [];
-        // Convertir a UTF-8 limpio si viene en otro encoding
         $content = file_get_contents($path);
         $content = mb_convert_encoding($content, 'UTF-8', 'UTF-8,ISO-8859-1,Windows-1252');
-        // Quitar BOM
         $content = preg_replace('/^\xEF\xBB\xBF/', '', $content);
         $tmpPath = tempnam(sys_get_temp_dir(), 'csv_');
         file_put_contents($tmpPath, $content);
@@ -178,7 +179,6 @@ class ExpenseImportController extends Controller
         $header = null;
 
         while (($line = fgetcsv($handle, 1000, ',')) !== false) {
-            // Limpiar caracteres de control pero NO los acentos
             $line = array_map(fn($v) => trim(preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', '', $v)), $line);
 
             if (!$header) {
@@ -186,41 +186,60 @@ class ExpenseImportController extends Controller
                 continue;
             }
 
-            if (count($line) < 4) continue;
+            if (count($line) < 3) continue;
 
-            // Formato 5 col: PAGO, DOC, FECHA, DETALLE, VALOR
-            // Formato 6 col: PAGO, DOC, FECHA, TERCERO, DETALLE, VALOR
             $cols = count($line);
-            $payMethod   = trim($line[0] ?? '');
-            $docNumber   = trim($line[1] ?? '');
-            $dateRaw     = trim($line[2] ?? '');
-            if ($cols >= 6) {
+
+            // Formato nuevo (4 col): FECHA, TERCERO, DETALLE, VALOR
+            // Formato viejo (5 col): PAGO, DOC, FECHA, DETALLE, VALOR
+            // Formato viejo extendido (6 col): PAGO, DOC, FECHA, TERCERO, DETALLE, VALOR
+            if ($cols <= 4) {
+                $dateRaw     = trim($line[0] ?? '');
+                $tercero     = trim($line[1] ?? '');
+                $description = trim($line[2] ?? '') ?: $tercero;
+                $valueRaw    = trim($line[3] ?? $line[2] ?? '');
+                $payMethod   = 'TRANSFERENCIA';
+                $docNumber   = null;
+            } elseif ($cols >= 6) {
+                $payMethod   = trim($line[0] ?? '');
+                $docNumber   = trim($line[1] ?? '');
+                $dateRaw     = trim($line[2] ?? '');
                 $tercero     = trim($line[3] ?? '');
                 $description = trim($line[4] ?? '') ?: $tercero;
                 $valueRaw    = trim($line[5] ?? '');
             } else {
+                $payMethod   = trim($line[0] ?? '');
+                $docNumber   = trim($line[1] ?? '');
+                $dateRaw     = trim($line[2] ?? '');
                 $tercero     = '';
                 $description = trim($line[3] ?? '');
                 $valueRaw    = trim($line[4] ?? '');
             }
 
-            // Parsear fecha M/D/YY → Y-m-d
+            // Parsear fecha: M/D/YY o D/M/YY o YYYY-MM-DD
             $date = null;
-            if (preg_match('|(\d+)/(\d+)/(\d+)|', $dateRaw, $m)) {
-                $year = $m[3] < 100 ? 2000 + (int)$m[3] : (int)$m[3];
+            if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $dateRaw)) {
+                $date = $dateRaw;
+            } elseif (preg_match('|(\d+)/(\d+)/(\d+)|', $dateRaw, $m)) {
+                $year = (int)$m[3] < 100 ? 2000 + (int)$m[3] : (int)$m[3];
                 $date = sprintf('%04d-%02d-%02d', $year, $m[1], $m[2]);
             }
 
-            $total = (float) str_replace([',', ' ', '$', '"'], '', $valueRaw);
+            $total = (float) str_replace([',', ' ', '$', '"', '.'], '', $valueRaw);
+            // Si el valor tiene punto decimal real (ej: 38500.00) re-parsear correctamente
+            if (str_contains($valueRaw, '.') && !str_contains($valueRaw, ',')) {
+                $total = (float) str_replace([',', ' ', '$', '"'], '', $valueRaw);
+            }
 
-            $catId = $this->detectCategory($description);
+            // Detectar categoría usando tercero + detalle juntos
+            $catId = $this->detectCategory($tercero . ' ' . $description);
 
             $rows[] = [
                 'payment_method'  => $payMethod,
                 'document_number' => $docNumber,
                 'expense_date'    => $date,
                 'tercero'         => $tercero,
-                'description'     => $description,
+                'description'     => $description ?: $tercero,
                 'total'           => $total,
                 'category_id'     => $catId,
                 'import'          => '1',

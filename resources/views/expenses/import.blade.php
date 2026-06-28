@@ -20,38 +20,32 @@
         <div class="bg-[#0d121f] border border-white/5 rounded-2xl p-6 space-y-4">
             <div class="flex items-center justify-between">
                 <p class="text-[10px] font-black uppercase tracking-widest text-yellow-400">
-                    <i class="fas fa-info-circle mr-2"></i>Formato del CSV
+                    <i class="fas fa-table mr-2"></i>Formato — 4 columnas
                 </p>
                 <a href="{{ route('expenses.import.template') }}"
                    class="h-8 px-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
-                    <i class="fas fa-download text-[9px]"></i> Descargar Plantilla Excel/CSV
+                    <i class="fas fa-download text-[9px]"></i> Descargar Plantilla
                 </a>
             </div>
-            <div class="bg-black/40 rounded-xl p-4 font-mono text-[10px] text-zinc-400 space-y-1">
-                <p class="text-yellow-500">MEDIO DE PAGO, DOC-SOPORTE, FECHA, DETALLE, VALOR</p>
-                <p>EFECTIVO, GT-01, 1/6/26, PEAJE MORRISON, 14100</p>
-                <p>TRANSFERENCIA, GT-05, 1/8/26, PARQUEADERO SOBRERUEDAS, 160000</p>
+            <div class="bg-black/40 rounded-xl p-4 font-mono text-[9px] text-zinc-400 overflow-x-auto space-y-1">
+                <p class="text-yellow-500">FECHA, TERCERO, DETALLE, VALOR</p>
+                <p>2/4/26, <span class="text-blue-400">RESTAURANTE MONTANAS AZULES HI</span>, ALIMENTACION, 38500</p>
+                <p>2/5/26, <span class="text-blue-400">SERVICIO AUTOMOTRIZ SOBRERUEDAS</span>, PARQUEADERO CENTRO, 160000</p>
+                <p>2/27/26, <span class="text-blue-400">JOSE LUIS CARVAJALINO</span>, CUENTA COBRO FLETE POLLITO, 400000</p>
             </div>
-            <div class="grid grid-cols-3 gap-3 text-[9px] text-zinc-500">
+            <div class="grid grid-cols-2 gap-3 text-[9px] text-zinc-500">
                 <div class="bg-black/20 rounded-lg p-3">
-                    <p class="font-black text-zinc-400 mb-1">MEDIO DE PAGO</p>
-                    <p>EFECTIVO</p>
-                    <p>TRANSFERENCIA</p>
-                    <p>TARJETA</p>
-                </div>
-                <div class="bg-black/20 rounded-lg p-3">
-                    <p class="font-black text-zinc-400 mb-1">FECHA</p>
-                    <p>1/6/26 → 6 Ene 2026</p>
-                    <p>12/31/26 → 31 Dic 2026</p>
+                    <p class="font-black text-zinc-400 mb-1">TERCERO</p>
+                    <p>Nombre del proveedor o persona</p>
+                    <p class="text-zinc-600 mt-1">Ej: ALKOSTO, JOSE LUIS CARVAJALINO</p>
                 </div>
                 <div class="bg-black/20 rounded-lg p-3">
                     <p class="font-black text-zinc-400 mb-1">VALOR</p>
-                    <p>Sin puntos ni $</p>
-                    <p>14100 ✓</p>
-                    <p>14.100 ✗</p>
+                    <p class="text-emerald-400">38500 ✓</p>
+                    <p class="text-red-400">$38.500 ✗ — sin $ ni puntos</p>
                 </div>
             </div>
-            <p class="text-[9px] text-zinc-500">La categoría se detecta automáticamente. Puedes corregirla en la vista previa antes de importar.</p>
+            <p class="text-[9px] text-zinc-500"><i class="fas fa-magic text-yellow-600 mr-1"></i>La categoría se detecta automáticamente por el texto. Puedes corregirla antes de importar.</p>
         </div>
 
         {{-- Formulario subida --}}
